@@ -1,66 +1,70 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func Test_SnakeCanDrawIntoTheFrame(t *testing.T) {
-	var dst frame
+	dst := setupScreen(t)
 	s := snake{
 		start: pos{x: 1, y: 1},
 		movement: []move{
 			{d: right, magnitude: 1},
 		},
 	}
-	s.draw(&dst)
+	s.draw(dst)
 
-	require.Equal(t, '-', dst[1][2])
+	requireEqualContents(t, 1, 2, '-', dst)
 }
 
 func Test_SnakeCanDrawDownMovementIntoTheFrame(t *testing.T) {
-	var dst frame
+	dst := setupScreen(t)
+
 	s := snake{
 		start: pos{x: 1, y: 1},
 		movement: []move{
 			{d: down, magnitude: 2},
 		},
 	}
-	s.draw(&dst)
+	s.draw(dst)
 
-	require.Equal(t, '|', dst[2][1])
-	require.Equal(t, '|', dst[3][1])
+	requireEqualContents(t, 2, 1, '|', dst)
+	requireEqualContents(t, 3, 1, '|', dst)
 }
 
 func Test_SnakeCanDrawUpMovementIntoTheFrame(t *testing.T) {
-	var dst frame
+	dst := setupScreen(t)
+
 	s := snake{
 		start: pos{x: 1, y: 1},
 		movement: []move{
 			{d: up, magnitude: 1},
 		},
 	}
-	s.draw(&dst)
+	s.draw(dst)
 
-	require.Equal(t, '|', dst[0][1])
+	requireEqualContents(t, 0, 1, '|', dst)
 }
 
 func Test_SnakeCanDrawLeftMovementIntoTheFrame(t *testing.T) {
-	var dst frame
+	dst := setupScreen(t)
+
 	s := snake{
 		start: pos{x: 1, y: 1},
 		movement: []move{
 			{d: left, magnitude: 1},
 		},
 	}
-	s.draw(&dst)
+	s.draw(dst)
 
-	require.Equal(t, '-', dst[1][0])
+	requireEqualContents(t, 1, 0, '-', dst)
 }
 
 func Test_SnakeCanDrawMultipleMovementsIntoTheFrame(t *testing.T) {
-	var dst frame
+	dst := setupScreen(t)
+
 	s := snake{
 		start: pos{x: 1, y: 1},
 		movement: []move{
@@ -68,12 +72,12 @@ func Test_SnakeCanDrawMultipleMovementsIntoTheFrame(t *testing.T) {
 			{d: right, magnitude: 2},
 		},
 	}
-	s.draw(&dst)
+	s.draw(dst)
 
-	require.Equal(t, '|', dst[2][1])
-	require.Equal(t, '|', dst[3][1])
-	require.Equal(t, '-', dst[3][2])
-	require.Equal(t, '-', dst[3][3])
+	requireEqualContents(t, 2, 1, '|', dst)
+	requireEqualContents(t, 3, 1, '|', dst)
+	requireEqualContents(t, 3, 2, '-', dst)
+	requireEqualContents(t, 3, 3, '-', dst)
 }
 
 func Test_MoveLeftAppendsNewMagnitude(t *testing.T) {
@@ -149,14 +153,25 @@ func Test_MovingWhenEmptyMovement(t *testing.T) {
 	require.Equal(t, s.movement[0], move{d: up, magnitude: 0})
 }
 
-func printFrame(f *frame) {
-	for x := 0; x < len(f); x++ {
-		for y := 0; y < len(f[x]); y++ {
-			fmt.Printf("%c", f[x][y])
-			if y < len(f[x])-1 {
-				fmt.Printf(" ")
-			}
-		}
-		fmt.Println()
-	}
+func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
+	act, _, _, _ := scn.GetContent(x, y)
+	require.EqualValues(t, exp, act, "position was (%d,%d)", x, y)
 }
+
+func setupScreen(t *testing.T) tcell.SimulationScreen {
+	ret := tcell.NewSimulationScreen("")
+	require.NoError(t, ret.Init())
+	return ret
+}
+
+//func printFrame(f *frame) {
+//	for x := 0; x < len(f); x++ {
+//		for y := 0; y < len(f[x]); y++ {
+//			fmt.Printf("%c", f[x][y])
+//			if y < len(f[x])-1 {
+//				fmt.Printf(" ")
+//			}
+//		}
+//		fmt.Println()
+//	}
+//}

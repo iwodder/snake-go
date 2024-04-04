@@ -6,19 +6,6 @@ import (
 	"os"
 )
 
-const NumCols = 80
-const NumRows = 80
-
-type frame [NumCols][NumRows]rune
-
-func (f frame) render(s tcell.Screen) {
-	for x := range NumCols {
-		for y := range NumRows {
-			s.SetContent(x, y, f[x][y], nil, tcell.Style{})
-		}
-	}
-}
-
 type direction uint
 
 const (
@@ -38,27 +25,28 @@ type move struct {
 }
 
 type snake struct {
+	style    tcell.Style
 	start    pos
 	movement []move
 }
 
-func (s *snake) draw(f *frame) {
+func (s *snake) draw(scn tcell.Screen) {
 	x, y := s.start.x, s.start.y
 	for _, m := range s.movement {
 		for range m.magnitude {
 			switch m.d {
 			case down:
 				y++
-				f[y][x] = '|'
+				scn.SetContent(y, x, '|', nil, s.style)
 			case up:
 				y--
-				f[y][x] = '|'
+				scn.SetContent(y, x, '|', nil, s.style)
 			case left:
 				x--
-				f[y][x] = '-'
+				scn.SetContent(y, x, '-', nil, s.style)
 			case right:
 				x++
-				f[y][x] = '-'
+				scn.SetContent(y, x, '-', nil, s.style)
 			}
 		}
 	}
