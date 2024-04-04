@@ -64,6 +64,28 @@ func (s *snake) draw(f *frame) {
 	}
 }
 
+func (s *snake) left() {
+	s.move(left)
+}
+
+func (s *snake) right() {
+	s.move(right)
+}
+
+func (s *snake) up() {
+	s.move(up)
+}
+
+func (s *snake) down() {
+	s.move(down)
+}
+
+func (s *snake) move(d direction) {
+	if l := len(s.movement); l == 0 || s.movement[l-1].d != d {
+		s.movement = append(s.movement, move{d: d, magnitude: 0})
+	}
+}
+
 func main() {
 	s, err := tcell.NewScreen()
 	if err != nil {
