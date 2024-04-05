@@ -45,7 +45,7 @@ func (s *snake) draw(scn tcell.Screen) {
 				r = '-'
 				x++
 			}
-			scn.SetContent(y, x, r, nil, s.style)
+			scn.SetContent(x, y, r, nil, s.style)
 		}
 	}
 }
@@ -85,4 +85,12 @@ func (s *snake) move() {
 		s.start.x--
 	}
 	s.segments[len(s.segments)-1].mag++
+}
+
+func newSnake(x int, y int) *snake {
+	return &snake{
+		style:    tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
+		start:    pos{x, y},
+		segments: append(make([]vector, 0, 24), vector{dir: right, mag: 1}),
+	}
 }

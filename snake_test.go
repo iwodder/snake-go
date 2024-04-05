@@ -16,7 +16,7 @@ func Test_SnakeCanDrawSelfIntoTheFrame(t *testing.T) {
 	}
 	s.draw(dst)
 
-	requireEqualContents(t, 1, 2, '-', dst)
+	requireEqualContents(t, 2, 1, '-', dst)
 }
 
 func Test_SnakeCanDrawDownDirectionIntoTheFrame(t *testing.T) {
@@ -30,8 +30,8 @@ func Test_SnakeCanDrawDownDirectionIntoTheFrame(t *testing.T) {
 	}
 	s.draw(dst)
 
-	requireEqualContents(t, 2, 1, '|', dst)
-	requireEqualContents(t, 3, 1, '|', dst)
+	requireEqualContents(t, 1, 2, '|', dst)
+	requireEqualContents(t, 1, 3, '|', dst)
 }
 
 func Test_SnakeCanDrawUpDirectionIntoTheFrame(t *testing.T) {
@@ -45,7 +45,7 @@ func Test_SnakeCanDrawUpDirectionIntoTheFrame(t *testing.T) {
 	}
 	s.draw(dst)
 
-	requireEqualContents(t, 0, 1, '|', dst)
+	requireEqualContents(t, 1, 0, '|', dst)
 }
 
 func Test_SnakeCanDrawLeftDirectionIntoTheFrame(t *testing.T) {
@@ -59,7 +59,7 @@ func Test_SnakeCanDrawLeftDirectionIntoTheFrame(t *testing.T) {
 	}
 	s.draw(dst)
 
-	requireEqualContents(t, 1, 0, '-', dst)
+	requireEqualContents(t, 0, 1, '-', dst)
 }
 
 func Test_SnakeCanDrawMultipleVectorsIntoTheFrame(t *testing.T) {
@@ -74,9 +74,9 @@ func Test_SnakeCanDrawMultipleVectorsIntoTheFrame(t *testing.T) {
 	}
 	s.draw(dst)
 
-	requireEqualContents(t, 2, 1, '|', dst)
-	requireEqualContents(t, 3, 1, '|', dst)
-	requireEqualContents(t, 3, 2, '-', dst)
+	requireEqualContents(t, 1, 2, '|', dst)
+	requireEqualContents(t, 1, 3, '|', dst)
+	requireEqualContents(t, 2, 3, '-', dst)
 	requireEqualContents(t, 3, 3, '-', dst)
 }
 
@@ -201,6 +201,18 @@ func Test_UpdateMovesPosInDirectionOfFirstVectorAndGrowsLastVector(t *testing.T)
 
 }
 
+func Test_NewSnakeState(t *testing.T) {
+	scn := setupScreen(t)
+
+	sn := newSnake(40, 40)
+	sn.draw(scn)
+
+	require.Equal(t, pos{x: 40, y: 40}, sn.start)
+	require.Equal(t, 24, cap(sn.segments))
+	require.Equal(t, vector{dir: right, mag: 1}, sn.segments[0])
+	requireEqualContents(t, 41, 40, '-', scn)
+}
+
 func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
 	act, _, _, _ := scn.GetContent(x, y)
 	require.EqualValues(t, exp, act, "position was (%dir,%dir)", x, y)
@@ -209,5 +221,6 @@ func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.Simulation
 func setupScreen(t *testing.T) tcell.SimulationScreen {
 	ret := tcell.NewSimulationScreen("")
 	require.NoError(t, ret.Init())
+	ret.SetSize(80, 80)
 	return ret
 }
