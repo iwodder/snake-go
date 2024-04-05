@@ -15,22 +15,22 @@ type pos struct {
 	x, y int
 }
 
-type move struct {
-	d         direction
-	magnitude int
+type vector struct {
+	dir direction
+	mag int
 }
 
 type snake struct {
 	style    tcell.Style
 	start    pos
-	movement []move
+	segments []vector
 }
 
 func (s *snake) draw(scn tcell.Screen) {
 	x, y := s.start.x, s.start.y
-	for _, m := range s.movement {
-		for range m.magnitude {
-			switch m.d {
+	for _, m := range s.segments {
+		for range m.mag {
+			switch m.dir {
 			case down:
 				y++
 				scn.SetContent(y, x, '|', nil, s.style)
@@ -65,14 +65,14 @@ func (s *snake) down() {
 }
 
 func (s *snake) move(d direction) {
-	if l := len(s.movement); l == 0 || s.movement[l-1].d != d {
-		s.movement = append(s.movement, move{d: d, magnitude: 0})
+	if l := len(s.segments); l == 0 || s.segments[l-1].dir != d {
+		s.segments = append(s.segments, vector{dir: d, mag: 0})
 	}
 }
 
 func (s *snake) updatePosition() {
-	m := s.movement[0]
-	switch m.d {
+	m := s.segments[0]
+	switch m.dir {
 	case up:
 		s.start.y--
 	case right:
@@ -82,5 +82,5 @@ func (s *snake) updatePosition() {
 	case left:
 		s.start.x--
 	}
-	s.movement[len(s.movement)-1].magnitude++
+	s.segments[len(s.segments)-1].mag++
 }
