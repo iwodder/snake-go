@@ -80,7 +80,7 @@ func Test_SnakeCanDrawMultipleVectorsIntoTheFrame(t *testing.T) {
 	requireEqualContents(t, 3, 3, '-', dst)
 }
 
-func Test_MoveLeftAppendsNewVector(t *testing.T) {
+func Test_HeadLeftAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
 		segments: []vector{
@@ -88,43 +88,43 @@ func Test_MoveLeftAppendsNewVector(t *testing.T) {
 			{dir: right, mag: 2},
 		},
 	}
-	s.left()
+	s.headLeft()
 
 	require.Equal(t, s.segments[2], vector{dir: left, mag: 0})
 }
 
-func Test_MoveRightAppendsNewVector(t *testing.T) {
+func Test_HeadRightAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
 		segments: []vector{
 			{dir: down, mag: 2},
 		},
 	}
-	s.right()
+	s.headRight()
 
 	require.Equal(t, s.segments[1], vector{dir: right, mag: 0})
 }
 
-func Test_MoveUpAppendsNewVector(t *testing.T) {
+func Test_HeadUpAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
 		segments: []vector{
 			{dir: down, mag: 2},
 		},
 	}
-	s.up()
+	s.headUp()
 
 	require.Equal(t, s.segments[1], vector{dir: up, mag: 0})
 }
 
-func Test_MoveDownAppendsNewVector(t *testing.T) {
+func Test_HeadDownAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
 		segments: []vector{
 			{dir: up, mag: 2},
 		},
 	}
-	s.down()
+	s.headDown()
 
 	require.Equal(t, s.segments[1], vector{dir: down, mag: 0})
 }
@@ -136,7 +136,7 @@ func Test_MovingCurrentDirectionDoesNotAddVector(t *testing.T) {
 			{dir: up, mag: 2},
 		},
 	}
-	s.up()
+	s.headUp()
 
 	require.Len(t, s.segments, 1)
 	require.Equal(t, s.segments[0], vector{dir: up, mag: 2})
@@ -147,7 +147,7 @@ func Test_MovingWhenEmptyMovement(t *testing.T) {
 		start:    pos{x: 1, y: 1},
 		segments: []vector{},
 	}
-	s.up()
+	s.headUp()
 
 	require.Len(t, s.segments, 1)
 	require.Equal(t, s.segments[0], vector{dir: up, mag: 0})
@@ -160,7 +160,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVectorAndGrowsLastVector(t *testing.T)
 		exp  pos
 	}{
 		{
-			name: "down",
+			name: "headDown",
 			m:    vector{dir: down, mag: 3},
 			exp:  pos{x: 40, y: 41},
 		},
@@ -188,7 +188,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVectorAndGrowsLastVector(t *testing.T)
 					tt.m,
 				},
 			}
-			s.updatePosition()
+			s.move()
 
 			require.Equal(t, tt.exp, s.start)
 			exp := vector{

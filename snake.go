@@ -28,49 +28,51 @@ type snake struct {
 
 func (s *snake) draw(scn tcell.Screen) {
 	x, y := s.start.x, s.start.y
+	var r rune
 	for _, m := range s.segments {
 		for range m.mag {
 			switch m.dir {
 			case down:
+				r = '|'
 				y++
-				scn.SetContent(y, x, '|', nil, s.style)
 			case up:
+				r = '|'
 				y--
-				scn.SetContent(y, x, '|', nil, s.style)
 			case left:
+				r = '-'
 				x--
-				scn.SetContent(y, x, '-', nil, s.style)
 			case right:
+				r = '-'
 				x++
-				scn.SetContent(y, x, '-', nil, s.style)
 			}
+			scn.SetContent(y, x, r, nil, s.style)
 		}
 	}
 }
 
-func (s *snake) left() {
-	s.move(left)
+func (s *snake) headLeft() {
+	s.head(left)
 }
 
-func (s *snake) right() {
-	s.move(right)
+func (s *snake) headRight() {
+	s.head(right)
 }
 
-func (s *snake) up() {
-	s.move(up)
+func (s *snake) headUp() {
+	s.head(up)
 }
 
-func (s *snake) down() {
-	s.move(down)
+func (s *snake) headDown() {
+	s.head(down)
 }
 
-func (s *snake) move(d direction) {
+func (s *snake) head(d direction) {
 	if l := len(s.segments); l == 0 || s.segments[l-1].dir != d {
 		s.segments = append(s.segments, vector{dir: d, mag: 0})
 	}
 }
 
-func (s *snake) updatePosition() {
+func (s *snake) move() {
 	m := s.segments[0]
 	switch m.dir {
 	case up:
