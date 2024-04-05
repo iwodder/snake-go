@@ -74,6 +74,21 @@ func (s *snake) move(d direction) {
 	}
 }
 
+func (s *snake) updatePosition() {
+	m := s.movement[0]
+	switch m.d {
+	case up:
+		s.start.y--
+	case right:
+		s.start.x++
+	case down:
+		s.start.y++
+	case left:
+		s.start.x--
+	}
+	s.movement[len(s.movement)-1].magnitude++
+}
+
 func main() {
 	s, err := tcell.NewScreen()
 	if err != nil {

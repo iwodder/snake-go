@@ -153,6 +153,54 @@ func Test_MovingWhenEmptyMovement(t *testing.T) {
 	require.Equal(t, s.movement[0], move{d: up, magnitude: 0})
 }
 
+func Test_UpdateMovesPosInDirectionOfFirstMovementAndGrowsLastMagnitude(t *testing.T) {
+	tests := []struct {
+		name string
+		m    move
+		exp  pos
+	}{
+		{
+			name: "down",
+			m:    move{d: down, magnitude: 3},
+			exp:  pos{x: 40, y: 41},
+		},
+		{
+			name: "up",
+			m:    move{d: up, magnitude: 3},
+			exp:  pos{x: 40, y: 39},
+		},
+		{
+			name: "right",
+			m:    move{d: right, magnitude: 3},
+			exp:  pos{x: 41, y: 40},
+		},
+		{
+			name: "left",
+			m:    move{d: left, magnitude: 3},
+			exp:  pos{x: 39, y: 40},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := snake{
+				start: pos{x: 40, y: 40},
+				movement: []move{
+					tt.m,
+				},
+			}
+			s.updatePosition()
+
+			require.Equal(t, tt.exp, s.start)
+			exp := move{
+				d:         tt.m.d,
+				magnitude: tt.m.magnitude + 1,
+			}
+			require.Equal(t, exp, s.movement[len(s.movement)-1])
+		})
+	}
+
+}
+
 func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
 	act, _, _, _ := scn.GetContent(x, y)
 	require.EqualValues(t, exp, act, "position was (%d,%d)", x, y)
