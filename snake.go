@@ -4,6 +4,16 @@ import "github.com/gdamore/tcell/v2"
 
 type direction uint
 
+func (d direction) rune() rune {
+	switch d {
+	case up, down:
+		return '|'
+	case right, left:
+		return '-'
+	}
+	panic("unsupported direction")
+}
+
 const (
 	up = iota
 	right
@@ -28,24 +38,19 @@ type snake struct {
 
 func (s *snake) draw(scn tcell.Screen) {
 	x, y := s.start.x, s.start.y
-	var r rune
 	for _, m := range s.segments {
 		for range m.mag {
 			switch m.dir {
 			case down:
-				r = '|'
 				y++
 			case up:
-				r = '|'
 				y--
 			case left:
-				r = '-'
 				x--
 			case right:
-				r = '-'
 				x++
 			}
-			scn.SetContent(x, y, r, nil, s.style)
+			scn.SetContent(x, y, m.dir.rune(), nil, s.style)
 		}
 	}
 }
