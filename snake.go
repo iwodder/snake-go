@@ -78,7 +78,7 @@ func (s *snake) head(d direction) {
 }
 
 func (s *snake) move() {
-	m := s.segments[0]
+	m := &s.segments[0]
 	switch m.dir {
 	case up:
 		s.start.y--
@@ -89,7 +89,14 @@ func (s *snake) move() {
 	case left:
 		s.start.x--
 	}
+	if len(s.segments) < 2 {
+		return
+	}
+	m.mag--
 	s.segments[len(s.segments)-1].mag++
+	if m.mag == 0 {
+		s.segments = s.segments[1:]
+	}
 }
 
 func newSnake(x int, y int) *snake {

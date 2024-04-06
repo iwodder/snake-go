@@ -153,7 +153,7 @@ func Test_MovingWhenEmptyMovement(t *testing.T) {
 	require.Equal(t, s.segments[0], vector{dir: up, mag: 0})
 }
 
-func Test_UpdateMovesPosInDirectionOfFirstVectorAndGrowsLastVector(t *testing.T) {
+func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 	tests := []struct {
 		name string
 		m    vector
@@ -191,14 +191,31 @@ func Test_UpdateMovesPosInDirectionOfFirstVectorAndGrowsLastVector(t *testing.T)
 			s.move()
 
 			require.Equal(t, tt.exp, s.start)
-			exp := vector{
-				dir: tt.m.dir,
-				mag: tt.m.mag + 1,
-			}
-			require.Equal(t, exp, s.segments[len(s.segments)-1])
+			require.Equal(t, vector{dir: tt.m.dir, mag: tt.m.mag}, s.segments[len(s.segments)-1])
 		})
 	}
 
+}
+
+func Test_SnakeDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
+	sn := newSnake(40, 40)
+	sn.move()
+
+	require.Equal(t, vector{dir: right, mag: 1}, sn.segments[0])
+}
+
+func Test_SnakeChangesMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
+	s := snake{
+		start: pos{40, 40},
+		segments: []vector{
+			{dir: right, mag: 1},
+			{dir: down, mag: 1},
+		},
+	}
+	s.move()
+
+	require.Len(t, s.segments, 1)
+	require.Equal(t, vector{dir: down, mag: 2}, s.segments[0])
 }
 
 func Test_NewSnakeState(t *testing.T) {
