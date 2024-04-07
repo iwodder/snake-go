@@ -1,6 +1,8 @@
 package main
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/gdamore/tcell/v2"
+)
 
 type direction uint
 
@@ -97,6 +99,33 @@ func (s *snake) move() {
 	if m.mag == 0 {
 		s.segments = s.segments[1:]
 	}
+}
+
+func (s *snake) eat(as apples) {
+	p := s.headPos()
+	for i := range as {
+		if p == as[i].pos {
+			as[i].eaten = true
+			s.segments[len(s.segments)-1].mag++
+		}
+	}
+}
+
+func (s *snake) headPos() pos {
+	ret := pos{x: s.start.x, y: s.start.y}
+	for _, seg := range s.segments {
+		switch seg.dir {
+		case up:
+			ret.y -= seg.mag
+		case down:
+			ret.y += seg.mag
+		case left:
+			ret.x -= seg.mag
+		case right:
+			ret.x += seg.mag
+		}
+	}
+	return ret
 }
 
 func newSnake(x int, y int) *snake {

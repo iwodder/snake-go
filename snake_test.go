@@ -218,6 +218,18 @@ func Test_SnakeChangesMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 	require.Equal(t, vector{dir: down, mag: 2}, s.segments[0])
 }
 
+func Test_SnakeGrowsByEatingApples(t *testing.T) {
+	s := newSnake(10, 10)
+	as := apples{
+		{pos: pos{x: 11, y: 10}, eaten: false},
+	}
+	s.eat(as)
+
+	require.Equal(t, 2, s.segments[0].mag)
+	require.Len(t, as, 1)
+	require.True(t, as[0].eaten)
+}
+
 func Test_NewSnakeState(t *testing.T) {
 	scn := setupScreen(t)
 

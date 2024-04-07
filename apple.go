@@ -11,7 +11,8 @@ func (as apples) draw(scn tcell.Screen) {
 }
 
 type apple struct {
-	pos pos
+	pos   pos
+	eaten bool
 }
 
 func (a apple) draw(scn tcell.Screen) {
