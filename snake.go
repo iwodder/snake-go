@@ -88,7 +88,10 @@ func (s *snake) head(d direction) {
 	}
 }
 
-func (s *snake) move() {
+func (s *snake) move(b bounds) {
+	if !b.isInside(s.headPos()) {
+		return
+	}
 	m := &s.segments[0]
 	switch m.dir {
 	case up:

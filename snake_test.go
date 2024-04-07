@@ -188,7 +188,10 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 					tt.m,
 				},
 			}
-			s.move()
+			s.move(bounds{
+				upperLeft:  pos{x: 0, y: 0},
+				lowerRight: pos{x: 80, y: 80},
+			})
 
 			require.Equal(t, tt.exp, s.start)
 			require.Equal(t, vector{dir: tt.m.dir, mag: tt.m.mag}, s.segments[len(s.segments)-1])
@@ -198,24 +201,49 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 }
 
 func Test_SnakeDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
-	sn := newSnake(40, 40)
-	sn.move()
+	sn := newSnake(10, 10)
+	sn.move(bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	})
 
 	require.Equal(t, vector{dir: right, mag: 1}, sn.segments[0])
 }
 
 func Test_SnakeChangesMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 	s := snake{
-		start: pos{40, 40},
+		start: pos{10, 10},
 		segments: []vector{
 			{dir: right, mag: 1},
 			{dir: down, mag: 1},
 		},
 	}
-	s.move()
+	s.move(bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	})
 
 	require.Len(t, s.segments, 1)
 	require.Equal(t, vector{dir: down, mag: 2}, s.segments[0])
+}
+
+func Test_SnakeWontMoveOutsideOfBounds(t *testing.T) {
+	s := snake{
+		start: pos{10, 10},
+		segments: []vector{
+			{dir: right, mag: 10},
+			{dir: down, mag: 1},
+		},
+	}
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	}
+	s.move(b)
+
+	require.Len(t, s.segments, 2)
+	require.Equal(t, vector{dir: right, mag: 10}, s.segments[0])
+	require.Equal(t, vector{dir: down, mag: 1}, s.segments[1])
 }
 
 func Test_SnakeGrowsByEatingApples(t *testing.T) {
