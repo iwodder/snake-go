@@ -27,6 +27,15 @@ type pos struct {
 	x, y int
 }
 
+type bounds struct {
+	upperLeft  pos
+	lowerRight pos
+}
+
+func (b bounds) isInside(p pos) bool {
+	return (b.upperLeft.x < p.x && p.x < b.lowerRight.x) && (b.upperLeft.y < p.y && p.y < b.lowerRight.y)
+}
+
 type vector struct {
 	dir direction
 	mag int
