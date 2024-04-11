@@ -36,6 +36,22 @@ func (b bounds) isInside(p pos) bool {
 	return (b.upperLeft.x < p.x && p.x < b.lowerRight.x) && (b.upperLeft.y < p.y && p.y < b.lowerRight.y)
 }
 
+func (b bounds) leftEdge() int {
+	return b.upperLeft.x
+}
+
+func (b bounds) rightEdge() int {
+	return b.lowerRight.x
+}
+
+func (b bounds) topEdge() int {
+	return b.upperLeft.y
+}
+
+func (b bounds) bottomEdge() int {
+	return b.lowerRight.x
+}
+
 type vector struct {
 	dir direction
 	mag int
@@ -89,7 +105,7 @@ func (s *snake) head(d direction) {
 }
 
 func (s *snake) move(b bounds) {
-	if !b.isInside(s.headPos()) {
+	if !s.canMove(b) {
 		return
 	}
 	m := &s.segments[0]
@@ -111,6 +127,19 @@ func (s *snake) move(b bounds) {
 	if m.mag == 0 {
 		s.segments = s.segments[1:]
 	}
+}
+
+func (s *snake) canMove(b bounds) bool {
+	p := s.headPos()
+	if b.isInside(p) {
+		return true
+	}
+
+	lastDir := s.segments[len(s.segments)-1].dir
+	return !((p.x == b.rightEdge() && lastDir == right) ||
+		(p.x == b.leftEdge() && lastDir == left) ||
+		(p.y == b.topEdge() && lastDir == up) ||
+		(p.y == b.bottomEdge() && lastDir == down))
 }
 
 func (s *snake) eat(as apples) {

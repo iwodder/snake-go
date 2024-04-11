@@ -8,12 +8,7 @@ import (
 
 func Test_SnakeCanDrawSelfIntoTheFrame(t *testing.T) {
 	dst := setupScreen(t)
-	s := snake{
-		start: pos{x: 1, y: 1},
-		segments: []vector{
-			{dir: right, mag: 1},
-		},
-	}
+	s := newSnake(1, 1)
 	s.draw(dst)
 
 	requireEqualContents(t, 2, 1, '-', dst)
@@ -227,12 +222,52 @@ func Test_SnakeChangesMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 	require.Equal(t, vector{dir: down, mag: 2}, s.segments[0])
 }
 
-func Test_SnakeWontMoveOutsideOfBounds(t *testing.T) {
+func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
+	tests := []struct {
+		name string
+		vec  vector
+	}{
+		{
+			name: "right edge of screen",
+			vec:  vector{dir: right, mag: 10},
+		},
+		{
+			name: "left edge of screen",
+			vec:  vector{dir: left, mag: 10},
+		},
+		{
+			name: "top edge of screen",
+			vec:  vector{dir: up, mag: 10},
+		},
+		{
+			name: "bottom edge of screen",
+			vec:  vector{dir: down, mag: 10},
+		},
+	}
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := snake{
+				start:    pos{10, 10},
+				segments: []vector{tt.vec},
+			}
+
+			s.move(b)
+
+			require.Len(t, s.segments, 1)
+			require.Equal(t, pos{10, 10}, s.start, "starting pos shouldn't have changed")
+		})
+	}
+}
+
+func Test_SnakeWontMoveUntilDirectionIsAwayFromRightEdgeOfScreen(t *testing.T) {
 	s := snake{
 		start: pos{10, 10},
 		segments: []vector{
 			{dir: right, mag: 10},
-			{dir: down, mag: 1},
 		},
 	}
 	b := bounds{
@@ -240,10 +275,76 @@ func Test_SnakeWontMoveOutsideOfBounds(t *testing.T) {
 		lowerRight: pos{x: 20, y: 20},
 	}
 	s.move(b)
+	s.headDown()
+	s.move(b)
 
 	require.Len(t, s.segments, 2)
-	require.Equal(t, vector{dir: right, mag: 10}, s.segments[0])
+	require.Equal(t, vector{dir: right, mag: 9}, s.segments[0])
 	require.Equal(t, vector{dir: down, mag: 1}, s.segments[1])
+
+}
+
+func Test_SnakeWontMoveUntilDirectionIsAwayFromLeftEdgeOfScreen(t *testing.T) {
+	s := snake{
+		start: pos{10, 10},
+		segments: []vector{
+			{dir: left, mag: 10},
+		},
+	}
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	}
+	s.move(b)
+	s.headUp()
+	s.move(b)
+
+	require.Len(t, s.segments, 2)
+	require.Equal(t, vector{dir: left, mag: 9}, s.segments[0])
+	require.Equal(t, vector{dir: up, mag: 1}, s.segments[1])
+
+}
+
+func Test_SnakeWontMoveUntilDirectionIsAwayFromTopEdgeOfScreen(t *testing.T) {
+	s := snake{
+		start: pos{10, 10},
+		segments: []vector{
+			{dir: up, mag: 10},
+		},
+	}
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	}
+	s.move(b)
+	s.headLeft()
+	s.move(b)
+
+	require.Len(t, s.segments, 2)
+	require.Equal(t, vector{dir: up, mag: 9}, s.segments[0])
+	require.Equal(t, vector{dir: left, mag: 1}, s.segments[1])
+
+}
+
+func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) {
+	s := snake{
+		start: pos{10, 10},
+		segments: []vector{
+			{dir: down, mag: 10},
+		},
+	}
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 20, y: 20},
+	}
+	s.move(b)
+	s.headRight()
+	s.move(b)
+
+	require.Len(t, s.segments, 2)
+	require.Equal(t, vector{dir: down, mag: 9}, s.segments[0])
+	require.Equal(t, vector{dir: right, mag: 1}, s.segments[1])
+
 }
 
 func Test_SnakeGrowsByEatingApples(t *testing.T) {
@@ -272,7 +373,7 @@ func Test_NewSnakeState(t *testing.T) {
 
 func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
 	act, _, _, _ := scn.GetContent(x, y)
-	require.EqualValues(t, exp, act, "position was (%dir,%dir)", x, y)
+	require.EqualValues(t, exp, act, "position (%d,%d) expected %c, but was %c", x, y, exp, act)
 }
 
 func setupScreen(t *testing.T) tcell.SimulationScreen {
