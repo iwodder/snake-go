@@ -80,12 +80,11 @@ func Test_HeadLeftAppendsNewVector(t *testing.T) {
 		start: pos{x: 1, y: 1},
 		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
-			{dir: right, mag: 2, r: dirRunes[right]},
 		},
 	}
 	s.headLeft()
 
-	require.Equal(t, s.vecs[2], vector{dir: left, mag: 0, r: dirRunes[left]})
+	require.Equal(t, vector{dir: left, mag: 0, r: dirRunes[left]}, s.vecs[1])
 }
 
 func Test_HeadRightAppendsNewVector(t *testing.T) {
@@ -101,24 +100,14 @@ func Test_HeadRightAppendsNewVector(t *testing.T) {
 }
 
 func Test_HeadUpAppendsNewVector(t *testing.T) {
-	s := snake{
-		start: pos{x: 1, y: 1},
-		vecs: []vector{
-			{dir: down, mag: 2, r: dirRunes[down]},
-		},
-	}
+	s := newSnake(10, 10)
 	s.headUp()
 
 	require.Equal(t, s.vecs[1], vector{dir: up, mag: 0, r: dirRunes[up]})
 }
 
 func Test_HeadDownAppendsNewVector(t *testing.T) {
-	s := snake{
-		start: pos{x: 1, y: 1},
-		vecs: []vector{
-			{dir: up, mag: 2, r: dirRunes[up]},
-		},
-	}
+	s := newSnake(10, 10)
 	s.headDown()
 
 	require.Equal(t, s.vecs[1], vector{dir: down, mag: 0, r: dirRunes[down]})
@@ -144,14 +133,62 @@ func Test_ChangingDirectionDoesNotAddVectorIfMagnitudeIsZero(t *testing.T) {
 	s.headUp()
 	s.headRight()
 	s.headUp()
+	s.headDown()
+	s.headDown()
 	s.headLeft()
-	s.headDown()
-	s.headDown()
 	s.headUp()
 
 	require.Len(t, s.vecs, 2)
 	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.vecs[0])
 	require.Equal(t, vector{dir: up, mag: 0, r: dirRunes[up]}, s.vecs[1])
+}
+
+func Test_SnakeCantDoubleBackOnSelfRightToLeft(t *testing.T) {
+	s := newSnake(10, 10)
+
+	s.headLeft()
+
+	require.Len(t, s.vecs, 1)
+	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.vecs[0])
+}
+
+func Test_SnakeCantDoubleBackOnSelfLeftToRight(t *testing.T) {
+	s := snake{
+		vecs: []vector{
+			{dir: left, mag: 1},
+		},
+	}
+
+	s.headRight()
+
+	require.Len(t, s.vecs, 1)
+	require.Equal(t, vector{dir: left, mag: 1}, s.vecs[0])
+}
+
+func Test_SnakeCantDoubleBackOnSelfUpToDown(t *testing.T) {
+	s := snake{
+		vecs: []vector{
+			{dir: up, mag: 1},
+		},
+	}
+
+	s.headDown()
+
+	require.Len(t, s.vecs, 1)
+	require.Equal(t, vector{dir: up, mag: 1}, s.vecs[0])
+}
+
+func Test_SnakeCantDoubleBackOnSelfDownToUp(t *testing.T) {
+	s := snake{
+		vecs: []vector{
+			{dir: down, mag: 1},
+		},
+	}
+
+	s.headUp()
+
+	require.Len(t, s.vecs, 1)
+	require.Equal(t, vector{dir: down, mag: 1}, s.vecs[0])
 }
 
 func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {

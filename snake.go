@@ -10,6 +10,13 @@ var dirRunes = map[direction]rune{
 
 type direction uint
 
+func (d direction) isOpposite(o direction) bool {
+	return (d == right && o == left) ||
+		(d == left && o == right) ||
+		(d == up && o == down) ||
+		(d == down && o == up)
+}
+
 const (
 	up = iota
 	right
@@ -98,14 +105,18 @@ func (s *snake) headDown() {
 	s.changeDirection(down)
 }
 
-func (s *snake) changeDirection(newDir direction) {
-	if last := s.lastVector(); last.dir != newDir {
+func (s *snake) changeDirection(d direction) {
+	if last := s.lastVector(); s.isNewDirectionValid(last.dir, d) {
 		if last.mag == 0 {
-			last.dir = newDir
+			last.dir = d
 		} else {
-			s.vecs = append(s.vecs, vector{dir: newDir, mag: 0, r: dirRunes[newDir]})
+			s.vecs = append(s.vecs, vector{dir: d, mag: 0, r: dirRunes[d]})
 		}
 	}
+}
+
+func (s *snake) isNewDirectionValid(last, new direction) bool {
+	return last != new && !new.isOpposite(last)
 }
 
 func (s *snake) move(b bounds) {
