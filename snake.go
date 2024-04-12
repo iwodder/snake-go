@@ -70,14 +70,14 @@ func (v vector) draw(scn tcell.Screen, start pos, style tcell.Style) pos {
 }
 
 type snake struct {
-	style    tcell.Style
-	start    pos
-	segments []vector
+	style tcell.Style
+	start pos
+	vecs  []vector
 }
 
 func (s *snake) draw(scn tcell.Screen) {
 	p := s.start
-	for _, m := range s.segments {
+	for _, m := range s.vecs {
 		p = m.draw(scn, p, s.style)
 	}
 }
@@ -98,9 +98,13 @@ func (s *snake) headDown() {
 	s.changeDirection(down)
 }
 
-func (s *snake) changeDirection(d direction) {
-	if l := len(s.segments); l == 0 || s.segments[l-1].dir != d {
-		s.segments = append(s.segments, vector{dir: d, mag: 0, r: dirRunes[d]})
+func (s *snake) changeDirection(newDir direction) {
+	if last := s.lastVector(); last.dir != newDir {
+		if last.mag == 0 {
+			last.dir = newDir
+		} else {
+			s.vecs = append(s.vecs, vector{dir: newDir, mag: 0, r: dirRunes[newDir]})
+		}
 	}
 }
 
@@ -108,7 +112,7 @@ func (s *snake) move(b bounds) {
 	if !s.canMove(b) {
 		return
 	}
-	m := &s.segments[0]
+	m := &s.vecs[0]
 	switch m.dir {
 	case up:
 		s.start.y--
@@ -119,13 +123,13 @@ func (s *snake) move(b bounds) {
 	case left:
 		s.start.x--
 	}
-	if len(s.segments) < 2 {
+	if len(s.vecs) < 2 {
 		return
 	}
 	m.mag--
-	s.segments[len(s.segments)-1].mag++
+	s.vecs[len(s.vecs)-1].mag++
 	if m.mag == 0 {
-		s.segments = s.segments[1:]
+		s.vecs = s.vecs[1:]
 	}
 }
 
@@ -135,7 +139,7 @@ func (s *snake) canMove(b bounds) bool {
 		return true
 	}
 
-	lastDir := s.segments[len(s.segments)-1].dir
+	lastDir := s.vecs[len(s.vecs)-1].dir
 	return !((p.x == b.rightEdge() && lastDir == right) ||
 		(p.x == b.leftEdge() && lastDir == left) ||
 		(p.y == b.topEdge() && lastDir == up) ||
@@ -147,14 +151,14 @@ func (s *snake) eat(as apples) {
 	for i := range as {
 		if p == as[i].pos {
 			as[i].eaten = true
-			s.segments[len(s.segments)-1].mag++
+			s.vecs[len(s.vecs)-1].mag++
 		}
 	}
 }
 
 func (s *snake) headPos() pos {
 	ret := pos{x: s.start.x, y: s.start.y}
-	for _, seg := range s.segments {
+	for _, seg := range s.vecs {
 		switch seg.dir {
 		case up:
 			ret.y -= seg.mag
@@ -169,10 +173,14 @@ func (s *snake) headPos() pos {
 	return ret
 }
 
+func (s *snake) lastVector() *vector {
+	return &s.vecs[len(s.vecs)-1]
+}
+
 func newSnake(x int, y int) *snake {
 	return &snake{
-		style:    tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
-		start:    pos{x, y},
-		segments: append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
+		style: tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
+		start: pos{x, y},
+		vecs:  append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
 	}
 }

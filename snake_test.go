@@ -19,7 +19,7 @@ func Test_SnakeCanDrawDownDirectionIntoTheFrame(t *testing.T) {
 
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
 		},
 	}
@@ -34,7 +34,7 @@ func Test_SnakeCanDrawUpDirectionIntoTheFrame(t *testing.T) {
 
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: up, mag: 1, r: dirRunes[up]},
 		},
 	}
@@ -48,7 +48,7 @@ func Test_SnakeCanDrawLeftDirectionIntoTheFrame(t *testing.T) {
 
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: left, mag: 1, r: dirRunes[left]},
 		},
 	}
@@ -62,7 +62,7 @@ func Test_SnakeCanDrawMultipleVectorsIntoTheFrame(t *testing.T) {
 
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
 			{dir: right, mag: 2, r: dirRunes[right]},
 		},
@@ -78,74 +78,80 @@ func Test_SnakeCanDrawMultipleVectorsIntoTheFrame(t *testing.T) {
 func Test_HeadLeftAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
 			{dir: right, mag: 2, r: dirRunes[right]},
 		},
 	}
 	s.headLeft()
 
-	require.Equal(t, s.segments[2], vector{dir: left, mag: 0, r: dirRunes[left]})
+	require.Equal(t, s.vecs[2], vector{dir: left, mag: 0, r: dirRunes[left]})
 }
 
 func Test_HeadRightAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
 		},
 	}
 	s.headRight()
 
-	require.Equal(t, s.segments[1], vector{dir: right, mag: 0, r: dirRunes[right]})
+	require.Equal(t, s.vecs[1], vector{dir: right, mag: 0, r: dirRunes[right]})
 }
 
 func Test_HeadUpAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
 		},
 	}
 	s.headUp()
 
-	require.Equal(t, s.segments[1], vector{dir: up, mag: 0, r: dirRunes[up]})
+	require.Equal(t, s.vecs[1], vector{dir: up, mag: 0, r: dirRunes[up]})
 }
 
 func Test_HeadDownAppendsNewVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: up, mag: 2, r: dirRunes[up]},
 		},
 	}
 	s.headDown()
 
-	require.Equal(t, s.segments[1], vector{dir: down, mag: 0, r: dirRunes[down]})
+	require.Equal(t, s.vecs[1], vector{dir: down, mag: 0, r: dirRunes[down]})
 }
 
 func Test_MovingCurrentDirectionDoesNotAddVector(t *testing.T) {
 	s := snake{
 		start: pos{x: 1, y: 1},
-		segments: []vector{
+		vecs: []vector{
 			{dir: up, mag: 2},
 		},
 	}
 	s.headUp()
 
-	require.Len(t, s.segments, 1)
-	require.Equal(t, s.segments[0], vector{dir: up, mag: 2})
+	require.Len(t, s.vecs, 1)
+	require.Equal(t, s.vecs[0], vector{dir: up, mag: 2})
 }
 
-func Test_MovingWhenEmptyMovement(t *testing.T) {
-	s := snake{
-		start:    pos{x: 1, y: 1},
-		segments: []vector{},
-	}
+func Test_ChangingDirectionDoesNotAddVectorIfMagnitudeIsZero(t *testing.T) {
+	s := newSnake(10, 10)
+
+	s.headUp()
+	s.headUp()
+	s.headRight()
+	s.headUp()
+	s.headLeft()
+	s.headDown()
+	s.headDown()
 	s.headUp()
 
-	require.Len(t, s.segments, 1)
-	require.Equal(t, s.segments[0], vector{dir: up, mag: 0, r: dirRunes[up]})
+	require.Len(t, s.vecs, 2)
+	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.vecs[0])
+	require.Equal(t, vector{dir: up, mag: 0, r: dirRunes[up]}, s.vecs[1])
 }
 
 func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
@@ -179,7 +185,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := snake{
 				start: pos{x: 40, y: 40},
-				segments: []vector{
+				vecs: []vector{
 					tt.m,
 				},
 			}
@@ -189,26 +195,26 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 			})
 
 			require.Equal(t, tt.exp, s.start)
-			require.Equal(t, vector{dir: tt.m.dir, mag: tt.m.mag}, s.segments[len(s.segments)-1])
+			require.Equal(t, vector{dir: tt.m.dir, mag: tt.m.mag}, s.vecs[len(s.vecs)-1])
 		})
 	}
 
 }
 
-func Test_SnakeDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
+func Test_MoveDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
 	sn := newSnake(10, 10)
 	sn.move(bounds{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	})
 
-	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.segments[0])
+	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.vecs[0])
 }
 
-func Test_SnakeChangesMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
+func Test_MoveDoesChangeMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 	s := snake{
 		start: pos{10, 10},
-		segments: []vector{
+		vecs: []vector{
 			{dir: right, mag: 1},
 			{dir: down, mag: 1},
 		},
@@ -218,8 +224,8 @@ func Test_SnakeChangesMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 		lowerRight: pos{x: 20, y: 20},
 	})
 
-	require.Len(t, s.segments, 1)
-	require.Equal(t, vector{dir: down, mag: 2}, s.segments[0])
+	require.Len(t, s.vecs, 1)
+	require.Equal(t, vector{dir: down, mag: 2}, s.vecs[0])
 }
 
 func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
@@ -251,13 +257,13 @@ func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := snake{
-				start:    pos{10, 10},
-				segments: []vector{tt.vec},
+				start: pos{10, 10},
+				vecs:  []vector{tt.vec},
 			}
 
 			s.move(b)
 
-			require.Len(t, s.segments, 1)
+			require.Len(t, s.vecs, 1)
 			require.Equal(t, pos{10, 10}, s.start, "starting pos shouldn't have changed")
 		})
 	}
@@ -266,7 +272,7 @@ func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
 func Test_SnakeWontMoveUntilDirectionIsAwayFromRightEdgeOfScreen(t *testing.T) {
 	s := snake{
 		start: pos{10, 10},
-		segments: []vector{
+		vecs: []vector{
 			{dir: right, mag: 10, r: dirRunes[right]},
 		},
 	}
@@ -278,16 +284,16 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromRightEdgeOfScreen(t *testing.T) {
 	s.headDown()
 	s.move(b)
 
-	require.Len(t, s.segments, 2)
-	require.Equal(t, vector{dir: right, mag: 9, r: dirRunes[right]}, s.segments[0])
-	require.Equal(t, vector{dir: down, mag: 1, r: dirRunes[down]}, s.segments[1])
+	require.Len(t, s.vecs, 2)
+	require.Equal(t, vector{dir: right, mag: 9, r: dirRunes[right]}, s.vecs[0])
+	require.Equal(t, vector{dir: down, mag: 1, r: dirRunes[down]}, s.vecs[1])
 
 }
 
 func Test_SnakeWontMoveUntilDirectionIsAwayFromLeftEdgeOfScreen(t *testing.T) {
 	s := snake{
 		start: pos{10, 10},
-		segments: []vector{
+		vecs: []vector{
 			{dir: left, mag: 10, r: dirRunes[left]},
 		},
 	}
@@ -299,16 +305,16 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromLeftEdgeOfScreen(t *testing.T) {
 	s.headUp()
 	s.move(b)
 
-	require.Len(t, s.segments, 2)
-	require.Equal(t, vector{dir: left, mag: 9, r: dirRunes[left]}, s.segments[0])
-	require.Equal(t, vector{dir: up, mag: 1, r: dirRunes[up]}, s.segments[1])
+	require.Len(t, s.vecs, 2)
+	require.Equal(t, vector{dir: left, mag: 9, r: dirRunes[left]}, s.vecs[0])
+	require.Equal(t, vector{dir: up, mag: 1, r: dirRunes[up]}, s.vecs[1])
 
 }
 
 func Test_SnakeWontMoveUntilDirectionIsAwayFromTopEdgeOfScreen(t *testing.T) {
 	s := snake{
 		start: pos{10, 10},
-		segments: []vector{
+		vecs: []vector{
 			{dir: up, mag: 10, r: dirRunes[up]},
 		},
 	}
@@ -320,16 +326,16 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromTopEdgeOfScreen(t *testing.T) {
 	s.headLeft()
 	s.move(b)
 
-	require.Len(t, s.segments, 2)
-	require.Equal(t, vector{dir: up, mag: 9, r: dirRunes[up]}, s.segments[0])
-	require.Equal(t, vector{dir: left, mag: 1, r: dirRunes[left]}, s.segments[1])
+	require.Len(t, s.vecs, 2)
+	require.Equal(t, vector{dir: up, mag: 9, r: dirRunes[up]}, s.vecs[0])
+	require.Equal(t, vector{dir: left, mag: 1, r: dirRunes[left]}, s.vecs[1])
 
 }
 
 func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) {
 	s := snake{
 		start: pos{10, 10},
-		segments: []vector{
+		vecs: []vector{
 			{dir: down, mag: 10, r: dirRunes[down]},
 		},
 	}
@@ -341,9 +347,9 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) 
 	s.headRight()
 	s.move(b)
 
-	require.Len(t, s.segments, 2)
-	require.Equal(t, vector{dir: down, mag: 9, r: dirRunes[down]}, s.segments[0])
-	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.segments[1])
+	require.Len(t, s.vecs, 2)
+	require.Equal(t, vector{dir: down, mag: 9, r: dirRunes[down]}, s.vecs[0])
+	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.vecs[1])
 
 }
 
@@ -354,7 +360,7 @@ func Test_SnakeGrowsByEatingApples(t *testing.T) {
 	}
 	s.eat(as)
 
-	require.Equal(t, 2, s.segments[0].mag)
+	require.Equal(t, 2, s.vecs[0].mag)
 	require.Len(t, as, 1)
 	require.True(t, as[0].eaten)
 }
@@ -366,8 +372,8 @@ func Test_NewSnakeState(t *testing.T) {
 	sn.draw(scn)
 
 	require.Equal(t, pos{x: 40, y: 40}, sn.start)
-	require.Equal(t, 24, cap(sn.segments))
-	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.segments[0])
+	require.Equal(t, 24, cap(sn.vecs))
+	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.vecs[0])
 	requireEqualContents(t, 41, 40, '-', scn)
 }
 
