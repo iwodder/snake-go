@@ -4,17 +4,11 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-type direction uint
-
-func (d direction) rune() rune {
-	switch d {
-	case up, down:
-		return '|'
-	case right, left:
-		return '-'
-	}
-	panic("unsupported direction")
+var dirRunes = map[direction]rune{
+	up: '|', down: '|', right: '-', left: '-',
 }
+
+type direction uint
 
 const (
 	up = iota
@@ -55,6 +49,24 @@ func (b bounds) bottomEdge() int {
 type vector struct {
 	dir direction
 	mag int
+	r   rune
+}
+
+func (v vector) draw(scn tcell.Screen, start pos, style tcell.Style) pos {
+	for range v.mag {
+		switch v.dir {
+		case up:
+			start.y--
+		case down:
+			start.y++
+		case right:
+			start.x++
+		case left:
+			start.x--
+		}
+		scn.SetContent(start.x, start.y, v.r, nil, style)
+	}
+	return start
 }
 
 type snake struct {
@@ -64,21 +76,9 @@ type snake struct {
 }
 
 func (s *snake) draw(scn tcell.Screen) {
-	x, y := s.start.x, s.start.y
+	p := s.start
 	for _, m := range s.segments {
-		for range m.mag {
-			switch m.dir {
-			case down:
-				y++
-			case up:
-				y--
-			case left:
-				x--
-			case right:
-				x++
-			}
-			scn.SetContent(x, y, m.dir.rune(), nil, s.style)
-		}
+		p = m.draw(scn, p, s.style)
 	}
 }
 
@@ -100,7 +100,7 @@ func (s *snake) headDown() {
 
 func (s *snake) head(d direction) {
 	if l := len(s.segments); l == 0 || s.segments[l-1].dir != d {
-		s.segments = append(s.segments, vector{dir: d, mag: 0})
+		s.segments = append(s.segments, vector{dir: d, mag: 0, r: dirRunes[d]})
 	}
 }
 
@@ -173,6 +173,6 @@ func newSnake(x int, y int) *snake {
 	return &snake{
 		style:    tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
 		start:    pos{x, y},
-		segments: append(make([]vector, 0, 24), vector{dir: right, mag: 1}),
+		segments: append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
 	}
 }
