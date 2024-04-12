@@ -83,22 +83,22 @@ func (s *snake) draw(scn tcell.Screen) {
 }
 
 func (s *snake) headLeft() {
-	s.head(left)
+	s.changeDirection(left)
 }
 
 func (s *snake) headRight() {
-	s.head(right)
+	s.changeDirection(right)
 }
 
 func (s *snake) headUp() {
-	s.head(up)
+	s.changeDirection(up)
 }
 
 func (s *snake) headDown() {
-	s.head(down)
+	s.changeDirection(down)
 }
 
-func (s *snake) head(d direction) {
+func (s *snake) changeDirection(d direction) {
 	if l := len(s.segments); l == 0 || s.segments[l-1].dir != d {
 		s.segments = append(s.segments, vector{dir: d, mag: 0, r: dirRunes[d]})
 	}
