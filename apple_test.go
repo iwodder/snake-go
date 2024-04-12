@@ -6,7 +6,7 @@ import (
 )
 
 func Test_CanDrawApple(t *testing.T) {
-	scn := setupScreen(t)
+	scn := setupDefaultScreen(t)
 
 	a := apple{
 		pos: pos{x: 1, y: 1},
@@ -18,7 +18,7 @@ func Test_CanDrawApple(t *testing.T) {
 }
 
 func Test_CanDrawApples(t *testing.T) {
-	scn := setupScreen(t)
+	scn := setupDefaultScreen(t)
 
 	a := apples{
 		{pos: pos{x: 1, y: 1}},

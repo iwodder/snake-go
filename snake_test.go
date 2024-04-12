@@ -6,73 +6,34 @@ import (
 	"testing"
 )
 
-func Test_SnakeCanDrawSelfIntoTheFrame(t *testing.T) {
-	dst := setupScreen(t)
-	s := newSnake(1, 1)
-	s.draw(dst)
-
-	requireEqualContents(t, 2, 1, '-', dst)
-}
-
-func Test_SnakeCanDrawDownDirectionIntoTheFrame(t *testing.T) {
-	dst := setupScreen(t)
-
-	s := snake{
-		start: pos{x: 1, y: 1},
-		vecs: []vector{
-			{dir: down, mag: 2, r: dirRunes[down]},
-		},
-	}
-	s.draw(dst)
-
-	requireEqualContents(t, 1, 2, '|', dst)
-	requireEqualContents(t, 1, 3, '|', dst)
-}
-
-func Test_SnakeCanDrawUpDirectionIntoTheFrame(t *testing.T) {
-	dst := setupScreen(t)
-
-	s := snake{
-		start: pos{x: 1, y: 1},
-		vecs: []vector{
-			{dir: up, mag: 1, r: dirRunes[up]},
-		},
-	}
-	s.draw(dst)
-
-	requireEqualContents(t, 1, 0, '|', dst)
-}
-
-func Test_SnakeCanDrawLeftDirectionIntoTheFrame(t *testing.T) {
-	dst := setupScreen(t)
-
-	s := snake{
-		start: pos{x: 1, y: 1},
-		vecs: []vector{
-			{dir: left, mag: 1, r: dirRunes[left]},
-		},
-	}
-	s.draw(dst)
-
-	requireEqualContents(t, 0, 1, '-', dst)
-}
-
-func Test_SnakeCanDrawMultipleVectorsIntoTheFrame(t *testing.T) {
-	dst := setupScreen(t)
+func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
+	dst := setupDefaultScreen(t)
 
 	s := snake{
 		start: pos{x: 1, y: 1},
 		vecs: []vector{
 			{dir: down, mag: 2, r: dirRunes[down]},
 			{dir: right, mag: 2, r: dirRunes[right]},
+			{dir: up, mag: 3, r: dirRunes[up]},
+			{dir: left, mag: 3, r: dirRunes[left]},
 		},
 	}
 	s.draw(dst)
 
-	requireEqualContents(t, 1, 2, '|', dst)
-	requireEqualContents(t, 1, 3, '|', dst)
-	requireEqualContents(t, 2, 3, '-', dst)
-	requireEqualContents(t, 3, 3, '-', dst)
+	exp := [][]rune{
+		{'-', '-', '-', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', '|', '-', '-', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	}
+
+	requireEqualScreen(t, exp[:], dst)
 }
 
 func Test_HeadLeftAppendsNewVector(t *testing.T) {
@@ -403,7 +364,7 @@ func Test_SnakeGrowsByEatingApples(t *testing.T) {
 }
 
 func Test_NewSnakeState(t *testing.T) {
-	scn := setupScreen(t)
+	scn := setupDefaultScreen(t)
 
 	sn := newSnake(40, 40)
 	sn.draw(scn)
@@ -414,14 +375,26 @@ func Test_NewSnakeState(t *testing.T) {
 	requireEqualContents(t, 41, 40, '-', scn)
 }
 
-func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
-	act, _, _, _ := scn.GetContent(x, y)
-	require.EqualValues(t, exp, act, "position (%d,%d) expected %c, but was %c", x, y, exp, act)
+func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {
+	for y := range exp {
+		for x := range exp[y] {
+			requireEqualContents(t, x, y, exp[y][x], act)
+		}
+	}
 }
 
-func setupScreen(t *testing.T) tcell.SimulationScreen {
+func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
+	act, _, _, _ := scn.GetContent(x, y)
+	require.EqualValues(t, exp, act, "position (%d,%d) expected '%c', but was '%c'", x, y, exp, act)
+}
+
+func setupDefaultScreen(t *testing.T) tcell.SimulationScreen {
+	return setupScreen(t, 80, 80)
+}
+
+func setupScreen(t *testing.T, height, width int) tcell.SimulationScreen {
 	ret := tcell.NewSimulationScreen("")
 	require.NoError(t, ret.Init())
-	ret.SetSize(80, 80)
+	ret.SetSize(height, width)
 	return ret
 }
