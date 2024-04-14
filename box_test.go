@@ -8,7 +8,7 @@ import (
 func Test_BoxCanDraw(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBox(10, 10)
+	b := newBorder(10, 10)
 
 	b.draw(dst)
 
