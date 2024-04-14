@@ -53,6 +53,14 @@ func (b bounds) bottomEdge() int {
 	return b.lowerRight.x
 }
 
+func (b bounds) height() int {
+	return b.lowerRight.y - b.upperLeft.y
+}
+
+func (b bounds) width() int {
+	return b.lowerRight.x - b.upperLeft.x
+}
+
 type vector struct {
 	dir direction
 	mag int

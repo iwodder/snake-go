@@ -375,6 +375,24 @@ func Test_NewSnakeState(t *testing.T) {
 	requireEqualContents(t, 41, 40, '-', scn)
 }
 
+func Test_BoundsWidth(t *testing.T) {
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 10, y: 10},
+	}
+
+	require.Equal(t, 10, b.width())
+}
+
+func Test_BoundsHeight(t *testing.T) {
+	b := bounds{
+		upperLeft:  pos{x: 0, y: 0},
+		lowerRight: pos{x: 10, y: 15},
+	}
+
+	require.Equal(t, 15, b.height())
+}
+
 func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {
 	for y := range exp {
 		for x := range exp[y] {
