@@ -33,8 +33,9 @@ type bounds struct {
 	lowerRight pos
 }
 
+// isInside reports whether the argument is within the bounds. The bounds are adjusted to be zero-based.
 func (b bounds) isInside(p pos) bool {
-	return (b.upperLeft.x < p.x && p.x < b.lowerRight.x) && (b.upperLeft.y < p.y && p.y < b.lowerRight.y)
+	return (b.upperLeft.x < p.x && p.x < b.lowerRight.x-1) && (b.upperLeft.y < p.y && p.y < b.lowerRight.y-1)
 }
 
 func (b bounds) leftEdge() int {
@@ -42,7 +43,7 @@ func (b bounds) leftEdge() int {
 }
 
 func (b bounds) rightEdge() int {
-	return b.lowerRight.x
+	return b.lowerRight.x - 1
 }
 
 func (b bounds) topEdge() int {
@@ -50,7 +51,7 @@ func (b bounds) topEdge() int {
 }
 
 func (b bounds) bottomEdge() int {
-	return b.lowerRight.x
+	return b.lowerRight.y - 1
 }
 
 func (b bounds) height() int {
@@ -59,6 +60,19 @@ func (b bounds) height() int {
 
 func (b bounds) width() int {
 	return b.lowerRight.x - b.upperLeft.x
+}
+
+func (b bounds) shrink(amt int) bounds {
+	return bounds{
+		upperLeft: pos{
+			x: b.upperLeft.x + amt,
+			y: b.upperLeft.y + amt,
+		},
+		lowerRight: pos{
+			x: b.lowerRight.x - amt,
+			y: b.lowerRight.y - amt,
+		},
+	}
 }
 
 type vector struct {
@@ -114,7 +128,7 @@ func (s *snake) headDown() {
 }
 
 func (s *snake) changeDirection(d direction) {
-	if last := s.lastVector(); s.isNewDirectionValid(last.dir, d) {
+	if last := s.head(); s.isNewDirectionValid(last.dir, d) {
 		if last.mag == 0 {
 			last.dir = d
 		} else {
@@ -131,8 +145,7 @@ func (s *snake) move(b bounds) {
 	if !s.canMove(b) {
 		return
 	}
-	m := &s.vecs[0]
-	switch m.dir {
+	switch s.tail().dir {
 	case up:
 		s.start.y--
 	case right:
@@ -145,9 +158,9 @@ func (s *snake) move(b bounds) {
 	if len(s.vecs) < 2 {
 		return
 	}
-	m.mag--
-	s.vecs[len(s.vecs)-1].mag++
-	if m.mag == 0 {
+	s.tail().mag--
+	s.head().mag++
+	if s.tail().mag == 0 {
 		s.vecs = s.vecs[1:]
 	}
 }
@@ -157,12 +170,11 @@ func (s *snake) canMove(b bounds) bool {
 	if b.isInside(p) {
 		return true
 	}
-
-	lastDir := s.vecs[len(s.vecs)-1].dir
-	return !((p.x == b.rightEdge() && lastDir == right) ||
-		(p.x == b.leftEdge() && lastDir == left) ||
-		(p.y == b.topEdge() && lastDir == up) ||
-		(p.y == b.bottomEdge() && lastDir == down))
+	lastDir := s.head().dir
+	return !((p.x >= b.rightEdge() && lastDir == right) ||
+		(p.x <= b.leftEdge() && lastDir == left) ||
+		(p.y <= b.topEdge() && lastDir == up) ||
+		(p.y >= b.bottomEdge() && lastDir == down))
 }
 
 func (s *snake) eat(as apples) {
@@ -192,8 +204,12 @@ func (s *snake) headPos() pos {
 	return ret
 }
 
-func (s *snake) lastVector() *vector {
+func (s *snake) head() *vector {
 	return &s.vecs[len(s.vecs)-1]
+}
+
+func (s *snake) tail() *vector {
+	return &s.vecs[0]
 }
 
 func newSnake(x int, y int) *snake {

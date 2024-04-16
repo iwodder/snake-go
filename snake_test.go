@@ -233,7 +233,7 @@ func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
 	}{
 		{
 			name: "right edge of screen",
-			vec:  vector{dir: right, mag: 10},
+			vec:  vector{dir: right, mag: 9},
 		},
 		{
 			name: "left edge of screen",
@@ -245,7 +245,7 @@ func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
 		},
 		{
 			name: "bottom edge of screen",
-			vec:  vector{dir: down, mag: 10},
+			vec:  vector{dir: down, mag: 9},
 		},
 	}
 	b := bounds{
@@ -375,22 +375,64 @@ func Test_NewSnakeState(t *testing.T) {
 	requireEqualContents(t, 41, 40, '-', scn)
 }
 
-func Test_BoundsWidth(t *testing.T) {
-	b := bounds{
-		upperLeft:  pos{x: 0, y: 0},
-		lowerRight: pos{x: 10, y: 10},
+func Test_BoundsMethods(t *testing.T) {
+	tests := []struct {
+		name   string
+		method func(bounds) int
+		exp    int
+	}{
+		{
+			name:   "top edge",
+			method: bounds.topEdge,
+			exp:    2,
+		},
+		{
+			name:   "left edge",
+			method: bounds.leftEdge,
+			exp:    1,
+		},
+		{
+			name:   "right edge",
+			method: bounds.rightEdge,
+			exp:    19,
+		},
+		{
+			name:   "bottom edge",
+			method: bounds.bottomEdge,
+			exp:    19,
+		},
+		{
+			name:   "height",
+			method: bounds.height,
+			exp:    18,
+		},
+		{
+			name:   "width",
+			method: bounds.width,
+			exp:    19,
+		},
 	}
-
-	require.Equal(t, 10, b.width())
+	b := bounds{
+		upperLeft:  pos{x: 1, y: 2},
+		lowerRight: pos{x: 20, y: 20},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.exp, tt.method(b))
+		})
+	}
 }
 
-func Test_BoundsHeight(t *testing.T) {
+func Test_ShrinkBounds(t *testing.T) {
 	b := bounds{
-		upperLeft:  pos{x: 0, y: 0},
-		lowerRight: pos{x: 10, y: 15},
+		upperLeft:  pos{x: 1, y: 1},
+		lowerRight: pos{x: 20, y: 20},
 	}
-
-	require.Equal(t, 15, b.height())
+	exp := bounds{
+		upperLeft:  pos{x: 2, y: 2},
+		lowerRight: pos{x: 19, y: 19},
+	}
+	require.Equal(t, exp, b.shrink(1))
 }
 
 func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {
