@@ -69,7 +69,7 @@ func Test_CanMoveApples(t *testing.T) {
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
-	a.move(b)
+	a.move(b, 0)
 
 	require.NotEqual(t, apple{pos: pos{x: 1, y: 1}, eaten: true}, a[0])
 	requireWithinBounds(t, b, a[0].pos)

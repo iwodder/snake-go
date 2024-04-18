@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"time"
 )
 
 var dirRunes = map[direction]rune{
@@ -102,6 +103,7 @@ type snake struct {
 	style tcell.Style
 	start pos
 	vecs  []vector
+	timer time.Duration
 }
 
 func (s *snake) draw(scn tcell.Screen) {
@@ -141,8 +143,8 @@ func (s *snake) isNewDirectionValid(last, new direction) bool {
 	return last != new && !new.isOpposite(last)
 }
 
-func (s *snake) move(b bounds) {
-	if !s.canMove(b) {
+func (s *snake) move(b bounds, delta time.Duration) {
+	if !s.canMove(b, delta) {
 		return
 	}
 	switch s.tail().dir {
@@ -165,7 +167,14 @@ func (s *snake) move(b bounds) {
 	}
 }
 
-func (s *snake) canMove(b bounds) bool {
+func (s *snake) canMove(b bounds, delta time.Duration) bool {
+	s.timer -= delta
+	if s.timer > 0 {
+		return false
+	} else {
+		s.timer = time.Millisecond * 250
+	}
+
 	p := s.headPos()
 	if b.isInside(p) {
 		return true

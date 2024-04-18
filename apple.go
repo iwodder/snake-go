@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gdamore/tcell/v2"
 	"math/rand"
+	"time"
 )
 
 type apples []apple
@@ -13,7 +14,7 @@ func (as apples) draw(scn tcell.Screen) {
 	}
 }
 
-func (as apples) move(b bounds) {
+func (as apples) move(b bounds, _ time.Duration) {
 	for i := range as {
 		as[i].move(b)
 	}

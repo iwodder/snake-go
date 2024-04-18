@@ -4,7 +4,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
+
+const moveDelta = time.Millisecond * 250
 
 func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
 	dst := setupDefaultScreen(t)
@@ -190,7 +193,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 			s.move(bounds{
 				upperLeft:  pos{x: 0, y: 0},
 				lowerRight: pos{x: 80, y: 80},
-			})
+			}, moveDelta)
 
 			require.Equal(t, tt.exp, s.start)
 			require.Equal(t, vector{dir: tt.m.dir, mag: tt.m.mag}, s.vecs[len(s.vecs)-1])
@@ -204,7 +207,7 @@ func Test_MoveDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
 	sn.move(bounds{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
-	})
+	}, moveDelta)
 
 	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.vecs[0])
 }
@@ -220,7 +223,7 @@ func Test_MoveDoesChangeMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 	s.move(bounds{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
-	})
+	}, moveDelta)
 
 	require.Len(t, s.vecs, 1)
 	require.Equal(t, vector{dir: down, mag: 2}, s.vecs[0])
@@ -259,7 +262,7 @@ func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
 				vecs:  []vector{tt.vec},
 			}
 
-			s.move(b)
+			s.move(b, moveDelta)
 
 			require.Len(t, s.vecs, 1)
 			require.Equal(t, pos{10, 10}, s.start, "starting pos shouldn't have changed")
@@ -278,9 +281,9 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromRightEdgeOfScreen(t *testing.T) {
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
-	s.move(b)
+	s.move(b, moveDelta)
 	s.headDown()
-	s.move(b)
+	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
 	require.Equal(t, vector{dir: right, mag: 9, r: dirRunes[right]}, s.vecs[0])
@@ -299,9 +302,9 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromLeftEdgeOfScreen(t *testing.T) {
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
-	s.move(b)
+	s.move(b, moveDelta)
 	s.headUp()
-	s.move(b)
+	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
 	require.Equal(t, vector{dir: left, mag: 9, r: dirRunes[left]}, s.vecs[0])
@@ -320,9 +323,9 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromTopEdgeOfScreen(t *testing.T) {
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
-	s.move(b)
+	s.move(b, moveDelta)
 	s.headLeft()
-	s.move(b)
+	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
 	require.Equal(t, vector{dir: up, mag: 9, r: dirRunes[up]}, s.vecs[0])
@@ -341,9 +344,9 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) 
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
-	s.move(b)
+	s.move(b, moveDelta)
 	s.headRight()
-	s.move(b)
+	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
 	require.Equal(t, vector{dir: down, mag: 9, r: dirRunes[down]}, s.vecs[0])
@@ -361,6 +364,23 @@ func Test_SnakeGrowsByEatingApples(t *testing.T) {
 	require.Equal(t, 2, s.vecs[0].mag)
 	require.Len(t, as, 1)
 	require.True(t, as[0].eaten)
+}
+
+func Test_SnakeMovesFourSquaresPerSecond(t *testing.T) {
+	rate := time.Second / 20
+	ticker := time.NewTicker(rate)
+
+	s := newSnake(10, 10)
+	ticks := 0
+	for range ticker.C {
+		s.move(bounds{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, rate)
+		ticks += 1
+		if ticks == 20 {
+			ticker.Stop()
+			break
+		}
+	}
+	require.Equal(t, pos{x: 14, y: 10}, s.start, "starting pos should have moved 4 squares right")
 }
 
 func Test_NewSnakeState(t *testing.T) {
