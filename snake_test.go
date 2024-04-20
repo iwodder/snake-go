@@ -455,6 +455,19 @@ func Test_ShrinkBounds(t *testing.T) {
 	require.Equal(t, exp, b.shrink(1))
 }
 
+func Test_BoundsCenter(t *testing.T) {
+	b := bounds{
+		upperLeft: pos{
+			x: 0, y: 0,
+		},
+		lowerRight: pos{
+			x: 20, y: 20,
+		},
+	}
+
+	require.Equal(t, pos{10, 10}, b.center())
+}
+
 func Test_SnakeRespondsToKeyEvents(t *testing.T) {
 	tests := []struct {
 		name   string

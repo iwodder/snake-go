@@ -76,6 +76,10 @@ func (b bounds) shrink(amt int) bounds {
 	}
 }
 
+func (b bounds) center() pos {
+	return pos{x: b.width() / 2, y: b.height() / 2}
+}
+
 type vector struct {
 	dir direction
 	mag int
