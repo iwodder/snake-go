@@ -234,10 +234,10 @@ func (s *snake) notify(ev *tcell.EventKey) {
 	}
 }
 
-func newSnake(x int, y int) *snake {
+func newSnake(initial pos) *snake {
 	return &snake{
 		style: tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
-		start: pos{x, y},
+		start: initial,
 		vecs:  append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
 	}
 }

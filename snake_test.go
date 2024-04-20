@@ -64,14 +64,14 @@ func Test_HeadRightAppendsNewVector(t *testing.T) {
 }
 
 func Test_HeadUpAppendsNewVector(t *testing.T) {
-	s := newSnake(10, 10)
+	s := newSnake(pos{10, 10})
 	s.headUp()
 
 	require.Equal(t, s.vecs[1], vector{dir: up, mag: 0, r: dirRunes[up]})
 }
 
 func Test_HeadDownAppendsNewVector(t *testing.T) {
-	s := newSnake(10, 10)
+	s := newSnake(pos{x: 10, y: 10})
 	s.headDown()
 
 	require.Equal(t, s.vecs[1], vector{dir: down, mag: 0, r: dirRunes[down]})
@@ -91,7 +91,7 @@ func Test_MovingCurrentDirectionDoesNotAddVector(t *testing.T) {
 }
 
 func Test_ChangingDirectionDoesNotAddVectorIfMagnitudeIsZero(t *testing.T) {
-	s := newSnake(10, 10)
+	s := newSnake(pos{x: 10, y: 10})
 
 	s.headUp()
 	s.headUp()
@@ -108,7 +108,7 @@ func Test_ChangingDirectionDoesNotAddVectorIfMagnitudeIsZero(t *testing.T) {
 }
 
 func Test_SnakeCantDoubleBackOnSelfRightToLeft(t *testing.T) {
-	s := newSnake(10, 10)
+	s := newSnake(pos{x: 10, y: 10})
 
 	s.headLeft()
 
@@ -203,7 +203,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 }
 
 func Test_MoveDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
-	sn := newSnake(10, 10)
+	sn := newSnake(pos{x: 10, y: 10})
 	sn.move(bounds{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
@@ -355,7 +355,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) 
 }
 
 func Test_SnakeGrowsByEatingApples(t *testing.T) {
-	s := newSnake(10, 10)
+	s := newSnake(pos{x: 10, y: 10})
 	as := apples{
 		{pos: pos{x: 11, y: 10}, eaten: false},
 	}
@@ -370,7 +370,7 @@ func Test_SnakeMovesFourSquaresPerSecond(t *testing.T) {
 	rate := time.Second / 20
 	ticker := time.NewTicker(rate)
 
-	s := newSnake(10, 10)
+	s := newSnake(pos{x: 10, y: 10})
 	ticks := 0
 	for range ticker.C {
 		s.move(bounds{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, rate)
@@ -386,7 +386,7 @@ func Test_SnakeMovesFourSquaresPerSecond(t *testing.T) {
 func Test_NewSnakeState(t *testing.T) {
 	scn := setupDefaultScreen(t)
 
-	sn := newSnake(40, 40)
+	sn := newSnake(pos{x: 40, y: 40})
 	sn.draw(scn)
 
 	require.Equal(t, pos{x: 40, y: 40}, sn.start)
