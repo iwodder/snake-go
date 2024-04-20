@@ -14,7 +14,7 @@ func (as apples) draw(scn tcell.Screen) {
 	}
 }
 
-func (as apples) move(b bounds, _ time.Duration) {
+func (as apples) move(b boundary, _ time.Duration) {
 	for i := range as {
 		as[i].move(b)
 	}
@@ -29,7 +29,7 @@ func (a *apple) draw(scn tcell.Screen) {
 	scn.SetContent(a.pos.x, a.pos.y, 'A', nil, tcell.StyleDefault)
 }
 
-func (a *apple) move(b bounds) {
+func (a *apple) move(b boundary) {
 	if a.eaten {
 		p := pos{x: rand.Intn(b.lowerRight.x), y: rand.Intn(b.lowerRight.y)}
 		for a.pos == p || !b.isInside(p) {

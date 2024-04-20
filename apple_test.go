@@ -36,7 +36,7 @@ func Test_CanDrawApples(t *testing.T) {
 func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
 	a := apple{pos: pos{x: 10, y: 10}, eaten: true}
 
-	b := bounds{
+	b := boundary{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -50,7 +50,7 @@ func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
 func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
 	a := apple{pos: pos{x: 10, y: 10}, eaten: false}
 
-	a.move(bounds{
+	a.move(boundary{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	})
@@ -65,7 +65,7 @@ func Test_CanMoveApples(t *testing.T) {
 		{pos: pos{x: 2, y: 2}, eaten: false},
 		{pos: pos{x: 3, y: 3}, eaten: true},
 	}
-	b := bounds{
+	b := boundary{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -81,7 +81,7 @@ func Test_CanMoveApples(t *testing.T) {
 	requireWithinBounds(t, b, a[2].pos)
 }
 
-func requireWithinBounds(t *testing.T, b bounds, p pos) {
+func requireWithinBounds(t *testing.T, b boundary, p pos) {
 	require.Less(t, p.x, b.lowerRight.x)
 	require.Less(t, p.y, b.lowerRight.y)
 	require.Greater(t, p.x, b.upperLeft.x)
