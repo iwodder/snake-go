@@ -221,6 +221,19 @@ func (s *snake) tail() *vector {
 	return &s.vecs[0]
 }
 
+func (s *snake) notify(ev *tcell.EventKey) {
+	switch ev.Key() {
+	case tcell.KeyDown:
+		s.headDown()
+	case tcell.KeyUp:
+		s.headUp()
+	case tcell.KeyRight:
+		s.headRight()
+	case tcell.KeyLeft:
+		s.headLeft()
+	}
+}
+
 func newSnake(x int, y int) *snake {
 	return &snake{
 		style: tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),

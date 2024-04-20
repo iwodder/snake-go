@@ -455,6 +455,48 @@ func Test_ShrinkBounds(t *testing.T) {
 	require.Equal(t, exp, b.shrink(1))
 }
 
+func Test_SnakeRespondsToKeyEvents(t *testing.T) {
+	tests := []struct {
+		name   string
+		ev     *tcell.EventKey
+		snake  snake
+		expDir direction
+	}{
+		{
+			name:   "down arrow",
+			snake:  snake{vecs: []vector{{dir: right, mag: 1, r: dirRunes[right]}}},
+			ev:     tcell.NewEventKey(tcell.KeyDown, tcell.RuneDArrow, tcell.ModNone),
+			expDir: down,
+		},
+		{
+			name:   "up arrow",
+			snake:  snake{vecs: []vector{{dir: right, mag: 1, r: dirRunes[right]}}},
+			ev:     tcell.NewEventKey(tcell.KeyUp, tcell.RuneUArrow, tcell.ModNone),
+			expDir: up,
+		},
+		{
+			name:   "left arrow",
+			snake:  snake{vecs: []vector{{dir: up, mag: 1, r: dirRunes[up]}}},
+			ev:     tcell.NewEventKey(tcell.KeyLeft, tcell.RuneLArrow, tcell.ModNone),
+			expDir: left,
+		},
+		{
+			name:   "right arrow",
+			snake:  snake{vecs: []vector{{dir: up, mag: 1, r: dirRunes[up]}}},
+			ev:     tcell.NewEventKey(tcell.KeyRight, tcell.RuneRArrow, tcell.ModNone),
+			expDir: right,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.snake.notify(tt.ev)
+
+			require.Len(t, tt.snake.vecs, 2)
+			require.Equal(t, tt.expDir, tt.snake.head().dir, "head direction didn't match")
+		})
+	}
+}
+
 func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {
 	for y := range exp {
 		for x := range exp[y] {
