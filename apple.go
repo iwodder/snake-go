@@ -20,6 +20,14 @@ func (as apples) move(b boundary, _ time.Duration) {
 	}
 }
 
+func newApples(b boundary, cnt int) apples {
+	ret := make(apples, 0, cnt)
+	for range cnt {
+		ret = append(ret, newApple(b))
+	}
+	return ret
+}
+
 type apple struct {
 	pos   pos
 	eaten bool
@@ -31,11 +39,21 @@ func (a *apple) draw(scn tcell.Screen) {
 
 func (a *apple) move(b boundary) {
 	if a.eaten {
-		p := pos{x: rand.Intn(b.lowerRight.x), y: rand.Intn(b.lowerRight.y)}
-		for a.pos == p || !b.isInside(p) {
-			p = pos{x: rand.Intn(b.lowerRight.x), y: rand.Intn(b.lowerRight.y)}
-		}
-		a.pos = p
+		a.setPos(b)
 		a.eaten = false
 	}
+}
+
+func (a *apple) setPos(b boundary) {
+	p := pos{x: rand.Intn(b.lowerRight.x), y: rand.Intn(b.lowerRight.y)}
+	for a.pos == p || !b.isInside(p) {
+		p = pos{x: rand.Intn(b.lowerRight.x), y: rand.Intn(b.lowerRight.y)}
+	}
+	a.pos = p
+}
+
+func newApple(b boundary) apple {
+	var ret apple
+	ret.setPos(b)
+	return ret
 }

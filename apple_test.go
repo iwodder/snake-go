@@ -81,6 +81,13 @@ func Test_CanMoveApples(t *testing.T) {
 	requireWithinBounds(t, b, a[2].pos)
 }
 
+func Test_NewApplesHasSizeOfTwo(t *testing.T) {
+	as := newApples(boundary{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, 2)
+
+	require.Len(t, as, 2)
+	require.NotEqual(t, as[0], as[1])
+}
+
 func requireWithinBounds(t *testing.T, b boundary, p pos) {
 	require.Less(t, p.x, b.lowerRight.x)
 	require.Less(t, p.y, b.lowerRight.y)
