@@ -7,6 +7,12 @@ import (
 	"testing"
 )
 
+func Test_Styles(t *testing.T) {
+	require.Equal(t, appleStyle, tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite))
+	require.Equal(t, boardStyle, tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite))
+	require.Equal(t, snakeStyle, tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite))
+}
+
 func Test_GameFinializesScreenOnCtrlC(t *testing.T) {
 	didExit := new(bool)
 	exitCode := new(int)

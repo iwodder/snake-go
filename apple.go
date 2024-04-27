@@ -34,7 +34,7 @@ type apple struct {
 }
 
 func (a *apple) draw(scn tcell.Screen) {
-	scn.SetContent(a.pos.x, a.pos.y, 'A', nil, tcell.StyleDefault)
+	scn.SetContent(a.pos.x, a.pos.y, 'A', nil, appleStyle)
 }
 
 func (a *apple) move(b boundary) {

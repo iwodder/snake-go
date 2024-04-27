@@ -104,7 +104,6 @@ func (v vector) draw(scn tcell.Screen, start pos, style tcell.Style) pos {
 }
 
 type snake struct {
-	style tcell.Style
 	start pos
 	vecs  []vector
 	timer time.Duration
@@ -113,7 +112,7 @@ type snake struct {
 func (s *snake) draw(scn tcell.Screen) {
 	p := s.start
 	for _, m := range s.vecs {
-		p = m.draw(scn, p, s.style)
+		p = m.draw(scn, p, snakeStyle)
 	}
 }
 
@@ -240,7 +239,6 @@ func (s *snake) notify(ev *tcell.EventKey) {
 
 func newSnake(initial pos) *snake {
 	return &snake{
-		style: tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
 		start: initial,
 		vecs:  append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
 	}

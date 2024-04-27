@@ -9,6 +9,12 @@ import (
 const maxWidth = 40
 const maxHeight = maxWidth
 
+var (
+	appleStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
+	boardStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
+	snakeStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
+)
+
 type keyListener interface {
 	notify(event *tcell.EventKey)
 }
@@ -47,8 +53,8 @@ func (g *game) start() {
 		default:
 			g.snake.eat(g.apples)
 
-			g.snake.move(g.board.bounds, delta)
-			g.apples.move(g.board.bounds, delta)
+			g.snake.move(g.board.boundary(), delta)
+			g.apples.move(g.board.boundary(), delta)
 
 			g.board.draw(g.scn)
 			g.snake.draw(g.scn)
