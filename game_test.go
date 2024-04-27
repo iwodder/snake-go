@@ -3,35 +3,64 @@ package main
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/require"
+	"sync"
 	"testing"
 )
 
-func Test_NotifiesKeyListenersOfEvents(t *testing.T) {
-	scn := setupDefaultScreen(t)
-
-	g := game{
-		scn: scn,
+func Test_GameFinializesScreenOnCtrlC(t *testing.T) {
+	didExit := new(bool)
+	exitCode := new(int)
+	spy := spyScreen{
+		wasFinialized:    false,
+		SimulationScreen: setupDefaultScreen(t),
 	}
-	mock := mockKeyListener{}
 
-	g.registerKeyListener(&mock)
+	g := newGame(&spy)
+	g.exitFunc = func(val int) {
+		*didExit = true
+		*exitCode = val
+	}
 
-	require.NoError(t, scn.PostEvent(&tcell.EventKey{}))
+	g.notify(tcell.NewEventKey(tcell.KeyCtrlC, 0, 0))
+
+	require.True(t, *didExit)
+	require.True(t, spy.wasFinialized)
+}
+
+func Test_EventPollerLoopExitsOnNil(t *testing.T) {
+	scn := setupDefaultScreen(t)
+	g := newGame(scn)
+
+	var wg sync.WaitGroup
+	go func() {
+		g.eventPoller()
+		wg.Done()
+	}()
+
+	require.NoError(t, scn.PostEvent(tcell.NewEventKey(tcell.KeyCtrlC, 0, 0)))
 	require.NoError(t, scn.PostEvent(nil))
 
-	g.pollEvents()
-
-	mock.assertWasNotified(t)
+	wg.Wait()
 }
 
-type mockKeyListener struct {
-	keyEvent *tcell.EventKey
+func Test_NewGameState(t *testing.T) {
+	g := newGame(setupDefaultScreen(t))
+
+	require.Len(t, g.kl, 2, "snake and game should be registered for key events")
+	require.NotNil(t, g.events)
+	require.NotNil(t, g.scn)
+	require.NotNil(t, g.snake)
+	require.NotNil(t, g.apples)
+	require.NotNil(t, g.board)
+	require.NotNil(t, g.exitFunc)
 }
 
-func (m *mockKeyListener) notify(event *tcell.EventKey) {
-	m.keyEvent = event
+type spyScreen struct {
+	wasFinialized bool
+	tcell.SimulationScreen
 }
 
-func (m *mockKeyListener) assertWasNotified(t *testing.T) {
-	require.NotNil(t, m.keyEvent, "mockKeyListener should've been notified")
+func (s *spyScreen) Fini() {
+	s.wasFinialized = true
+	s.SimulationScreen.Fini()
 }

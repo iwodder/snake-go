@@ -3,32 +3,15 @@ package main
 import (
 	"github.com/gdamore/tcell/v2"
 	"log"
-	"os"
 )
 
 func main() {
-	s, err := tcell.NewScreen()
+	scn, err := tcell.NewScreen()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("failed to get screen: %v", err)
 	}
-	err = s.Init()
-	if err != nil {
-		log.Fatalln(err)
+	if err = scn.Init(); err != nil {
+		log.Fatalf("failed to init screen: %v", err)
 	}
-
-	for {
-		// Poll event
-		ev := s.PollEvent()
-
-		// Process event
-		switch ev := ev.(type) {
-		case *tcell.EventResize:
-			s.Sync()
-		case *tcell.EventKey:
-			if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC {
-				s.Fini()
-				os.Exit(0)
-			}
-		}
-	}
+	newGame(scn).start()
 }
