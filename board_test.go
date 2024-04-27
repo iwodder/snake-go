@@ -3,13 +3,14 @@ package main
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func Test_BoxCanDraw(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(10, 10)
+	b := newBoard(pos{x: 0, y: 0}, pos{x: 10, y: 10})
 
 	b.draw(dst)
 
@@ -32,7 +33,7 @@ func Test_BoxCanDraw(t *testing.T) {
 func Test_BoxFillsEachCell(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(10, 10)
+	b := newBoard(pos{x: 0, y: 0}, pos{x: 10, y: 10})
 
 	b.draw(dst)
 
@@ -42,4 +43,14 @@ func Test_BoxFillsEachCell(t *testing.T) {
 			assert.Equal(t, b.style, style, "cell (x=%d,y=%d) didn't have the correct style", x, y)
 		}
 	}
+}
+
+func Test_BoundaryIsShrunkBy1(t *testing.T) {
+	b := newBoard(pos{x: 0, y: 0}, pos{x: 10, y: 10})
+
+	act := b.boundary()
+
+	require.Equal(t, pos{x: 1, y: 1}, act.upperLeft)
+	require.Equal(t, pos{x: 9, y: 9}, act.lowerRight)
+
 }
