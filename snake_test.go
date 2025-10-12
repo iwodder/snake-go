@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -24,20 +25,94 @@ func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
 	}
 	s.draw(dst)
 
-	exp := [][]rune{
-		{'-', '-', '-', '|', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', '|', '-', '-', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+	cells := []cell{
+		{1, 2, dirRunes[down]},
+		{1, 3, tcell.RuneLLCorner},
+		{2, 3, dirRunes[right]},
+		{3, 3, tcell.RuneLRCorner},
+		{3, 2, dirRunes[up]},
+		{3, 0, tcell.RuneURCorner},
+		{3, 1, dirRunes[up]},
+		{2, 0, dirRunes[left]},
+		{1, 0, dirRunes[left]},
+		{0, 0, dirRunes[left]},
 	}
 
-	requireEqualScreen(t, exp[:], dst)
+	for cell := range slices.Values(cells) {
+		requireCellContentsAreEqual(t, cell, dst)
+	}
+}
+
+func Test_DrawsCorners(t *testing.T) {
+	simScrn := setupDefaultScreen(t)
+
+	t.Run("can make right circle", func(t *testing.T) {
+		simScrn.Clear()
+
+		s := snake{
+			start: pos{x: 4, y: 4},
+			vecs: []vector{
+				{dir: down, mag: 2, r: dirRunes[down]},
+				{dir: right, mag: 3, r: dirRunes[right]},
+				{dir: up, mag: 2, r: dirRunes[up]},
+				{dir: left, mag: 2, r: dirRunes[left]},
+				{dir: down, mag: 1, r: dirRunes[down]},
+			},
+		}
+
+		cells := []cell{
+			{x: 4, y: 5, rune: dirRunes[down]},
+			{x: 4, y: 6, rune: tcell.RuneLLCorner},
+			{x: 5, y: 6, rune: dirRunes[right]},
+			{x: 6, y: 6, rune: dirRunes[right]},
+			{x: 7, y: 6, rune: tcell.RuneLRCorner},
+			{x: 7, y: 5, rune: dirRunes[up]},
+			{x: 7, y: 4, rune: tcell.RuneURCorner},
+			{x: 6, y: 4, rune: dirRunes[left]},
+			{x: 5, y: 4, rune: tcell.RuneULCorner},
+			{x: 5, y: 5, rune: dirRunes[down]},
+		}
+
+		s.draw(simScrn)
+
+		for cell := range slices.Values(cells) {
+			requireCellContentsAreEqual(t, cell, simScrn)
+		}
+	})
+
+	t.Run("can make left circle", func(t *testing.T) {
+		simScrn.Clear()
+
+		s := snake{
+			start: pos{x: 4, y: 4},
+			vecs: []vector{
+				{dir: down, mag: 2, r: dirRunes[down]},
+				{dir: left, mag: 3, r: dirRunes[left]},
+				{dir: up, mag: 2, r: dirRunes[up]},
+				{dir: right, mag: 2, r: dirRunes[right]},
+				{dir: down, mag: 1, r: dirRunes[down]},
+			},
+		}
+
+		cells := []cell{
+			{x: 4, y: 5, rune: dirRunes[down]},
+			{x: 4, y: 6, rune: tcell.RuneLRCorner},
+			{x: 3, y: 6, rune: dirRunes[left]},
+			{x: 2, y: 6, rune: dirRunes[left]},
+			{x: 1, y: 6, rune: tcell.RuneLLCorner},
+			{x: 1, y: 5, rune: dirRunes[up]},
+			{x: 1, y: 4, rune: tcell.RuneULCorner},
+			{x: 2, y: 4, rune: dirRunes[right]},
+			{x: 3, y: 4, rune: tcell.RuneURCorner},
+			{x: 3, y: 5, rune: dirRunes[down]},
+		}
+
+		s.draw(simScrn)
+
+		for cell := range slices.Values(cells) {
+			requireCellContentsAreEqual(t, cell, simScrn)
+		}
+	})
 }
 
 func Test_HeadLeftAppendsNewVector(t *testing.T) {
@@ -393,7 +468,7 @@ func Test_NewSnakeState(t *testing.T) {
 	require.Equal(t, pos{x: 40, y: 40}, sn.start)
 	require.Equal(t, 24, cap(sn.vecs))
 	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.vecs[0])
-	requireEqualContents(t, 41, 40, '-', scn)
+	requireEqualContents(t, 41, 40, dirRunes[right], scn)
 }
 
 func Test_BoundsMethods(t *testing.T) {
@@ -533,4 +608,14 @@ func setupScreen(t *testing.T, height, width int) tcell.SimulationScreen {
 	require.NoError(t, ret.Init())
 	ret.SetSize(height, width)
 	return ret
+}
+
+type cell struct {
+	x    int
+	y    int
+	rune rune
+}
+
+func requireCellContentsAreEqual(t *testing.T, exp cell, scrn tcell.SimulationScreen) {
+	requireEqualContents(t, exp.x, exp.y, exp.rune, scrn)
 }

@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
 )
 
 var dirRunes = map[direction]rune{
-	up: '|', down: '|', right: '-', left: '-',
+	up: tcell.RuneVLine, down: tcell.RuneVLine, right: tcell.RuneHLine, left: tcell.RuneHLine,
 }
 
 type direction uint
@@ -17,6 +18,21 @@ func (d direction) isOpposite(o direction) bool {
 		(d == left && o == right) ||
 		(d == up && o == down) ||
 		(d == down && o == up)
+}
+
+func (d direction) String() string {
+	switch d {
+	case up:
+		return "up"
+	case down:
+		return "down"
+	case right:
+		return "right"
+	case left:
+		return "left"
+	default:
+		return fmt.Sprintf("unrecognized direction: %d", d)
+	}
 }
 
 const (
@@ -111,9 +127,27 @@ type snake struct {
 }
 
 func (s *snake) draw(scn tcell.Screen) {
-	p := s.start
-	for _, m := range s.vecs {
-		p = m.draw(scn, p, snakeStyle)
+	currentPos := s.start
+	for idx, vec := range s.vecs {
+		currentPos = vec.draw(scn, currentPos, snakeStyle)
+		if idx < len(s.vecs)-1 {
+			scn.SetContent(currentPos.x, currentPos.y, s.getRune(vec.dir, s.vecs[idx+1].dir), nil, snakeStyle)
+		}
+	}
+}
+
+func (s *snake) getRune(curDir direction, nextDir direction) rune {
+	switch {
+	case (curDir == up || curDir == left) && (nextDir == right || nextDir == down):
+		return tcell.RuneULCorner
+	case (curDir == up || curDir == right) && (nextDir == left || nextDir == down):
+		return tcell.RuneURCorner
+	case (curDir == down || curDir == left) && (nextDir == right || nextDir == up):
+		return tcell.RuneLLCorner
+	case (curDir == down || curDir == right) && (nextDir == left || nextDir == up):
+		return tcell.RuneLRCorner
+	default:
+		panic(fmt.Sprintf("unhandled direction combination: curDir=%s, nextDir=%s", curDir, nextDir))
 	}
 }
 
