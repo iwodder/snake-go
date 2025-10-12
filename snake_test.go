@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/stretchr/testify/require"
 )
 
 const moveDelta = time.Millisecond * 250
@@ -46,7 +47,7 @@ func Test_HeadLeftAppendsNewVector(t *testing.T) {
 			{dir: down, mag: 2, r: dirRunes[down]},
 		},
 	}
-	s.headLeft()
+	s.moveLeft()
 
 	require.Equal(t, vector{dir: left, mag: 0, r: dirRunes[left]}, s.vecs[1])
 }
@@ -58,21 +59,21 @@ func Test_HeadRightAppendsNewVector(t *testing.T) {
 			{dir: down, mag: 2, r: dirRunes[down]},
 		},
 	}
-	s.headRight()
+	s.moveRight()
 
 	require.Equal(t, s.vecs[1], vector{dir: right, mag: 0, r: dirRunes[right]})
 }
 
 func Test_HeadUpAppendsNewVector(t *testing.T) {
 	s := newSnake(pos{10, 10})
-	s.headUp()
+	s.moveUp()
 
 	require.Equal(t, s.vecs[1], vector{dir: up, mag: 0, r: dirRunes[up]})
 }
 
 func Test_HeadDownAppendsNewVector(t *testing.T) {
 	s := newSnake(pos{x: 10, y: 10})
-	s.headDown()
+	s.moveDown()
 
 	require.Equal(t, s.vecs[1], vector{dir: down, mag: 0, r: dirRunes[down]})
 }
@@ -84,7 +85,7 @@ func Test_MovingCurrentDirectionDoesNotAddVector(t *testing.T) {
 			{dir: up, mag: 2},
 		},
 	}
-	s.headUp()
+	s.moveUp()
 
 	require.Len(t, s.vecs, 1)
 	require.Equal(t, s.vecs[0], vector{dir: up, mag: 2})
@@ -93,14 +94,14 @@ func Test_MovingCurrentDirectionDoesNotAddVector(t *testing.T) {
 func Test_ChangingDirectionDoesNotAddVectorIfMagnitudeIsZero(t *testing.T) {
 	s := newSnake(pos{x: 10, y: 10})
 
-	s.headUp()
-	s.headUp()
-	s.headRight()
-	s.headUp()
-	s.headDown()
-	s.headDown()
-	s.headLeft()
-	s.headUp()
+	s.moveUp()
+	s.moveUp()
+	s.moveRight()
+	s.moveUp()
+	s.moveDown()
+	s.moveDown()
+	s.moveLeft()
+	s.moveUp()
 
 	require.Len(t, s.vecs, 2)
 	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.vecs[0])
@@ -110,7 +111,7 @@ func Test_ChangingDirectionDoesNotAddVectorIfMagnitudeIsZero(t *testing.T) {
 func Test_SnakeCantDoubleBackOnSelfRightToLeft(t *testing.T) {
 	s := newSnake(pos{x: 10, y: 10})
 
-	s.headLeft()
+	s.moveLeft()
 
 	require.Len(t, s.vecs, 1)
 	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, s.vecs[0])
@@ -123,7 +124,7 @@ func Test_SnakeCantDoubleBackOnSelfLeftToRight(t *testing.T) {
 		},
 	}
 
-	s.headRight()
+	s.moveRight()
 
 	require.Len(t, s.vecs, 1)
 	require.Equal(t, vector{dir: left, mag: 1}, s.vecs[0])
@@ -136,7 +137,7 @@ func Test_SnakeCantDoubleBackOnSelfUpToDown(t *testing.T) {
 		},
 	}
 
-	s.headDown()
+	s.moveDown()
 
 	require.Len(t, s.vecs, 1)
 	require.Equal(t, vector{dir: up, mag: 1}, s.vecs[0])
@@ -149,7 +150,7 @@ func Test_SnakeCantDoubleBackOnSelfDownToUp(t *testing.T) {
 		},
 	}
 
-	s.headUp()
+	s.moveUp()
 
 	require.Len(t, s.vecs, 1)
 	require.Equal(t, vector{dir: down, mag: 1}, s.vecs[0])
@@ -162,7 +163,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 		exp  pos
 	}{
 		{
-			name: "headDown",
+			name: "down",
 			m:    vector{dir: down, mag: 3},
 			exp:  pos{x: 40, y: 41},
 		},
@@ -282,7 +283,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromRightEdgeOfScreen(t *testing.T) {
 		lowerRight: pos{x: 20, y: 20},
 	}
 	s.move(b, moveDelta)
-	s.headDown()
+	s.moveDown()
 	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
@@ -303,7 +304,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromLeftEdgeOfScreen(t *testing.T) {
 		lowerRight: pos{x: 20, y: 20},
 	}
 	s.move(b, moveDelta)
-	s.headUp()
+	s.moveUp()
 	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
@@ -324,7 +325,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromTopEdgeOfScreen(t *testing.T) {
 		lowerRight: pos{x: 20, y: 20},
 	}
 	s.move(b, moveDelta)
-	s.headLeft()
+	s.moveLeft()
 	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)
@@ -345,7 +346,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) 
 		lowerRight: pos{x: 20, y: 20},
 	}
 	s.move(b, moveDelta)
-	s.headRight()
+	s.moveRight()
 	s.move(b, moveDelta)
 
 	require.Len(t, s.vecs, 2)

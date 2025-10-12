@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"time"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 var dirRunes = map[direction]rune{
@@ -116,19 +117,19 @@ func (s *snake) draw(scn tcell.Screen) {
 	}
 }
 
-func (s *snake) headLeft() {
+func (s *snake) moveLeft() {
 	s.changeDirection(left)
 }
 
-func (s *snake) headRight() {
+func (s *snake) moveRight() {
 	s.changeDirection(right)
 }
 
-func (s *snake) headUp() {
+func (s *snake) moveUp() {
 	s.changeDirection(up)
 }
 
-func (s *snake) headDown() {
+func (s *snake) moveDown() {
 	s.changeDirection(down)
 }
 
@@ -227,13 +228,13 @@ func (s *snake) tail() *vector {
 func (s *snake) notify(ev *tcell.EventKey) {
 	switch ev.Key() {
 	case tcell.KeyDown:
-		s.headDown()
+		s.moveDown()
 	case tcell.KeyUp:
-		s.headUp()
+		s.moveUp()
 	case tcell.KeyRight:
-		s.headRight()
+		s.moveRight()
 	case tcell.KeyLeft:
-		s.headLeft()
+		s.moveLeft()
 	}
 }
 
