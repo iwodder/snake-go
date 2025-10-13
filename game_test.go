@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"github.com/stretchr/testify/require"
 	"sync"
 	"testing"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Styles(t *testing.T) {
@@ -38,6 +39,7 @@ func Test_EventPollerLoopExitsOnNil(t *testing.T) {
 	g := newGame(scn)
 
 	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
 		g.eventPoller()
 		wg.Done()

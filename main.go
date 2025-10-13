@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"log"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 func main() {
@@ -13,5 +14,5 @@ func main() {
 	if err = scn.Init(); err != nil {
 		log.Fatalf("failed to init screen: %v", err)
 	}
-	newGame(scn).start()
+	newGame(scn).run()
 }

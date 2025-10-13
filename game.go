@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/gdamore/tcell/v2"
+	"log"
 	"os"
 	"time"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 const maxWidth = 40
@@ -37,7 +39,13 @@ type game struct {
 	exitFunc func(int)
 }
 
-func (g *game) start() {
+func (g *game) run() {
+	defer func() {
+		if r := recover(); r != nil {
+			g.scn.Fini()
+			log.Fatalf("panic caught in game loop: %v", r)
+		}
+	}()
 	go g.eventPoller()
 
 	now := time.Now()
@@ -60,8 +68,6 @@ func (g *game) start() {
 			g.snake.draw(g.scn)
 			g.apples.draw(g.scn)
 			g.scn.Show()
-
-			time.Sleep(time.Second / 60)
 		}
 	}
 }
