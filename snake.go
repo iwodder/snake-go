@@ -168,12 +168,8 @@ func (s *snake) moveDown() {
 }
 
 func (s *snake) changeDirection(d direction) {
-	if last := s.head(); s.isNewDirectionValid(last.dir, d) {
-		if last.mag == 0 {
-			last.dir = d
-		} else {
-			s.vecs = append(s.vecs, vector{dir: d, mag: 0, r: dirRunes[d]})
-		}
+	if head := s.head(); head.mag > 0 && s.isNewDirectionValid(head.dir, d) {
+		s.vecs = append(s.vecs, vector{dir: d, mag: 0, r: dirRunes[d]})
 	}
 }
 

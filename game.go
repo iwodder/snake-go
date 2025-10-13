@@ -59,21 +59,21 @@ func (g *game) run() {
 		case ev := <-g.events:
 			g.kl.post(ev)
 		default:
-			g.snake.eat(g.apples)
-
-			g.snake.move(g.board.boundary(), delta)
-			g.apples.move(g.board.boundary(), delta)
-
-			g.board.draw(g.scn)
-			g.snake.draw(g.scn)
-			g.apples.draw(g.scn)
-			g.scn.Show()
 		}
+
+		g.snake.eat(g.apples)
+
+		g.snake.move(g.board.boundary(), delta)
+		g.apples.move(g.board.boundary(), delta)
+
+		g.board.draw(g.scn)
+		g.snake.draw(g.scn)
+		g.apples.draw(g.scn)
+		g.scn.Show()
 	}
 }
 
 func (g *game) eventPoller() {
-	g.events = make(chan *tcell.EventKey)
 	for {
 		switch ev := g.scn.PollEvent().(type) {
 		case *tcell.EventKey:
@@ -100,7 +100,7 @@ func newGame(scn tcell.Screen) *game {
 	ret := game{
 		kl:       keyListeners{},
 		scn:      scn,
-		events:   make(chan *tcell.EventKey),
+		events:   make(chan *tcell.EventKey, 1),
 		exitFunc: os.Exit,
 	}
 
