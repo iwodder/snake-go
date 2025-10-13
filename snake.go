@@ -46,57 +46,6 @@ type pos struct {
 	x, y int
 }
 
-type boundary struct {
-	upperLeft  pos
-	lowerRight pos
-}
-
-// isInside reports whether the argument is within the boundary. The boundary are adjusted to be zero-based.
-func (b boundary) isInside(p pos) bool {
-	return (b.upperLeft.x < p.x && p.x < b.lowerRight.x-1) && (b.upperLeft.y < p.y && p.y < b.lowerRight.y-1)
-}
-
-func (b boundary) leftEdge() int {
-	return b.upperLeft.x
-}
-
-func (b boundary) rightEdge() int {
-	return b.lowerRight.x - 1
-}
-
-func (b boundary) topEdge() int {
-	return b.upperLeft.y
-}
-
-func (b boundary) bottomEdge() int {
-	return b.lowerRight.y - 1
-}
-
-func (b boundary) height() int {
-	return b.lowerRight.y - b.upperLeft.y
-}
-
-func (b boundary) width() int {
-	return b.lowerRight.x - b.upperLeft.x
-}
-
-func (b boundary) shrink(amt int) boundary {
-	return boundary{
-		upperLeft: pos{
-			x: b.upperLeft.x + amt,
-			y: b.upperLeft.y + amt,
-		},
-		lowerRight: pos{
-			x: b.lowerRight.x - amt,
-			y: b.lowerRight.y - amt,
-		},
-	}
-}
-
-func (b boundary) center() pos {
-	return pos{x: b.width() / 2, y: b.height() / 2}
-}
-
 type vector struct {
 	dir direction
 	mag int
@@ -177,7 +126,7 @@ func (s *snake) isNewDirectionValid(last, new direction) bool {
 	return last != new && !new.isOpposite(last)
 }
 
-func (s *snake) move(b boundary, delta time.Duration) {
+func (s *snake) move(b *board, delta time.Duration) {
 	if !s.canMove(b, delta) {
 		return
 	}
@@ -201,7 +150,7 @@ func (s *snake) move(b boundary, delta time.Duration) {
 	}
 }
 
-func (s *snake) canMove(b boundary, delta time.Duration) bool {
+func (s *snake) canMove(b *board, delta time.Duration) bool {
 	s.timer -= delta
 	if s.timer > 0 {
 		return false
@@ -210,14 +159,11 @@ func (s *snake) canMove(b boundary, delta time.Duration) bool {
 	}
 
 	p := s.headPos()
-	if b.isInside(p) {
-		return true
-	}
-	lastDir := s.head().dir
-	return !((p.x >= b.rightEdge() && lastDir == right) ||
-		(p.x <= b.leftEdge() && lastDir == left) ||
-		(p.y <= b.topEdge() && lastDir == up) ||
-		(p.y >= b.bottomEdge() && lastDir == down))
+	currentDir := s.head().dir
+	return !((p.x >= b.rightEdge() && currentDir == right) ||
+		(p.x <= b.leftEdge() && currentDir == left) ||
+		(p.y <= b.topEdge() && currentDir == up) ||
+		(p.y >= b.bottomEdge() && currentDir == down))
 }
 
 func (s *snake) eat(as apples) {

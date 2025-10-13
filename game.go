@@ -63,8 +63,8 @@ func (g *game) run() {
 
 		g.snake.eat(g.apples)
 
-		g.snake.move(g.board.boundary(), delta)
-		g.apples.move(g.board.boundary(), delta)
+		g.snake.move(g.board, delta)
+		g.apples.move(g.board, delta)
 
 		g.board.draw(g.scn)
 		g.snake.draw(g.scn)
@@ -107,8 +107,8 @@ func newGame(scn tcell.Screen) *game {
 	x, y := ret.scn.Size()
 	ret.board = newBoard(pos{x: 0, y: 0}, pos{x: min(x, maxWidth), y: min(y, maxHeight)})
 
-	ret.snake = newSnake(ret.board.boundary().center())
-	ret.apples = newApples(ret.board.boundary(), 2)
+	ret.snake = newSnake(ret.board.center())
+	ret.apples = newApples(ret.board, 2)
 
 	ret.registerKeyListener(ret.snake)
 	ret.registerKeyListener(&ret)

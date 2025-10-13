@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_CanDrawApple(t *testing.T) {
@@ -36,7 +37,7 @@ func Test_CanDrawApples(t *testing.T) {
 func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
 	a := apple{pos: pos{x: 10, y: 10}, eaten: true}
 
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -50,7 +51,7 @@ func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
 func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
 	a := apple{pos: pos{x: 10, y: 10}, eaten: false}
 
-	a.move(boundary{
+	a.move(&board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	})
@@ -65,7 +66,7 @@ func Test_CanMoveApples(t *testing.T) {
 		{pos: pos{x: 2, y: 2}, eaten: false},
 		{pos: pos{x: 3, y: 3}, eaten: true},
 	}
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -82,15 +83,15 @@ func Test_CanMoveApples(t *testing.T) {
 }
 
 func Test_NewApplesHasSizeOfTwo(t *testing.T) {
-	as := newApples(boundary{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, 2)
+	as := newApples(&board{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, 2)
 
 	require.Len(t, as, 2)
 	require.NotEqual(t, as[0], as[1])
 }
 
-func requireWithinBounds(t *testing.T, b boundary, p pos) {
-	require.Less(t, p.x, b.lowerRight.x)
-	require.Less(t, p.y, b.lowerRight.y)
-	require.Greater(t, p.x, b.upperLeft.x)
-	require.Greater(t, p.y, b.upperLeft.y)
+func requireWithinBounds(t *testing.T, b *board, p pos) {
+	require.Less(t, p.x, b.rightEdge())
+	require.Less(t, p.y, b.bottomEdge())
+	require.Greater(t, p.x, b.leftEdge())
+	require.Greater(t, p.y, b.topEdge())
 }

@@ -266,7 +266,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 					tt.m,
 				},
 			}
-			s.move(boundary{
+			s.move(&board{
 				upperLeft:  pos{x: 0, y: 0},
 				lowerRight: pos{x: 80, y: 80},
 			}, moveDelta)
@@ -280,7 +280,7 @@ func Test_UpdateMovesPosInDirectionOfFirstVector(t *testing.T) {
 
 func Test_MoveDoesNotChangeMagnitudeWhenOnlyOneSegmentExists(t *testing.T) {
 	sn := newSnake(pos{x: 10, y: 10})
-	sn.move(boundary{
+	sn.move(&board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}, moveDelta)
@@ -296,7 +296,7 @@ func Test_MoveDoesChangeMagnitudeWhenMoreThanOneSegmentExists(t *testing.T) {
 			{dir: down, mag: 1},
 		},
 	}
-	s.move(boundary{
+	s.move(&board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}, moveDelta)
@@ -327,7 +327,7 @@ func Test_SnakeWontMoveOutsideOfThe(t *testing.T) {
 			vec:  vector{dir: down, mag: 9},
 		},
 	}
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -353,7 +353,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromRightEdgeOfScreen(t *testing.T) {
 			{dir: right, mag: 10, r: dirRunes[right]},
 		},
 	}
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -374,7 +374,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromLeftEdgeOfScreen(t *testing.T) {
 			{dir: left, mag: 10, r: dirRunes[left]},
 		},
 	}
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -395,7 +395,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromTopEdgeOfScreen(t *testing.T) {
 			{dir: up, mag: 10, r: dirRunes[up]},
 		},
 	}
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -416,7 +416,7 @@ func Test_SnakeWontMoveUntilDirectionIsAwayFromBottomEdgeOfScreen(t *testing.T) 
 			{dir: down, mag: 10, r: dirRunes[down]},
 		},
 	}
-	b := boundary{
+	b := &board{
 		upperLeft:  pos{x: 0, y: 0},
 		lowerRight: pos{x: 20, y: 20},
 	}
@@ -449,7 +449,7 @@ func Test_SnakeMovesFourSquaresPerSecond(t *testing.T) {
 	s := newSnake(pos{x: 10, y: 10})
 	ticks := 0
 	for range ticker.C {
-		s.move(boundary{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, rate)
+		s.move(&board{upperLeft: pos{x: 0, y: 0}, lowerRight: pos{x: 20, y: 20}}, rate)
 		ticks += 1
 		if ticks == 20 {
 			ticker.Stop()
@@ -469,79 +469,6 @@ func Test_NewSnakeState(t *testing.T) {
 	require.Equal(t, 24, cap(sn.vecs))
 	require.Equal(t, vector{dir: right, mag: 1, r: dirRunes[right]}, sn.vecs[0])
 	requireEqualContents(t, 41, 40, dirRunes[right], scn)
-}
-
-func Test_BoundsMethods(t *testing.T) {
-	tests := []struct {
-		name   string
-		method func(boundary) int
-		exp    int
-	}{
-		{
-			name:   "top edge",
-			method: boundary.topEdge,
-			exp:    2,
-		},
-		{
-			name:   "left edge",
-			method: boundary.leftEdge,
-			exp:    1,
-		},
-		{
-			name:   "right edge",
-			method: boundary.rightEdge,
-			exp:    19,
-		},
-		{
-			name:   "bottom edge",
-			method: boundary.bottomEdge,
-			exp:    19,
-		},
-		{
-			name:   "height",
-			method: boundary.height,
-			exp:    18,
-		},
-		{
-			name:   "width",
-			method: boundary.width,
-			exp:    19,
-		},
-	}
-	b := boundary{
-		upperLeft:  pos{x: 1, y: 2},
-		lowerRight: pos{x: 20, y: 20},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.exp, tt.method(b))
-		})
-	}
-}
-
-func Test_ShrinkBounds(t *testing.T) {
-	b := boundary{
-		upperLeft:  pos{x: 1, y: 1},
-		lowerRight: pos{x: 20, y: 20},
-	}
-	exp := boundary{
-		upperLeft:  pos{x: 2, y: 2},
-		lowerRight: pos{x: 19, y: 19},
-	}
-	require.Equal(t, exp, b.shrink(1))
-}
-
-func Test_BoundsCenter(t *testing.T) {
-	b := boundary{
-		upperLeft: pos{
-			x: 0, y: 0,
-		},
-		lowerRight: pos{
-			x: 20, y: 20,
-		},
-	}
-
-	require.Equal(t, pos{10, 10}, b.center())
 }
 
 func Test_SnakeRespondsToKeyEvents(t *testing.T) {
