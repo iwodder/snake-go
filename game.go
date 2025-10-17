@@ -105,7 +105,7 @@ func newGame(scn tcell.Screen) *game {
 	}
 
 	x, y := ret.scn.Size()
-	ret.board = newBoard(pos{x: 0, y: 0}, pos{x: min(x, maxWidth), y: min(y, maxHeight)})
+	ret.board = newBoard(Position{x: 0, y: 0}, Position{x: min(x, maxWidth), y: min(y, maxHeight)})
 
 	ret.snake = newSnake(ret.board.center())
 	ret.apples = newApples(ret.board, 2)

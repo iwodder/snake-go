@@ -7,8 +7,8 @@ import (
 const borderWidth = 1
 
 type board struct {
-	upperLeft  pos
-	lowerRight pos
+	upperLeft  Position
+	lowerRight Position
 }
 
 func (b *board) draw(scn tcell.Screen) {
@@ -71,15 +71,15 @@ func (b *board) height() int {
 	return b.lowerRight.y - b.upperLeft.y
 }
 
-func (b *board) center() pos {
-	return pos{x: b.width() / 2, y: b.height() / 2}
+func (b *board) center() Position {
+	return Position{x: b.width() / 2, y: b.height() / 2}
 }
 
-func (b *board) isInside(p pos) bool {
-	return p.x > b.leftEdge() && p.x < b.rightEdge() && p.y > b.topEdge() && p.y < b.bottomEdge()
+func (b *board) isInside(pos Position) bool {
+	return pos.x > b.leftEdge() && pos.x < b.rightEdge() && pos.y > b.topEdge() && pos.y < b.bottomEdge()
 }
 
-func newBoard(ul, lr pos) *board {
+func newBoard(ul, lr Position) *board {
 	return &board{
 		upperLeft:  ul,
 		lowerRight: lr,

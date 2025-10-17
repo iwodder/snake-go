@@ -10,7 +10,7 @@ import (
 func Test_BoxCanDraw(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(pos{x: 0, y: 0}, pos{x: 10, y: 10})
+	b := newBoard(Position{x: 0, y: 0}, Position{x: 10, y: 10})
 
 	b.draw(dst)
 
@@ -33,7 +33,7 @@ func Test_BoxCanDraw(t *testing.T) {
 func Test_BoxFillsEachCell(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(pos{x: 0, y: 0}, pos{x: 10, y: 10})
+	b := newBoard(Position{x: 0, y: 0}, Position{x: 10, y: 10})
 
 	b.draw(dst)
 

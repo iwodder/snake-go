@@ -42,7 +42,7 @@ const (
 	left
 )
 
-type pos struct {
+type Position struct {
 	x, y int
 }
 
@@ -52,7 +52,7 @@ type vector struct {
 	r   rune
 }
 
-func (v vector) draw(scn tcell.Screen, start pos, style tcell.Style) pos {
+func (v vector) draw(scn tcell.Screen, start Position, style tcell.Style) Position {
 	for range v.mag {
 		switch v.dir {
 		case up:
@@ -70,7 +70,7 @@ func (v vector) draw(scn tcell.Screen, start pos, style tcell.Style) pos {
 }
 
 type snake struct {
-	start pos
+	start Position
 	vecs  []vector
 	timer time.Duration
 }
@@ -176,8 +176,8 @@ func (s *snake) eat(as apples) {
 	}
 }
 
-func (s *snake) headPos() pos {
-	ret := pos{x: s.start.x, y: s.start.y}
+func (s *snake) headPos() Position {
+	ret := Position{x: s.start.x, y: s.start.y}
 	for _, seg := range s.vecs {
 		switch seg.dir {
 		case up:
@@ -214,7 +214,7 @@ func (s *snake) notify(ev *tcell.EventKey) {
 	}
 }
 
-func newSnake(initial pos) *snake {
+func newSnake(initial Position) *snake {
 	return &snake{
 		start: initial,
 		vecs:  append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
