@@ -5,12 +5,13 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_BoxCanDraw(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(Position{x: 0, y: 0}, Position{x: 10, y: 10})
+	b := newBoard(Position{x: 0, y: 0}, Position{x: 9, y: 9})
 
 	b.draw(dst)
 
@@ -43,4 +44,38 @@ func Test_BoxFillsEachCell(t *testing.T) {
 			assert.Equal(t, boardStyle, style, "cell (x=%d,y=%d) didn't have the correct style", x, y)
 		}
 	}
+}
+
+func Test_Board(t *testing.T) {
+	t.Run("height", func(t *testing.T) {
+		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
+
+		require.Equal(t, 11, board.height())
+	})
+
+	t.Run("width", func(t *testing.T) {
+		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
+
+		require.Equal(t, 6, board.width())
+	})
+
+	t.Run("test edges", func(t *testing.T) {
+		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
+
+		t.Run("top", func(t *testing.T) {
+			require.Equal(t, 1, board.topEdge())
+		})
+
+		t.Run("bottom", func(t *testing.T) {
+			require.Equal(t, 9, board.bottomEdge())
+		})
+
+		t.Run("left", func(t *testing.T) {
+			require.Equal(t, 1, board.leftEdge())
+		})
+
+		t.Run("right", func(t *testing.T) {
+			require.Equal(t, 4, board.rightEdge())
+		})
+	})
 }

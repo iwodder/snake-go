@@ -13,38 +13,42 @@ type board struct {
 
 func (b *board) draw(scn tcell.Screen) {
 	b.fill(scn)
-	b.drawHorizontalEdges(scn)
-	b.drawVerticalEdges(scn)
-	b.setCorners(scn)
+	b.drawBorder(scn)
 }
 
 func (b *board) fill(scn tcell.Screen) {
-	for x := range b.width() {
-		for y := range b.height() {
+	for x := 0; x < b.width(); x++ {
+		for y := 0; y < b.height(); y++ {
 			scn.SetContent(x, y, ' ', nil, boardStyle)
 		}
 	}
 }
 
+func (b *board) drawBorder(scn tcell.Screen) {
+	b.drawHorizontalEdges(scn)
+	b.drawVerticalEdges(scn)
+	b.setCorners(scn)
+}
+
 func (b *board) drawHorizontalEdges(scn tcell.Screen) {
-	for x := range b.width() {
-		scn.SetContent(x, 0, tcell.RuneHLine, nil, boardStyle)
-		scn.SetContent(x, b.height()-1, tcell.RuneHLine, nil, boardStyle)
+	for x := 0; x < b.width(); x++ {
+		scn.SetContent(x, b.upperLeft.y, tcell.RuneHLine, nil, boardStyle)
+		scn.SetContent(x, b.lowerRight.y, tcell.RuneHLine, nil, boardStyle)
 	}
 }
 
 func (b *board) drawVerticalEdges(scn tcell.Screen) {
-	for y := range b.height() {
-		scn.SetContent(0, y, tcell.RuneVLine, nil, boardStyle)
-		scn.SetContent(b.width()-1, y, tcell.RuneVLine, nil, boardStyle)
+	for y := 0; y < b.height(); y++ {
+		scn.SetContent(b.upperLeft.x, y, tcell.RuneVLine, nil, boardStyle)
+		scn.SetContent(b.lowerRight.x, y, tcell.RuneVLine, nil, boardStyle)
 	}
 }
 
 func (b *board) setCorners(scn tcell.Screen) {
-	scn.SetContent(0, 0, tcell.RuneULCorner, nil, boardStyle)
-	scn.SetContent(b.width()-1, 0, tcell.RuneURCorner, nil, boardStyle)
-	scn.SetContent(0, b.height()-1, tcell.RuneLLCorner, nil, boardStyle)
-	scn.SetContent(b.width()-1, b.height()-1, tcell.RuneLRCorner, nil, boardStyle)
+	scn.SetContent(b.upperLeft.x, b.upperLeft.y, tcell.RuneULCorner, nil, boardStyle)
+	scn.SetContent(b.lowerRight.x, b.upperLeft.y, tcell.RuneURCorner, nil, boardStyle)
+	scn.SetContent(b.upperLeft.x, b.lowerRight.y, tcell.RuneLLCorner, nil, boardStyle)
+	scn.SetContent(b.lowerRight.x, b.lowerRight.y, tcell.RuneLRCorner, nil, boardStyle)
 }
 
 func (b *board) leftEdge() int {
@@ -64,11 +68,11 @@ func (b *board) bottomEdge() int {
 }
 
 func (b *board) width() int {
-	return b.lowerRight.x - b.upperLeft.x
+	return b.lowerRight.x - b.upperLeft.x + 1
 }
 
 func (b *board) height() int {
-	return b.lowerRight.y - b.upperLeft.y
+	return b.lowerRight.y - b.upperLeft.y + 1
 }
 
 func (b *board) center() Position {
