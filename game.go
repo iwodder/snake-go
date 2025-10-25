@@ -32,7 +32,6 @@ func (k keyListeners) post(event *tcell.EventKey) {
 
 type game struct {
 	kl       keyListeners
-	scn      tcell.Screen
 	events   chan *tcell.EventKey
 	board    *board
 	snake    *snake
@@ -71,30 +70,19 @@ func (g *game) registerKeyListener(kl keyListener) {
 	g.kl = append(g.kl, kl)
 }
 
-func (g *game) notify(ev *tcell.EventKey) {
-	switch ev.Key() {
-	case tcell.KeyCtrlC, tcell.KeyEscape:
-		g.scn.Fini()
-	}
-}
-
 func newGame(scn tcell.Screen) *game {
-	ret := game{
-		kl:     keyListeners{},
-		scn:    scn,
+	x, y := scn.Size()
+	b := newBoard(Position{x: 0, y: 0}, Position{x: min(x, maxWidth), y: min(y, maxHeight)})
+	s := newSnake(b.center())
+	a := newApples(b, 2)
+
+	return &game{
+		kl:     keyListeners{s},
 		events: make(chan *tcell.EventKey, 1),
+		board:  b,
+		snake:  s,
+		apples: a,
 	}
-
-	x, y := ret.scn.Size()
-	ret.board = newBoard(Position{x: 0, y: 0}, Position{x: min(x, maxWidth), y: min(y, maxHeight)})
-
-	ret.snake = newSnake(ret.board.center())
-	ret.apples = newApples(ret.board, 2)
-
-	ret.registerKeyListener(ret.snake)
-	ret.registerKeyListener(&ret)
-
-	return &ret
 }
 
 type Game interface {
