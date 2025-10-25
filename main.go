@@ -14,5 +14,9 @@ func main() {
 	if err = scn.Init(); err != nil {
 		log.Fatalf("failed to init screen: %v", err)
 	}
-	newGame(scn).run()
+	err = RunGame(newGame(scn), scn)
+	scn.Fini()
+	if err != nil {
+		log.Fatalf("error while running game: %v", err)
+	}
 }

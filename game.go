@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
-	"os"
+	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -36,52 +37,34 @@ type game struct {
 	board    *board
 	snake    *snake
 	apples   apples
-	exitFunc func(int)
+	finished bool
 }
 
-func (g *game) run() {
-	defer func() {
-		if r := recover(); r != nil {
-			g.scn.Fini()
-			log.Fatalf("panic caught in game loop: %v", r)
-		}
-	}()
-	go g.eventPoller()
-
-	now := time.Now()
-	var delta time.Duration
-	for {
-		next := time.Now()
-		delta = next.Sub(now)
-		now = next
-
-		select {
-		case ev := <-g.events:
-			g.kl.post(ev)
-		default:
-		}
-
-		g.snake.eat(g.apples)
-
-		g.snake.move(g.board, delta)
-		g.apples.move(g.board, delta)
-
-		g.board.draw(g.scn)
-		g.snake.draw(g.scn)
-		g.apples.draw(g.scn)
-		g.scn.Show()
-	}
-}
-
-func (g *game) eventPoller() {
-	for {
-		switch ev := g.scn.PollEvent().(type) {
-		case *tcell.EventKey:
-			g.events <- ev
-		case nil: // screen finalized
+func (g *game) Handle(event tcell.Event) {
+	switch ev := event.(type) {
+	case *tcell.EventKey:
+		if ev.Key() == tcell.KeyCtrlC {
+			g.finished = true
 			return
 		}
+		g.kl.post(ev)
 	}
+}
+
+func (g *game) Update(delta time.Duration) {
+	g.snake.eat(g.apples)
+	g.snake.move(g.board, delta)
+	g.apples.move(g.board, delta)
+}
+
+func (g *game) Draw(scrn tcell.Screen) {
+	g.board.draw(scrn)
+	g.snake.draw(scrn)
+	g.apples.draw(scrn)
+}
+
+func (g *game) Finished() bool {
+	return g.finished
 }
 
 func (g *game) registerKeyListener(kl keyListener) {
@@ -92,16 +75,14 @@ func (g *game) notify(ev *tcell.EventKey) {
 	switch ev.Key() {
 	case tcell.KeyCtrlC, tcell.KeyEscape:
 		g.scn.Fini()
-		g.exitFunc(0)
 	}
 }
 
 func newGame(scn tcell.Screen) *game {
 	ret := game{
-		kl:       keyListeners{},
-		scn:      scn,
-		events:   make(chan *tcell.EventKey, 1),
-		exitFunc: os.Exit,
+		kl:     keyListeners{},
+		scn:    scn,
+		events: make(chan *tcell.EventKey, 1),
 	}
 
 	x, y := ret.scn.Size()
@@ -114,4 +95,48 @@ func newGame(scn tcell.Screen) *game {
 	ret.registerKeyListener(&ret)
 
 	return &ret
+}
+
+type Game interface {
+	Handle(event tcell.Event)
+	Update(delta time.Duration)
+	Draw(scrn tcell.Screen)
+	Finished() bool
+}
+
+func RunGame(game Game, scrn tcell.Screen) (err error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	eventQueue := runEventPoller(ctx, scrn)
+	defer func() {
+		cancel()
+		if r := recover(); r != nil {
+			err = errors.Join(err, fmt.Errorf("panic caught in game loop: %v", r))
+		}
+	}()
+
+	now := time.Now()
+	var delta time.Duration
+	for !game.Finished() {
+		next := time.Now()
+		delta = next.Sub(now)
+		now = next
+
+		select {
+		case ev := <-eventQueue:
+			game.Handle(ev)
+		default:
+		}
+		game.Update(delta)
+		game.Draw(scrn)
+		scrn.Show()
+	}
+	return nil
+}
+
+func runEventPoller(ctx context.Context, scrn tcell.Screen) <-chan tcell.Event {
+	ret := make(chan tcell.Event, 1)
+	go func() {
+		scrn.ChannelEvents(ret, ctx.Done())
+	}()
+	return ret
 }
