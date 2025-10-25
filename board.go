@@ -1,19 +1,26 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gdamore/tcell/v2"
 )
 
-const borderWidth = 1
+const (
+	borderWidth = 1
+	scoreHeight = 2
+)
 
 type board struct {
 	upperLeft  Position
 	lowerRight Position
+	score      uint
 }
 
 func (b *board) draw(scn tcell.Screen) {
 	b.fill(scn)
 	b.drawBorder(scn)
+	b.drawScoreArea(scn)
 }
 
 func (b *board) fill(scn tcell.Screen) {
@@ -51,6 +58,18 @@ func (b *board) setCorners(scn tcell.Screen) {
 	scn.SetContent(b.lowerRight.x, b.lowerRight.y, tcell.RuneLRCorner, nil, boardStyle)
 }
 
+func (b *board) drawScoreArea(scn tcell.Screen) {
+	scn.SetContent(b.upperLeft.x, scoreHeight, tcell.RuneLTee, nil, boardStyle)
+	scn.SetContent(b.lowerRight.x, scoreHeight, tcell.RuneRTee, nil, boardStyle)
+	for x := b.upperLeft.x + 1; x < b.lowerRight.x; x++ {
+		scn.SetContent(x, scoreHeight, tcell.RuneHLine, nil, boardStyle)
+	}
+	textStart := b.upperLeft.x + 1
+	for i, r := range fmt.Sprintf("Score: %d", b.score) {
+		scn.SetContent(textStart+i, b.upperLeft.y+1, r, nil, boardStyle)
+	}
+}
+
 func (b *board) leftEdge() int {
 	return b.upperLeft.x + borderWidth
 }
@@ -60,7 +79,7 @@ func (b *board) rightEdge() int {
 }
 
 func (b *board) topEdge() int {
-	return b.upperLeft.y + borderWidth
+	return b.upperLeft.y + borderWidth + scoreHeight
 }
 
 func (b *board) bottomEdge() int {
@@ -83,9 +102,14 @@ func (b *board) isInside(pos Position) bool {
 	return pos.x > b.leftEdge() && pos.x < b.rightEdge() && pos.y > b.topEdge() && pos.y < b.bottomEdge()
 }
 
+func (b *board) setScore(score uint) {
+	b.score = score
+}
+
 func newBoard(ul, lr Position) *board {
-	return &board{
+	ret := board{
 		upperLeft:  ul,
 		lowerRight: lr,
 	}
+	return &ret
 }

@@ -11,6 +11,7 @@ import (
 
 const maxWidth = 40
 const maxHeight = maxWidth
+const pointsPerApple uint = 100
 
 var (
 	appleStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
@@ -36,6 +37,7 @@ type game struct {
 	board    *board
 	snake    *snake
 	apples   apples
+	score    uint
 	finished bool
 }
 
@@ -51,7 +53,9 @@ func (g *game) Handle(event tcell.Event) {
 }
 
 func (g *game) Update(delta time.Duration) {
-	g.snake.eat(g.apples)
+	applesEaten := g.snake.eat(g.apples)
+	g.score += applesEaten * pointsPerApple
+	g.board.setScore(g.score)
 	g.snake.move(g.board, delta)
 	g.apples.move(g.board, delta)
 }

@@ -48,7 +48,7 @@ func (a *apple) move(b *board) {
 func (a *apple) setPos(b *board) {
 	p := Position{x: rand.Intn(b.rightEdge()), y: rand.Intn(b.bottomEdge())}
 	for a.pos == p || !b.isInside(p) {
-		p = Position{x: rand.Intn(b.lowerRight.x), y: rand.Intn(b.lowerRight.y)}
+		p = Position{x: rand.Intn(b.rightEdge()), y: rand.Intn(b.bottomEdge())}
 	}
 	a.pos = p
 }

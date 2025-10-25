@@ -61,21 +61,22 @@ func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
 }
 
 func Test_CanMoveApples(t *testing.T) {
-	a := apples{
-		{pos: Position{x: 1, y: 1}, eaten: true},
-		{pos: Position{x: 2, y: 2}, eaten: false},
-		{pos: Position{x: 3, y: 3}, eaten: true},
-	}
 	b := &board{
 		upperLeft:  Position{x: 0, y: 0},
 		lowerRight: Position{x: 20, y: 20},
 	}
+	a := apples{
+		{pos: Position{x: 1, y: 1}, eaten: true},
+		{pos: Position{x: b.leftEdge() + 1, y: b.topEdge() + 1}, eaten: false},
+		{pos: Position{x: 3, y: 3}, eaten: true},
+	}
+
 	a.move(b, 0)
 
 	require.NotEqual(t, apple{pos: Position{x: 1, y: 1}, eaten: true}, a[0])
 	requireWithinBounds(t, b, a[0].pos)
 
-	require.Equal(t, apple{pos: Position{x: 2, y: 2}, eaten: false}, a[1])
+	require.Equal(t, apple{pos: Position{x: b.leftEdge() + 1, y: b.topEdge() + 1}, eaten: false}, a[1])
 	requireWithinBounds(t, b, a[1].pos)
 
 	require.NotEqual(t, apple{pos: Position{x: 3, y: 3}, eaten: true}, a[0])
@@ -90,8 +91,5 @@ func Test_NewApplesHasSizeOfTwo(t *testing.T) {
 }
 
 func requireWithinBounds(t *testing.T, b *board, p Position) {
-	require.Less(t, p.x, b.rightEdge())
-	require.Less(t, p.y, b.bottomEdge())
-	require.Greater(t, p.x, b.leftEdge())
-	require.Greater(t, p.y, b.topEdge())
+	require.Truef(t, b.isInside(p), "%#v was not inside board", p)
 }

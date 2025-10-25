@@ -54,6 +54,24 @@ func Test_RunGame(t *testing.T) {
 	})
 }
 
+func Test_Game(t *testing.T) {
+	t.Run("player earns points for eating apples", func(t *testing.T) {
+		b := board{upperLeft: Position{x: 0, y: 0}, lowerRight: Position{x: 9, y: 9}}
+		a := apples{apple{pos: Position{x: 4, y: 4}}}
+		s := newSnake(Position{x: 3, y: 4})
+
+		g := game{
+			board:  &b,
+			snake:  s,
+			apples: a,
+		}
+
+		g.Update(moveDelta)
+
+		require.Equal(t, pointsPerApple, b.score)
+	})
+}
+
 type spyScreen struct {
 	wasFinialized bool
 	tcell.SimulationScreen

@@ -166,14 +166,17 @@ func (s *snake) canMove(b *board, delta time.Duration) bool {
 		(p.y >= b.bottomEdge() && currentDir == down))
 }
 
-func (s *snake) eat(as apples) {
+func (s *snake) eat(as apples) uint {
+	ret := uint(0)
 	p := s.headPos()
 	for i := range as {
 		if p == as[i].pos {
 			as[i].eaten = true
 			s.vecs[len(s.vecs)-1].mag++
+			ret += 1
 		}
 	}
+	return ret
 }
 
 func (s *snake) headPos() Position {
