@@ -471,46 +471,48 @@ func Test_NewSnakeState(t *testing.T) {
 	requireEqualContents(t, 41, 40, dirRunes[right], scn)
 }
 
-func Test_SnakeRespondsToKeyEvents(t *testing.T) {
-	tests := []struct {
-		name   string
-		ev     *tcell.EventKey
-		snake  snake
-		expDir direction
-	}{
-		{
-			name:   "down arrow",
-			snake:  snake{vecs: []vector{{dir: right, mag: 1, r: dirRunes[right]}}},
-			ev:     tcell.NewEventKey(tcell.KeyDown, tcell.RuneDArrow, tcell.ModNone),
-			expDir: down,
-		},
-		{
-			name:   "up arrow",
-			snake:  snake{vecs: []vector{{dir: right, mag: 1, r: dirRunes[right]}}},
-			ev:     tcell.NewEventKey(tcell.KeyUp, tcell.RuneUArrow, tcell.ModNone),
-			expDir: up,
-		},
-		{
-			name:   "left arrow",
-			snake:  snake{vecs: []vector{{dir: up, mag: 1, r: dirRunes[up]}}},
-			ev:     tcell.NewEventKey(tcell.KeyLeft, tcell.RuneLArrow, tcell.ModNone),
-			expDir: left,
-		},
-		{
-			name:   "right arrow",
-			snake:  snake{vecs: []vector{{dir: up, mag: 1, r: dirRunes[up]}}},
-			ev:     tcell.NewEventKey(tcell.KeyRight, tcell.RuneRArrow, tcell.ModNone),
-			expDir: right,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.snake.notify(tt.ev)
+func Test_Snake(t *testing.T) {
+	var s *snake
+	var b *board
 
-			require.Len(t, tt.snake.vecs, 2)
-			require.Equal(t, tt.expDir, tt.snake.head().dir, "head direction didn't match")
-		})
+	setup := func() {
+		s = newSnake(Position{x: 5, y: 5})
+		b = newBoard(Position{x: 0, y: 0}, Position{x: 9, y: 9})
 	}
+
+	t.Run("responds to events", func(t *testing.T) {
+		t.Run("down event", func(t *testing.T) {
+			setup()
+
+			simulate(s, b, MoveDown)
+
+			require.Equal(t, &vector{dir: down, mag: 1, r: dirRunes[down]}, s.head())
+		})
+
+		t.Run("up event", func(t *testing.T) {
+			setup()
+
+			simulate(s, b, MoveUp)
+
+			require.Equal(t, &vector{dir: up, mag: 1, r: dirRunes[up]}, s.head())
+		})
+
+		t.Run("left event", func(t *testing.T) {
+			setup()
+
+			simulate(s, b, MoveDown, MoveLeft)
+
+			require.Equal(t, &vector{dir: left, mag: 1, r: dirRunes[left]}, s.head())
+		})
+
+		t.Run("right event", func(t *testing.T) {
+			setup()
+
+			simulate(s, b, MoveDown, MoveRight)
+
+			require.Equal(t, &vector{dir: right, mag: 1, r: dirRunes[right]}, s.head())
+		})
+	})
 }
 
 func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {
@@ -528,6 +530,13 @@ func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.Simulation
 
 func setupDefaultScreen(t *testing.T) tcell.SimulationScreen {
 	return setupScreen(t, 80, 80)
+}
+
+func simulate(s *snake, b *board, events ...Event) {
+	for _, event := range events {
+		s.Notify(event)
+		s.move(b, moveDelta)
+	}
 }
 
 func setupScreen(t *testing.T, height, width int) tcell.SimulationScreen {

@@ -204,15 +204,15 @@ func (s *snake) tail() *vector {
 	return &s.vecs[0]
 }
 
-func (s *snake) notify(ev *tcell.EventKey) {
-	switch ev.Key() {
-	case tcell.KeyDown:
+func (s *snake) Notify(event Event) {
+	switch event {
+	case MoveDown:
 		s.moveDown()
-	case tcell.KeyUp:
+	case MoveUp:
 		s.moveUp()
-	case tcell.KeyRight:
+	case MoveRight:
 		s.moveRight()
-	case tcell.KeyLeft:
+	case MoveLeft:
 		s.moveLeft()
 	}
 }

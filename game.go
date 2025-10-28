@@ -19,26 +19,14 @@ var (
 	snakeStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
 )
 
-type keyListener interface {
-	notify(event *tcell.EventKey)
-}
-
-type keyListeners []keyListener
-
-func (k keyListeners) post(event *tcell.EventKey) {
-	for _, listener := range k {
-		listener.notify(event)
-	}
-}
-
 type game struct {
-	kl       keyListeners
-	events   chan *tcell.EventKey
-	board    *board
-	snake    *snake
-	apples   apples
-	score    uint
-	finished bool
+	eventMap       EventMap
+	eventListeners EventListeners
+	board          *board
+	snake          *snake
+	apples         apples
+	score          uint
+	finished       bool
 }
 
 func (g *game) Handle(event tcell.Event) {
@@ -48,7 +36,7 @@ func (g *game) Handle(event tcell.Event) {
 			g.finished = true
 			return
 		}
-		g.kl.post(ev)
+		g.eventListeners.Notify(g.eventMap.Get(event))
 	}
 }
 
@@ -70,10 +58,6 @@ func (g *game) Finished() bool {
 	return g.finished
 }
 
-func (g *game) registerKeyListener(kl keyListener) {
-	g.kl = append(g.kl, kl)
-}
-
 func newGame(scn tcell.Screen) *game {
 	x, y := scn.Size()
 	b := newBoard(Position{x: 0, y: 0}, Position{x: min(x, maxWidth), y: min(y, maxHeight)})
@@ -81,11 +65,11 @@ func newGame(scn tcell.Screen) *game {
 	a := newApples(b, 2)
 
 	return &game{
-		kl:     keyListeners{s},
-		events: make(chan *tcell.EventKey, 1),
-		board:  b,
-		snake:  s,
-		apples: a,
+		eventListeners: EventListeners{s},
+		eventMap:       EventMap{},
+		board:          b,
+		snake:          s,
+		apples:         a,
 	}
 }
 
