@@ -10,6 +10,8 @@ const (
 	MoveDown
 	MoveLeft
 	MoveRight
+	PauseGame
+	ExitGame
 )
 
 type EventListener interface {
@@ -32,7 +34,7 @@ func (e *EventMap) Get(event tcell.Event) Event {
 	case *tcell.EventKey:
 		return e.GetEventFromKey(ev)
 	default:
-		panic("unrecognized event type")
+		return Unknown
 	}
 }
 
@@ -48,6 +50,8 @@ func (e *EventMap) GetEventFromKey(ev *tcell.EventKey) Event {
 			return MoveDown
 		case 'D', 'd':
 			return MoveRight
+		case ' ':
+			return PauseGame
 		}
 		return MoveUp
 	case ev.Key() == tcell.KeyUp:
@@ -58,6 +62,8 @@ func (e *EventMap) GetEventFromKey(ev *tcell.EventKey) Event {
 		return MoveRight
 	case ev.Key() == tcell.KeyLeft:
 		return MoveLeft
+	case ev.Key() == tcell.KeyCtrlC:
+		return ExitGame
 	}
 	return Unknown
 }

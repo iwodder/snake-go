@@ -8,7 +8,7 @@ import (
 )
 
 func Test_DefaultEvent(t *testing.T) {
-	require.Equal(t, 0, Unknown, "zero value must not map to expected event(s)")
+	require.Equal(t, Event(0), Unknown, "zero value must not map to expected event(s)")
 }
 
 func Test_EventMappings(t *testing.T) {
@@ -36,5 +36,13 @@ func Test_EventMappings(t *testing.T) {
 		require.Equal(t, MoveLeft, eventMap.Get(tcell.NewEventKey(tcell.KeyRune, 'a', tcell.ModNone)))
 		require.Equal(t, MoveLeft, eventMap.Get(tcell.NewEventKey(tcell.KeyRune, 'A', tcell.ModNone)))
 		require.Equal(t, MoveLeft, eventMap.Get(tcell.NewEventKey(tcell.KeyLeft, 0, tcell.ModNone)))
+	})
+
+	t.Run("pause event", func(t *testing.T) {
+		require.Equal(t, PauseGame, eventMap.Get(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone)))
+	})
+
+	t.Run("exit event", func(t *testing.T) {
+		require.Equal(t, ExitGame, eventMap.Get(tcell.NewEventKey(tcell.KeyCtrlC, 0, tcell.ModNone)))
 	})
 }

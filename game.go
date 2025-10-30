@@ -9,7 +9,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-const maxWidth = 40
+// maxWidth and maxHeight are zero-based numbers
+const maxWidth = 39
 const maxHeight = maxWidth
 const pointsPerApple uint = 100
 
@@ -27,20 +28,25 @@ type game struct {
 	apples         apples
 	score          uint
 	finished       bool
+	paused         bool
 }
 
 func (g *game) Handle(event tcell.Event) {
-	switch ev := event.(type) {
-	case *tcell.EventKey:
-		if ev.Key() == tcell.KeyCtrlC {
-			g.finished = true
-			return
-		}
-		g.eventListeners.Notify(g.eventMap.Get(event))
+	ev := g.eventMap.Get(event)
+	switch ev {
+	case ExitGame:
+		g.finished = true
+	case PauseGame:
+		g.paused = !g.paused
+	default:
+		g.eventListeners.Notify(ev)
 	}
 }
 
 func (g *game) Update(delta time.Duration) {
+	if g.paused {
+		return
+	}
 	applesEaten := g.snake.eat(g.apples)
 	g.score += applesEaten * pointsPerApple
 	g.board.setScore(g.score)
@@ -52,6 +58,28 @@ func (g *game) Draw(scrn tcell.Screen) {
 	g.board.draw(scrn)
 	g.snake.draw(scrn)
 	g.apples.draw(scrn)
+	if g.paused {
+		g.drawPausedBox(scrn)
+	}
+}
+
+func (g *game) drawPausedBox(scrn tcell.Screen) {
+	const PausedText = "Game Paused."
+	const BorderChar = '*'
+	const BoxWidth = len(PausedText) + 2
+	const BoxHeight = 3
+	width, height := g.board.width(), g.board.height()
+	startY := (height - BoxHeight) / 2
+	startX := (width - BoxWidth) / 2
+
+	for y := 0; y < BoxHeight; y++ {
+		for x := 0; x < BoxWidth; x++ {
+			scrn.SetContent(startX+x, startY+y, BorderChar, nil, boardStyle)
+		}
+	}
+	for i, ch := range PausedText {
+		scrn.SetCell(startX+1+i, startY+1, boardStyle, ch)
+	}
 }
 
 func (g *game) Finished() bool {
