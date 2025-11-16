@@ -77,8 +77,8 @@ func (g *game) Finished() bool {
 }
 
 func newGame(scn tcell.Screen) *game {
-	x, y := scn.Size()
-	b := newBoard(Position{x: 0, y: 0}, Position{x: min(x, maxWidth), y: min(y, maxHeight)})
+	width, height := scn.Size()
+	b := newBoard(Position{x: 0, y: 0}, Position{x: min(width, maxWidth), y: min(height, maxHeight)})
 	s := newSnake(b.center())
 	a := newApples(b, 2)
 
