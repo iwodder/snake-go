@@ -9,11 +9,13 @@ import (
 const (
 	borderWidth = 1
 	scoreHeight = 2
+	scoreFormat = "Score: %d"
 )
 
 type board struct {
 	upperLeft  Position
 	lowerRight Position
+	scoreBox   *TextBox
 	score      uint
 }
 
@@ -59,15 +61,10 @@ func (b *board) setCorners(scn tcell.Screen) {
 }
 
 func (b *board) drawScoreArea(scn tcell.Screen) {
-	scn.SetContent(b.upperLeft.x, scoreHeight, tcell.RuneLTee, nil, boardStyle)
-	scn.SetContent(b.lowerRight.x, scoreHeight, tcell.RuneRTee, nil, boardStyle)
-	for x := b.upperLeft.x + 1; x < b.lowerRight.x; x++ {
-		scn.SetContent(x, scoreHeight, tcell.RuneHLine, nil, boardStyle)
-	}
-	textStart := b.upperLeft.x + 1
-	for i, r := range fmt.Sprintf("Score: %d", b.score) {
-		scn.SetContent(textStart+i, b.upperLeft.y+1, r, nil, boardStyle)
-	}
+	b.scoreBox.Draw(scn)
+
+	scn.SetContent(b.upperLeft.x, b.scoreBox.BottomEdge(), tcell.RuneLTee, nil, boardStyle)
+	scn.SetContent(b.lowerRight.x, b.scoreBox.BottomEdge(), tcell.RuneRTee, nil, boardStyle)
 }
 
 func (b *board) leftEdge() int {
@@ -104,12 +101,21 @@ func (b *board) isInside(pos Position) bool {
 
 func (b *board) setScore(score uint) {
 	b.score = score
+	b.scoreBox.SetText(fmt.Sprintf(scoreFormat, b.score))
 }
 
 func newBoard(ul, lr Position) *board {
 	ret := board{
 		upperLeft:  ul,
 		lowerRight: lr,
+		score:      0,
 	}
+
+	scoreBox := NewTextBox(fmt.Sprintf(scoreFormat, 0), boardStyle)
+	scoreBox.SetHeight(scoreHeight)
+	scoreBox.SetWidth(ret.width())
+	scoreBox.SetPosition(ret.upperLeft)
+
+	ret.scoreBox = scoreBox
 	return &ret
 }

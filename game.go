@@ -64,22 +64,12 @@ func (g *game) Draw(scrn tcell.Screen) {
 }
 
 func (g *game) drawPausedBox(scrn tcell.Screen) {
-	const PausedText = "Game Paused."
-	const BorderChar = '*'
-	const BoxWidth = len(PausedText) + 2
-	const BoxHeight = 3
-	width, height := g.board.width(), g.board.height()
-	startY := (height - BoxHeight) / 2
-	startX := (width - BoxWidth) / 2
-
-	for y := 0; y < BoxHeight; y++ {
-		for x := 0; x < BoxWidth; x++ {
-			scrn.SetContent(startX+x, startY+y, BorderChar, nil, boardStyle)
-		}
-	}
-	for i, ch := range PausedText {
-		scrn.SetCell(startX+1+i, startY+1, boardStyle, ch)
-	}
+	paused := NewTextBox("Game Paused", boardStyle)
+	paused.SetPosition(Position{
+		x: (g.board.width() - paused.Width()) / 2,
+		y: (g.board.height() - paused.Height()) / 2,
+	})
+	paused.Draw(scrn)
 }
 
 func (g *game) Finished() bool {
