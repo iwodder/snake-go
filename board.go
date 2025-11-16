@@ -16,7 +16,6 @@ type board struct {
 	upperLeft  Position
 	lowerRight Position
 	scoreBox   *TextBox
-	score      uint
 }
 
 func (b *board) draw(scn tcell.Screen) {
@@ -100,15 +99,13 @@ func (b *board) isInside(pos Position) bool {
 }
 
 func (b *board) setScore(score uint) {
-	b.score = score
-	b.scoreBox.SetText(fmt.Sprintf(scoreFormat, b.score))
+	b.scoreBox.SetText(fmt.Sprintf(scoreFormat, score))
 }
 
 func newBoard(ul, lr Position) *board {
 	ret := board{
 		upperLeft:  ul,
 		lowerRight: lr,
-		score:      0,
 	}
 
 	scoreBox := NewTextBox(fmt.Sprintf(scoreFormat, 0), boardStyle)
