@@ -4,12 +4,16 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+const MinTextboxHeight = 3
+
 // TextBox displays immutable text on the screen. The TextBox is wrapped with a border
 // and has no padding.
 type TextBox struct {
 	upperLeft Position
 	text      string
 	style     tcell.Style
+	height    int
+	width     int
 }
 
 func (p *TextBox) Draw(scrn tcell.Screen) {
@@ -19,24 +23,40 @@ func (p *TextBox) Draw(scrn tcell.Screen) {
 }
 
 func (p *TextBox) Height() int {
-	// top & bottom borders + padding
-	return 3
+	return max(MinTextboxHeight, p.height)
+}
+
+func (p *TextBox) SetHeight(height int) {
+	p.height = height
 }
 
 func (p *TextBox) Width() int {
-	return len(p.text) + 2
+	minWidth := len(p.text) + 2
+	return max(minWidth, p.width)
+}
+
+func (p *TextBox) SetWidth(width int) {
+	p.width = width
+}
+
+func (p *TextBox) Position() (x, y int) {
+	return p.upperLeft.x, p.upperLeft.y
 }
 
 func (p *TextBox) SetPosition(pos Position) {
 	p.upperLeft = pos
 }
 
-func (p *TextBox) Location() (x, y int) {
-	return p.upperLeft.x, p.upperLeft.y
+func (p *TextBox) Text() string {
+	return p.text
+}
+
+func (p *TextBox) SetText(text string) {
+	p.text = text
 }
 
 func (p *TextBox) fill(scrn tcell.Screen) {
-	for y := p.topEdge(); y < p.bottomEdge(); y++ {
+	for y := p.topEdge(); y < p.BottomEdge(); y++ {
 		for x := p.rightEdge(); x < p.leftEdge(); x++ {
 			scrn.SetContent(x, y, ' ', nil, p.style)
 		}
@@ -65,8 +85,8 @@ func (p *TextBox) drawText(scrn tcell.Screen) {
 	}
 }
 
-func (p *TextBox) bottomEdge() int {
-	return p.upperLeft.y + 2
+func (p *TextBox) BottomEdge() int {
+	return p.upperLeft.y + p.Height() - 1
 }
 
 func (p *TextBox) topEdge() int {
@@ -78,7 +98,7 @@ func (p *TextBox) leftEdge() int {
 }
 
 func (p *TextBox) rightEdge() int {
-	return p.upperLeft.x + len(p.text) + 1
+	return p.upperLeft.x + p.Width() - 1
 }
 
 func NewTextBox(text string, style tcell.Style) *TextBox {
