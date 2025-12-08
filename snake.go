@@ -2,14 +2,11 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
 )
-
-var dirRunes = map[direction]rune{
-	up: tcell.RuneVLine, down: tcell.RuneVLine, right: tcell.RuneHLine, left: tcell.RuneHLine,
-}
 
 type direction uint
 
@@ -36,7 +33,9 @@ func (d direction) String() string {
 }
 
 const (
-	up = iota
+	snakeRune = 'X'
+	
+	up direction = iota
 	right
 	down
 	left
@@ -46,57 +45,19 @@ type Position struct {
 	x, y int
 }
 
-type vector struct {
-	dir direction
-	mag int
-	r   rune
-}
-
-func (v vector) draw(scn tcell.Screen, start Position, style tcell.Style) Position {
-	for range v.mag {
-		switch v.dir {
-		case up:
-			start.y--
-		case down:
-			start.y++
-		case right:
-			start.x++
-		case left:
-			start.x--
-		}
-		scn.SetContent(start.x, start.y, v.r, nil, style)
-	}
-	return start
+type cell struct {
+	x, y int
 }
 
 type snake struct {
-	start Position
-	vecs  []vector
 	timer time.Duration
+	dir   direction
+	body  []cell
 }
 
 func (s *snake) draw(scn tcell.Screen) {
-	currentPos := s.start
-	for idx, vec := range s.vecs {
-		currentPos = vec.draw(scn, currentPos, snakeStyle)
-		if idx < len(s.vecs)-1 {
-			scn.SetContent(currentPos.x, currentPos.y, s.getRune(vec.dir, s.vecs[idx+1].dir), nil, snakeStyle)
-		}
-	}
-}
-
-func (s *snake) getRune(curDir direction, nextDir direction) rune {
-	switch {
-	case (curDir == up || curDir == left) && (nextDir == right || nextDir == down):
-		return tcell.RuneULCorner
-	case (curDir == up || curDir == right) && (nextDir == left || nextDir == down):
-		return tcell.RuneURCorner
-	case (curDir == down || curDir == left) && (nextDir == right || nextDir == up):
-		return tcell.RuneLLCorner
-	case (curDir == down || curDir == right) && (nextDir == left || nextDir == up):
-		return tcell.RuneLRCorner
-	default:
-		panic(fmt.Sprintf("unhandled direction combination: curDir=%s, nextDir=%s", curDir, nextDir))
+	for _, c := range slices.All(s.body) {
+		scn.SetContent(c.x, c.y, snakeRune, nil, snakeStyle)
 	}
 }
 
@@ -117,37 +78,31 @@ func (s *snake) moveDown() {
 }
 
 func (s *snake) changeDirection(d direction) {
-	if head := s.head(); head.mag > 0 && s.isNewDirectionValid(head.dir, d) {
-		s.vecs = append(s.vecs, vector{dir: d, mag: 0, r: dirRunes[d]})
+	if !d.isOpposite(s.dir) {
+		s.dir = d
 	}
-}
-
-func (s *snake) isNewDirectionValid(last, new direction) bool {
-	return last != new && !new.isOpposite(last)
 }
 
 func (s *snake) move(b *board, delta time.Duration) {
 	if !s.canMove(b, delta) {
 		return
 	}
-	switch s.tail().dir {
+	nextCell := cell{
+		x: s.head().x,
+		y: s.head().y,
+	}
+	switch s.dir {
 	case up:
-		s.start.y--
+		nextCell.y--
 	case right:
-		s.start.x++
+		nextCell.x++
 	case down:
-		s.start.y++
+		nextCell.y++
 	case left:
-		s.start.x--
+		nextCell.x--
 	}
-	if len(s.vecs) < 2 {
-		return
-	}
-	s.tail().mag--
-	s.head().mag++
-	if s.tail().mag == 0 {
-		s.vecs = s.vecs[1:]
-	}
+	s.body = append(s.body, nextCell)
+	s.body = s.body[1:]
 }
 
 func (s *snake) canMove(b *board, delta time.Duration) bool {
@@ -158,12 +113,11 @@ func (s *snake) canMove(b *board, delta time.Duration) bool {
 		s.timer = time.Millisecond * 250
 	}
 
-	p := s.headPos()
-	currentDir := s.head().dir
-	return !((p.x >= b.rightEdge() && currentDir == right) ||
-		(p.x <= b.leftEdge() && currentDir == left) ||
-		(p.y <= b.topEdge() && currentDir == up) ||
-		(p.y >= b.bottomEdge() && currentDir == down))
+	c := s.head()
+	return !((c.x >= b.rightEdge() && s.dir == right) ||
+		(c.x <= b.leftEdge() && s.dir == left) ||
+		(c.y <= b.topEdge() && s.dir == up) ||
+		(c.y >= b.bottomEdge() && s.dir == down))
 }
 
 func (s *snake) eat(as apples) uint {
@@ -172,7 +126,7 @@ func (s *snake) eat(as apples) uint {
 	for i := range as {
 		if p == as[i].pos {
 			as[i].eaten = true
-			s.vecs[len(s.vecs)-1].mag++
+			s.body = slices.Insert(s.body, 0, s.body[0])
 			ret += 1
 		}
 	}
@@ -180,28 +134,12 @@ func (s *snake) eat(as apples) uint {
 }
 
 func (s *snake) headPos() Position {
-	ret := Position{x: s.start.x, y: s.start.y}
-	for _, seg := range s.vecs {
-		switch seg.dir {
-		case up:
-			ret.y -= seg.mag
-		case down:
-			ret.y += seg.mag
-		case left:
-			ret.x -= seg.mag
-		case right:
-			ret.x += seg.mag
-		}
-	}
-	return ret
+	head := s.head()
+	return Position{x: head.x, y: head.y}
 }
 
-func (s *snake) head() *vector {
-	return &s.vecs[len(s.vecs)-1]
-}
-
-func (s *snake) tail() *vector {
-	return &s.vecs[0]
+func (s *snake) head() cell {
+	return s.body[len(s.body)-1]
 }
 
 func (s *snake) Notify(event Event) {
@@ -218,8 +156,9 @@ func (s *snake) Notify(event Event) {
 }
 
 func newSnake(initial Position) *snake {
+	const startingDir = right
 	return &snake{
-		start: initial,
-		vecs:  append(make([]vector, 0, 24), vector{dir: right, mag: 1, r: dirRunes[right]}),
+		dir:  startingDir,
+		body: append(make([]cell, 0, 48), cell{x: initial.x, y: initial.y}),
 	}
 }
