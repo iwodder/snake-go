@@ -61,7 +61,7 @@ func Test_Game(t *testing.T) {
 			scoreBox:   NewTextBox("", boardStyle),
 		}
 		a := apples{apple{pos: Position{x: 4, y: 4}}}
-		s := newSnake(Position{x: 3, y: 4})
+		s := newSnake(Position{x: 4, y: 4})
 
 		g := game{
 			board:  &b,
