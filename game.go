@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -20,6 +21,9 @@ var (
 	snakeStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
 )
 
+const GameOverText = "Game Over"
+const GamePausedText = "Game Paused"
+
 type game struct {
 	eventMap       EventMap
 	eventListeners EventListeners
@@ -29,6 +33,7 @@ type game struct {
 	score          uint
 	finished       bool
 	paused         bool
+	gameOver       bool
 }
 
 func (g *game) Handle(event tcell.Event) {
@@ -37,14 +42,20 @@ func (g *game) Handle(event tcell.Event) {
 	case ExitGame:
 		g.finished = true
 	case PauseGame:
-		g.paused = !g.paused
+		if !g.gameOver {
+			g.paused = !g.paused
+		}
+	case StartGame:
+		if g.gameOver {
+			g.reset()
+		}
 	default:
 		g.eventListeners.Notify(ev)
 	}
 }
 
 func (g *game) Update(delta time.Duration) {
-	if g.paused {
+	if g.paused || g.gameOver {
 		return
 	}
 	applesEaten := g.snake.eat(g.apples)
@@ -52,6 +63,9 @@ func (g *game) Update(delta time.Duration) {
 	g.board.setScore(g.score)
 	g.snake.move(g.board, delta)
 	g.apples.move(g.board, delta)
+	if g.snake.crashed() {
+		g.gameOver = true
+	}
 }
 
 func (g *game) Draw(scrn tcell.Screen) {
@@ -59,21 +73,33 @@ func (g *game) Draw(scrn tcell.Screen) {
 	g.snake.draw(scrn)
 	g.apples.draw(scrn)
 	if g.paused {
-		g.drawPausedBox(scrn)
+		g.drawTextBox(GamePausedText, scrn)
+	} else if g.gameOver {
+		g.drawTextBox(GameOverText, scrn)
 	}
 }
 
-func (g *game) drawPausedBox(scrn tcell.Screen) {
-	paused := NewTextBox("Game Paused", boardStyle)
-	paused.SetPosition(Position{
-		x: (g.board.width() - paused.Width()) / 2,
-		y: (g.board.height() - paused.Height()) / 2,
+func (g *game) drawTextBox(text string, scrn tcell.Screen) {
+	textBox := NewTextBox(text, boardStyle)
+	textBox.SetPosition(Position{
+		x: (g.board.width() - textBox.Width()) / 2,
+		y: (g.board.height() - textBox.Height()) / 2,
 	})
-	paused.Draw(scrn)
+	textBox.Draw(scrn)
 }
 
 func (g *game) Finished() bool {
 	return g.finished
+}
+
+func (g *game) reset() {
+	g.score = 0
+	g.gameOver = false
+	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
+		return listener == g.snake
+	})
+	g.snake = newSnake(g.board.center())
+	g.eventListeners = append(g.eventListeners, g.snake)
 }
 
 func newGame(scn tcell.Screen) *game {

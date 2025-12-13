@@ -321,6 +321,76 @@ func Test_Snake(t *testing.T) {
 		require.True(t, as[0].eaten)
 		require.False(t, as[1].eaten)
 	})
+
+	t.Run("snake moving in left circle crashes", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 2, y: 3},
+			{x: 2, y: 2},
+			{x: 3, y: 2},
+			{x: 3, y: 3},
+		}
+
+		require.True(t, s.crashed())
+	})
+
+	t.Run("snake moving in right circle crashes", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 4, y: 3},
+			{x: 4, y: 2},
+			{x: 3, y: 2},
+			{x: 3, y: 3},
+		}
+
+		require.True(t, s.crashed())
+	})
+
+	t.Run("moving in straight line (right) doesn't crash", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 4, y: 3},
+			{x: 5, y: 3},
+		}
+
+		require.False(t, s.crashed())
+	})
+
+	t.Run("moving in straight line (left) doesn't crash", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 2, y: 3},
+			{x: 1, y: 3},
+		}
+
+		require.False(t, s.crashed())
+	})
+
+	t.Run("moving in straight line (up) doesn't crash", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 3, y: 2},
+			{x: 3, y: 1},
+		}
+
+		require.False(t, s.crashed())
+	})
+
+	t.Run("moving in straight line (down) doesn't crash", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 3, y: 4},
+			{x: 3, y: 5},
+		}
+
+		require.False(t, s.crashed())
+	})
 }
 
 func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {

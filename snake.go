@@ -34,7 +34,7 @@ func (d direction) String() string {
 
 const (
 	snakeRune = 'X'
-	
+
 	up direction = iota
 	right
 	down
@@ -140,6 +140,16 @@ func (s *snake) headPos() Position {
 
 func (s *snake) head() cell {
 	return s.body[len(s.body)-1]
+}
+
+func (s *snake) crashed() bool {
+	head := s.headPos()
+	for i := 0; i < len(s.body)-2; i += 1 {
+		if head.x == s.body[i].x && head.y == s.body[i].y {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *snake) Notify(event Event) {

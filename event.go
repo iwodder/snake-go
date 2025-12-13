@@ -12,6 +12,7 @@ const (
 	MoveRight
 	PauseGame
 	ExitGame
+	StartGame
 )
 
 type EventListener interface {
@@ -64,6 +65,8 @@ func (e *EventMap) GetEventFromKey(ev *tcell.EventKey) Event {
 		return MoveLeft
 	case ev.Key() == tcell.KeyCtrlC:
 		return ExitGame
+	case ev.Key() == tcell.KeyEnter:
+		return StartGame
 	}
 	return Unknown
 }

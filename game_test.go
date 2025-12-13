@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -54,24 +55,80 @@ func Test_RunGame(t *testing.T) {
 }
 
 func Test_Game(t *testing.T) {
-	t.Run("player earns points for eating apples", func(t *testing.T) {
-		b := board{
+	var b board
+	var a apples
+	var s *snake
+	var g game
+
+	setup := func() {
+		b = board{
 			upperLeft:  Position{x: 0, y: 0},
 			lowerRight: Position{x: 9, y: 9},
 			scoreBox:   NewTextBox("", boardStyle),
 		}
-		a := apples{apple{pos: Position{x: 4, y: 4}}}
-		s := newSnake(Position{x: 4, y: 4})
-
-		g := game{
+		a = apples{apple{pos: b.center()}}
+		s = newSnake(b.center())
+		g = game{
 			board:  &b,
 			snake:  s,
 			apples: a,
 		}
+	}
+
+	t.Run("player earns points for eating apples", func(t *testing.T) {
+		setup()
 
 		g.Update(moveDelta)
 
 		require.Equal(t, pointsPerApple, g.score)
+	})
+
+	t.Run("crashing snake ends game", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 4, y: 3},
+			{x: 4, y: 2},
+			{x: 3, y: 2},
+			{x: 3, y: 3},
+		}
+
+		g.Update(moveDelta)
+
+		require.True(t, g.gameOver)
+	})
+
+	t.Run("on game over no entities move", func(t *testing.T) {
+		setup()
+		g.gameOver = true
+		startPos := s.headPos()
+
+		g.Update(moveDelta)
+
+		require.True(t, slices.IndexFunc(a, func(a apple) bool { return a.eaten }) == -1)
+		require.Equal(t, startPos, s.headPos())
+	})
+
+	t.Run("on game over enter resets game", func(t *testing.T) {
+		setup()
+		g.gameOver = true
+		g.score = 100
+
+		g.Handle(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
+
+		assert.False(t, g.gameOver)
+		assert.Zero(t, g.score)
+		assert.NotSame(t, g.snake, s)
+	})
+
+	t.Run("on game over pressing pause key does nothing", func(t *testing.T) {
+		setup()
+		g.gameOver = true
+		paused := g.paused
+
+		g.Handle(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
+
+		assert.Equal(t, paused, g.paused)
 	})
 }
 
