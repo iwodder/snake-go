@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -15,7 +13,7 @@ const (
 type board struct {
 	upperLeft  Position
 	lowerRight Position
-	scoreBox   *TextBox
+	hud        *DisplayBox
 }
 
 func (b *board) draw(scn tcell.Screen) {
@@ -38,6 +36,16 @@ func (b *board) drawBorder(scn tcell.Screen) {
 	b.setCorners(scn)
 }
 
+func (b *board) drawScoreArea(scn tcell.Screen) {
+	b.hud.Draw(scn)
+
+	for i := range b.width() {
+		scn.SetContent(b.upperLeft.x+i, b.hud.Bottom(), tcell.RuneHLine, nil, boardStyle)
+	}
+	scn.SetContent(b.upperLeft.x, b.hud.Bottom(), tcell.RuneLTee, nil, boardStyle)
+	scn.SetContent(b.lowerRight.x, b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
+}
+
 func (b *board) drawHorizontalEdges(scn tcell.Screen) {
 	for x := 0; x < b.width(); x++ {
 		scn.SetContent(x, b.upperLeft.y, tcell.RuneHLine, nil, boardStyle)
@@ -57,13 +65,6 @@ func (b *board) setCorners(scn tcell.Screen) {
 	scn.SetContent(b.lowerRight.x, b.upperLeft.y, tcell.RuneURCorner, nil, boardStyle)
 	scn.SetContent(b.upperLeft.x, b.lowerRight.y, tcell.RuneLLCorner, nil, boardStyle)
 	scn.SetContent(b.lowerRight.x, b.lowerRight.y, tcell.RuneLRCorner, nil, boardStyle)
-}
-
-func (b *board) drawScoreArea(scn tcell.Screen) {
-	b.scoreBox.Draw(scn)
-
-	scn.SetContent(b.upperLeft.x, b.scoreBox.BottomEdge(), tcell.RuneLTee, nil, boardStyle)
-	scn.SetContent(b.lowerRight.x, b.scoreBox.BottomEdge(), tcell.RuneRTee, nil, boardStyle)
 }
 
 func (b *board) leftEdge() int {
@@ -99,7 +100,7 @@ func (b *board) isInside(pos Position) bool {
 }
 
 func (b *board) setScore(score uint) {
-	b.scoreBox.SetText(fmt.Sprintf(scoreFormat, score))
+	b.hud.SetScore(score)
 }
 
 func newBoard(ul, lr Position) *board {
@@ -107,12 +108,6 @@ func newBoard(ul, lr Position) *board {
 		upperLeft:  ul,
 		lowerRight: lr,
 	}
-
-	scoreBox := NewTextBox(fmt.Sprintf(scoreFormat, 0), boardStyle)
-	scoreBox.SetHeight(scoreHeight)
-	scoreBox.SetWidth(ret.width())
-	scoreBox.SetPosition(ret.upperLeft)
-
-	ret.scoreBox = scoreBox
+	ret.hud = NewDisplayBox(Position{x: ul.x + 1, y: ul.y + 1}, 0, ret.width())
 	return &ret
 }

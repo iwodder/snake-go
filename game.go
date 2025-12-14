@@ -31,6 +31,7 @@ type game struct {
 	snake          *snake
 	apples         apples
 	score          uint
+	lives          uint
 	finished       bool
 	paused         bool
 	gameOver       bool

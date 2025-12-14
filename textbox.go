@@ -4,7 +4,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-const MinTextboxHeight = 3
+const (
+	MinTextboxHeightWithBorder = 3
+	MinTextboxHeightNoBorder   = 1
+)
 
 // TextBox displays immutable text on the screen. The TextBox is wrapped with a border
 // and has no padding.
@@ -14,45 +17,63 @@ type TextBox struct {
 	style     tcell.Style
 	height    int
 	width     int
+	border    bool
 }
 
 func (p *TextBox) Draw(scrn tcell.Screen) {
 	p.fill(scrn)
-	p.drawBorder(scrn)
+	if p.border {
+		p.drawBorder(scrn)
+	}
 	p.drawText(scrn)
 }
 
 func (p *TextBox) Height() int {
-	return max(MinTextboxHeight, p.height)
-}
-
-func (p *TextBox) SetHeight(height int) {
-	p.height = height
+	if p.border {
+		return max(MinTextboxHeightWithBorder, p.height)
+	}
+	return max(MinTextboxHeightNoBorder, p.height)
 }
 
 func (p *TextBox) Width() int {
-	minWidth := len(p.text) + 2
+	minWidth := len(p.text)
+	if p.border {
+		minWidth += 2
+	}
 	return max(minWidth, p.width)
 }
 
-func (p *TextBox) SetWidth(width int) {
+func (p *TextBox) SetHeight(height int) *TextBox {
+	p.height = height
+	return p
+}
+
+func (p *TextBox) SetWidth(width int) *TextBox {
 	p.width = width
+	return p
 }
 
 func (p *TextBox) Position() (x, y int) {
 	return p.upperLeft.x, p.upperLeft.y
 }
 
-func (p *TextBox) SetPosition(pos Position) {
+func (p *TextBox) SetPosition(pos Position) *TextBox {
 	p.upperLeft = pos
+	return p
 }
 
 func (p *TextBox) Text() string {
 	return p.text
 }
 
-func (p *TextBox) SetText(text string) {
+func (p *TextBox) SetText(text string) *TextBox {
 	p.text = text
+	return p
+}
+
+func (p *TextBox) NoBorder() *TextBox {
+	p.border = false
+	return p
 }
 
 func (p *TextBox) fill(scrn tcell.Screen) {
@@ -79,10 +100,17 @@ func (p *TextBox) drawBorder(scrn tcell.Screen) {
 }
 
 func (p *TextBox) drawText(scrn tcell.Screen) {
-	x, y := p.upperLeft.x+1, p.upperLeft.y+1
+	x, y := p.getTextPos()
 	for i, ch := range p.text {
 		scrn.SetContent(x+i, y, ch, nil, p.style)
 	}
+}
+
+func (p *TextBox) getTextPos() (x, y int) {
+	if p.border {
+		return p.upperLeft.x + 1, p.upperLeft.y + 1
+	}
+	return p.upperLeft.x, p.upperLeft.y
 }
 
 func (p *TextBox) BottomEdge() int {
@@ -103,7 +131,8 @@ func (p *TextBox) rightEdge() int {
 
 func NewTextBox(text string, style tcell.Style) *TextBox {
 	return &TextBox{
-		text:  text,
-		style: style,
+		text:   text,
+		style:  style,
+		border: true,
 	}
 }

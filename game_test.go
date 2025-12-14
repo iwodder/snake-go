@@ -64,7 +64,7 @@ func Test_Game(t *testing.T) {
 		b = board{
 			upperLeft:  Position{x: 0, y: 0},
 			lowerRight: Position{x: 9, y: 9},
-			scoreBox:   NewTextBox("", boardStyle),
+			hud:        NewDisplayBox(b.upperLeft, 0, b.width()),
 		}
 		a = apples{apple{pos: b.center()}}
 		s = newSnake(b.center())
