@@ -114,7 +114,7 @@ func (p *TextBox) getTextPos() (x, y int) {
 }
 
 func (p *TextBox) BottomEdge() int {
-	return p.upperLeft.y + p.Height() - 1
+	return p.upperLeft.y + p.Height()
 }
 
 func (p *TextBox) topEdge() int {
