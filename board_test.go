@@ -18,8 +18,8 @@ func Test_BoxCanDraw(t *testing.T) {
 	exp := [][]rune{
 		{tcell.RuneULCorner, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneURCorner},
 		{tcell.RuneVLine, 'S', 'c', 'o', 'r', 'e', ':', ' ', '0', tcell.RuneVLine},
+		{tcell.RuneVLine, 'L', 'i', 'v', 'e', 's', ':', ' ', '0', tcell.RuneVLine},
 		{tcell.RuneLTee, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneHLine, tcell.RuneRTee},
-		{tcell.RuneVLine, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', tcell.RuneVLine},
 		{tcell.RuneVLine, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', tcell.RuneVLine},
 		{tcell.RuneVLine, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', tcell.RuneVLine},
 		{tcell.RuneVLine, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', tcell.RuneVLine},
@@ -63,7 +63,7 @@ func Test_Board(t *testing.T) {
 		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
 
 		t.Run("top", func(t *testing.T) {
-			require.Equal(t, 3, board.topEdge())
+			require.Equal(t, 4, board.topEdge())
 		})
 
 		t.Run("bottom", func(t *testing.T) {

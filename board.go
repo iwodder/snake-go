@@ -6,8 +6,6 @@ import (
 
 const (
 	borderWidth = 1
-	scoreHeight = 2
-	scoreFormat = "Score: %d"
 )
 
 type board struct {
@@ -76,7 +74,7 @@ func (b *board) rightEdge() int {
 }
 
 func (b *board) topEdge() int {
-	return b.upperLeft.y + borderWidth + scoreHeight
+	return b.upperLeft.y + borderWidth + b.hud.Height() + borderWidth
 }
 
 func (b *board) bottomEdge() int {
