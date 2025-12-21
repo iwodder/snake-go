@@ -101,6 +101,10 @@ func (b *board) setScore(score uint) {
 	b.hud.SetScore(score)
 }
 
+func (b *board) setLives(lives uint) {
+	b.hud.SetLives(lives)
+}
+
 func newBoard(ul, lr Position) *board {
 	ret := board{
 		upperLeft:  ul,

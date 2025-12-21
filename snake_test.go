@@ -391,6 +391,23 @@ func Test_Snake(t *testing.T) {
 
 		require.False(t, s.crashed())
 	})
+
+	t.Run("reset restores initial state", func(t *testing.T) {
+		setup()
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 3, y: 4},
+			{x: 3, y: 5},
+		}
+		simulate(s, b, MoveUp, MoveUp, MoveRight, MoveLeft)
+
+		pos := Position{1, 1}
+		s.ResetTo(pos)
+
+		require.Equal(t, right, s.dir)
+		require.Len(t, s.body, 1)
+		require.Equal(t, pos, s.headPos())
+	})
 }
 
 func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) {

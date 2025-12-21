@@ -8,6 +8,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+const (
+	startingDir = right
+)
+
 type direction uint
 
 func (d direction) isOpposite(o direction) bool {
@@ -163,6 +167,11 @@ func (s *snake) Notify(event Event) {
 	case MoveLeft:
 		s.moveLeft()
 	}
+}
+
+func (s *snake) ResetTo(initial Position) {
+	s.dir = startingDir
+	s.body = append(make([]cell, 0, 48), cell{x: initial.x, y: initial.y})
 }
 
 func newSnake(initial Position) *snake {

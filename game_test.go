@@ -66,12 +66,14 @@ func Test_Game(t *testing.T) {
 			lowerRight: Position{x: 9, y: 9},
 			hud:        NewDisplayBox(b.upperLeft, 0, b.width()),
 		}
-		a = apples{apple{pos: b.center()}}
+		pos := b.center()
+		a = apples{apple{pos: Position{x: pos.x + 1, y: pos.y}}}
 		s = newSnake(b.center())
 		g = game{
-			board:  &b,
-			snake:  s,
-			apples: a,
+			board:          &b,
+			snake:          s,
+			apples:         a,
+			remainingLives: defaultNumberOfLives,
 		}
 	}
 
@@ -83,8 +85,26 @@ func Test_Game(t *testing.T) {
 		require.Equal(t, pointsPerApple, g.score)
 	})
 
-	t.Run("crashing snake ends game", func(t *testing.T) {
+	t.Run("crashing reduces remainingLives remaining", func(t *testing.T) {
 		setup()
+
+		s.body = []cell{
+			{x: 3, y: 3},
+			{x: 4, y: 3},
+			{x: 4, y: 2},
+			{x: 3, y: 2},
+			{x: 3, y: 3},
+		}
+
+		g.Update(moveDelta)
+
+		require.False(t, g.gameOver)
+		require.Equal(t, uint(2), g.remainingLives)
+	})
+
+	t.Run("crashing and running out of remaining lives snake ends game", func(t *testing.T) {
+		setup()
+		g.remainingLives = 1
 		s.body = []cell{
 			{x: 3, y: 3},
 			{x: 4, y: 3},
@@ -118,6 +138,7 @@ func Test_Game(t *testing.T) {
 
 		assert.False(t, g.gameOver)
 		assert.Zero(t, g.score)
+		assert.Equal(t, defaultNumberOfLives, g.remainingLives)
 		assert.NotSame(t, g.snake, s)
 	})
 

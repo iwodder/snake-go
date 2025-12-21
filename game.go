@@ -14,6 +14,7 @@ import (
 const maxWidth = 39
 const maxHeight = maxWidth
 const pointsPerApple uint = 100
+const defaultNumberOfLives uint = 3
 
 var (
 	appleStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
@@ -31,7 +32,7 @@ type game struct {
 	snake          *snake
 	apples         apples
 	score          uint
-	lives          uint
+	remainingLives uint
 	finished       bool
 	paused         bool
 	gameOver       bool
@@ -59,13 +60,20 @@ func (g *game) Update(delta time.Duration) {
 	if g.paused || g.gameOver {
 		return
 	}
-	applesEaten := g.snake.eat(g.apples)
-	g.score += applesEaten * pointsPerApple
-	g.board.setScore(g.score)
 	g.snake.move(g.board, delta)
 	g.apples.move(g.board, delta)
 	if g.snake.crashed() {
-		g.gameOver = true
+		g.remainingLives -= 1
+		if g.remainingLives == 0 {
+			g.gameOver = true
+		} else {
+			g.board.setLives(g.remainingLives)
+			g.snake.ResetTo(g.board.center())
+		}
+	} else {
+		applesEaten := g.snake.eat(g.apples)
+		g.score += applesEaten * pointsPerApple
+		g.board.setScore(g.score)
 	}
 }
 
@@ -95,6 +103,7 @@ func (g *game) Finished() bool {
 
 func (g *game) reset() {
 	g.score = 0
+	g.remainingLives = defaultNumberOfLives
 	g.gameOver = false
 	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
 		return listener == g.snake
@@ -109,13 +118,16 @@ func newGame(scn tcell.Screen) *game {
 	s := newSnake(b.center())
 	a := newApples(b, 2)
 
-	return &game{
+	ret := game{
 		eventListeners: EventListeners{s},
 		eventMap:       EventMap{},
 		board:          b,
 		snake:          s,
 		apples:         a,
+		remainingLives: defaultNumberOfLives,
 	}
+	ret.board.setLives(ret.remainingLives)
+	return &ret
 }
 
 type Game interface {
