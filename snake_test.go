@@ -35,13 +35,13 @@ func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
 }
 
 func Test_Snake(t *testing.T) {
-	initialPosition := func() Position { return Position{x: 5, y: 5} }
+	initialPosition := Position{x: 5, y: 5}
 
 	var s *snake
 	var b *board
 
 	setup := func() {
-		s = newSnake(initialPosition())
+		s = newSnake(initialPosition)
 		b = newBoard(Position{x: 0, y: 0}, Position{x: 9, y: 9})
 	}
 
@@ -50,7 +50,7 @@ func Test_Snake(t *testing.T) {
 
 		require.Equal(t, right, s.dir)
 		require.Len(t, s.body, 1)
-		require.Equal(t, initialPosition(), s.headPos())
+		require.Equal(t, initialPosition, s.headPos())
 	})
 
 	t.Run("responds to events", func(t *testing.T) {
@@ -59,7 +59,8 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveDown)
 
-			require.Equal(t, Position{x: 5, y: 6}, s.headPos())
+			exp := Position{x: initialPosition.x, y: initialPosition.y + 1}
+			require.Equal(t, exp, s.headPos())
 		})
 
 		t.Run("up event", func(t *testing.T) {
@@ -67,7 +68,8 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveUp)
 
-			require.Equal(t, Position{x: 5, y: 4}, s.headPos())
+			exp := Position{x: initialPosition.x, y: initialPosition.y - 1}
+			require.Equal(t, exp, s.headPos())
 		})
 
 		t.Run("left event", func(t *testing.T) {
@@ -75,7 +77,8 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveDown, MoveLeft)
 
-			require.Equal(t, Position{x: 4, y: 6}, s.headPos())
+			exp := Position{x: initialPosition.x - 1, y: initialPosition.y + 1}
+			require.Equal(t, exp, s.headPos())
 		})
 
 		t.Run("right event", func(t *testing.T) {
@@ -83,7 +86,8 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveDown, MoveRight)
 
-			require.Equal(t, Position{x: 6, y: 6}, s.headPos())
+			exp := Position{x: initialPosition.x + 1, y: initialPosition.y + 1}
+			require.Equal(t, exp, s.headPos())
 		})
 	})
 
@@ -160,8 +164,9 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveUp)
 
+			exp := cell{x: initialPosition.x, y: initialPosition.y - 1}
 			require.Equal(t, up, s.dir)
-			require.Equal(t, cell{x: 5, y: 4}, s.body[0])
+			require.Equal(t, exp, s.body[0])
 		})
 
 		t.Run("down", func(t *testing.T) {
@@ -169,8 +174,9 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveDown)
 
+			exp := cell{x: initialPosition.x, y: initialPosition.y + 1}
 			require.Equal(t, down, s.dir)
-			require.Equal(t, cell{x: 5, y: 6}, s.body[0])
+			require.Equal(t, exp, s.body[0])
 		})
 
 		t.Run("right", func(t *testing.T) {
@@ -179,8 +185,9 @@ func Test_Snake(t *testing.T) {
 			simulate(s, b, MoveUp)
 			simulate(s, b, MoveRight)
 
+			exp := cell{x: initialPosition.x + 1, y: initialPosition.y - 1}
 			require.Equal(t, right, s.dir)
-			require.Equal(t, cell{x: 6, y: 4}, s.body[0])
+			require.Equal(t, exp, s.body[0])
 		})
 
 		t.Run("left", func(t *testing.T) {
@@ -189,8 +196,9 @@ func Test_Snake(t *testing.T) {
 			simulate(s, b, MoveUp)
 			simulate(s, b, MoveLeft)
 
+			exp := cell{x: initialPosition.x - 1, y: initialPosition.y - 1}
 			require.Equal(t, left, s.dir)
-			require.Equal(t, cell{x: 4, y: 4}, s.body[0])
+			require.Equal(t, exp, s.body[0])
 		})
 
 		t.Run("stays on board (right)", func(t *testing.T) {
@@ -198,7 +206,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveRight, MoveRight, MoveRight, MoveRight, MoveRight)
 
-			require.Equal(t, Position{x: b.rightEdge(), y: 5}, s.headPos())
+			require.Equal(t, Position{x: b.rightEdge(), y: initialPosition.y}, s.headPos())
 		})
 
 		t.Run("stays on board (up)", func(t *testing.T) {
@@ -206,7 +214,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveUp, MoveUp, MoveUp, MoveUp, MoveUp)
 
-			require.Equal(t, Position{x: 5, y: b.topEdge()}, s.headPos())
+			require.Equal(t, Position{x: initialPosition.x, y: b.topEdge()}, s.headPos())
 		})
 
 		t.Run("stays on board (down)", func(t *testing.T) {
@@ -214,7 +222,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveDown, MoveDown, MoveDown, MoveDown, MoveDown)
 
-			require.Equal(t, Position{x: 5, y: b.bottomEdge()}, s.headPos())
+			require.Equal(t, Position{x: initialPosition.x, y: b.bottomEdge()}, s.headPos())
 		})
 
 		t.Run("stays on board (left)", func(t *testing.T) {
@@ -222,67 +230,67 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveUp, MoveLeft, MoveLeft, MoveLeft, MoveLeft, MoveLeft)
 
-			require.Equal(t, Position{x: b.leftEdge(), y: 4}, s.headPos())
+			require.Equal(t, Position{x: b.leftEdge(), y: initialPosition.y - 1}, s.headPos())
 		})
 
 		t.Run("doesn't move until direction is away from edge (right)", func(t *testing.T) {
 			setup()
 
 			simulate(s, b, MoveRight, MoveRight, MoveRight)
-			require.Equal(t, Position{x: b.rightEdge(), y: 5}, s.headPos(),
+			require.Equal(t, Position{x: b.rightEdge(), y: initialPosition.y}, s.headPos(),
 				"snake not to right edge")
 
 			simulate(s, b, MoveRight)
-			require.Equal(t, Position{x: b.rightEdge(), y: 5}, s.headPos(),
+			require.Equal(t, Position{x: b.rightEdge(), y: initialPosition.y}, s.headPos(),
 				"snake moved after hitting right edge")
 
 			simulate(s, b, MoveUp)
-			require.Equal(t, Position{x: b.rightEdge(), y: 4}, s.headPos())
+			require.Equal(t, Position{x: b.rightEdge(), y: initialPosition.y - 1}, s.headPos())
 		})
 
 		t.Run("doesn't move until direction is away from edge (left)", func(t *testing.T) {
 			setup()
 
 			simulate(s, b, MoveUp, MoveLeft, MoveLeft, MoveLeft, MoveLeft, MoveLeft)
-			require.Equal(t, Position{x: b.leftEdge(), y: 4}, s.headPos(),
+			require.Equal(t, Position{x: b.leftEdge(), y: initialPosition.y - 1}, s.headPos(),
 				"snake not to left edge")
 
 			simulate(s, b, MoveLeft)
-			require.Equal(t, Position{x: b.leftEdge(), y: 4}, s.headPos(),
+			require.Equal(t, Position{x: b.leftEdge(), y: initialPosition.y - 1}, s.headPos(),
 				"snake moved after hitting left edge")
 
 			simulate(s, b, MoveDown)
-			require.Equal(t, Position{x: b.leftEdge(), y: 5}, s.headPos())
+			require.Equal(t, Position{x: b.leftEdge(), y: initialPosition.y}, s.headPos())
 		})
 
 		t.Run("doesn't move until direction is away from edge (top)", func(t *testing.T) {
 			setup()
 
 			simulate(s, b, MoveUp, MoveUp, MoveUp, MoveUp)
-			require.Equal(t, Position{x: 5, y: b.topEdge()}, s.headPos(),
+			require.Equal(t, Position{x: initialPosition.x, y: b.topEdge()}, s.headPos(),
 				"snake not to top edge")
 
 			simulate(s, b, MoveUp)
-			require.Equal(t, Position{x: 5, y: b.topEdge()}, s.headPos(),
+			require.Equal(t, Position{x: initialPosition.x, y: b.topEdge()}, s.headPos(),
 				"snake moved after hitting top edge")
 
 			simulate(s, b, MoveLeft)
-			require.Equal(t, Position{x: 4, y: b.topEdge()}, s.headPos())
+			require.Equal(t, Position{x: initialPosition.x - 1, y: b.topEdge()}, s.headPos())
 		})
 
 		t.Run("doesn't move until direction is away from edge (bottom)", func(t *testing.T) {
 			setup()
 
 			simulate(s, b, MoveDown, MoveDown, MoveDown, MoveDown)
-			require.Equal(t, Position{x: 5, y: b.bottomEdge()}, s.headPos(),
+			require.Equal(t, Position{x: initialPosition.x, y: b.bottomEdge()}, s.headPos(),
 				"snake not to bottom edge")
 
 			simulate(s, b, MoveDown)
-			require.Equal(t, Position{x: 5, y: b.bottomEdge()}, s.headPos(),
+			require.Equal(t, Position{x: initialPosition.x, y: b.bottomEdge()}, s.headPos(),
 				"snake moved after hitting bottom edge")
 
 			simulate(s, b, MoveRight)
-			require.Equal(t, Position{x: 6, y: b.bottomEdge()}, s.headPos())
+			require.Equal(t, Position{x: initialPosition.x + 1, y: b.bottomEdge()}, s.headPos())
 		})
 
 		t.Run("is 4 cells per second", func(t *testing.T) {
@@ -312,7 +320,7 @@ func Test_Snake(t *testing.T) {
 		setup()
 
 		as := apples{
-			{pos: initialPosition(), eaten: false},
+			{pos: initialPosition, eaten: false},
 			{pos: Position{x: 1, y: 1}, eaten: false},
 		}
 		s.eat(as)
