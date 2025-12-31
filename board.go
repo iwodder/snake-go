@@ -110,6 +110,6 @@ func newBoard(ul, lr Position) *board {
 		upperLeft:  ul,
 		lowerRight: lr,
 	}
-	ret.hud = NewDisplayBox(Position{x: ul.x + 1, y: ul.y + 1}, 0, ret.width())
+	ret.hud = NewDisplayBox(Position{x: ul.x + 1, y: ul.y + 1}, 0, ret.width()-2)
 	return &ret
 }

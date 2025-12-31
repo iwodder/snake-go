@@ -35,7 +35,7 @@ func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
 }
 
 func Test_Snake(t *testing.T) {
-	initialPosition := Position{x: 5, y: 5}
+	initialPosition := Position{x: 5, y: 6}
 
 	var s *snake
 	var b *board
@@ -428,7 +428,7 @@ func requireEqualScreen(t *testing.T, exp [][]rune, act tcell.SimulationScreen) 
 
 func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
 	act, _, _, _ := scn.GetContent(x, y)
-	require.EqualValues(t, exp, act, "position (%d,%d) expected '%c', but was '%c'", x, y, exp, act)
+	require.EqualValues(t, exp, act, "position (x=%d,y=%d) expected '%c', but was '%c'", x, y, exp, act)
 }
 
 func setupDefaultScreen(t *testing.T) tcell.SimulationScreen {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -9,10 +11,43 @@ const (
 	MinTextboxHeightNoBorder   = 1
 )
 
+const (
+	NoAlignment TextAlignment = iota + 0
+	LeftAlignment
+	RightAlignment
+	CenterAlignment
+)
+
+// TextAlignment is used to for adjusting how text is aligned within a TextBox
+type TextAlignment int
+
+func (t TextAlignment) Align(width int, text string) string {
+	padding := width - len(text)
+	if padding < 0 {
+		return text
+	}
+
+	switch t {
+	case NoAlignment:
+		return text
+	case LeftAlignment:
+		return text + strings.Repeat(" ", padding)
+	case RightAlignment:
+		return strings.Repeat(" ", padding) + text
+	case CenterAlignment:
+		left := strings.Repeat(" ", padding/2)
+		right := strings.Repeat(" ", padding-len(left))
+		return left + text + right
+	default:
+		panic("unknown alignment value used")
+	}
+}
+
 // TextBox displays immutable text on the screen. The TextBox is wrapped with a border
 // and has no padding.
 type TextBox struct {
 	upperLeft Position
+	alignment TextAlignment
 	text      string
 	style     tcell.Style
 	height    int
@@ -63,7 +98,7 @@ func (p *TextBox) SetPosition(pos Position) *TextBox {
 }
 
 func (p *TextBox) Text() string {
-	return p.text
+	return p.alignment.Align(p.width, p.text)
 }
 
 func (p *TextBox) SetText(text string) *TextBox {
@@ -101,7 +136,7 @@ func (p *TextBox) drawBorder(scrn tcell.Screen) {
 
 func (p *TextBox) drawText(scrn tcell.Screen) {
 	x, y := p.getTextPos()
-	for i, ch := range p.text {
+	for i, ch := range p.Text() {
 		scrn.SetContent(x+i, y, ch, nil, p.style)
 	}
 }
@@ -130,9 +165,14 @@ func (p *TextBox) rightEdge() int {
 }
 
 func NewTextBox(text string, style tcell.Style) *TextBox {
+	return NewTextBoxWithAlignment(text, NoAlignment, style)
+}
+
+func NewTextBoxWithAlignment(text string, ta TextAlignment, style tcell.Style) *TextBox {
 	return &TextBox{
-		text:   text,
-		style:  style,
-		border: true,
+		text:      text,
+		style:     style,
+		alignment: ta,
+		border:    true,
 	}
 }

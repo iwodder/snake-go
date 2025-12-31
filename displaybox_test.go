@@ -15,11 +15,11 @@ func Test_DisplayBox(t *testing.T) {
 	displayBox := NewDisplayBox(pos, height, width)
 
 	t.Run("height includes components", func(t *testing.T) {
-		require.Equal(t, 2, displayBox.Height())
+		require.Equal(t, 3, displayBox.Height())
 	})
 
 	t.Run("bottom is offset from position", func(t *testing.T) {
-		require.Equal(t, 2, displayBox.Bottom())
+		require.Equal(t, 3, displayBox.Bottom())
 	})
 
 	t.Run("sets text of lives box", func(t *testing.T) {

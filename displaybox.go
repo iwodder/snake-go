@@ -9,6 +9,7 @@ import (
 const (
 	livesFormat = "Lives: %d"
 	scoreFormat = "Score: %d"
+	title       = "Snake"
 )
 
 // DisplayBox contains information relevant to the player like
@@ -17,11 +18,13 @@ type DisplayBox struct {
 	pos    Position
 	height int
 	width  int
+	title  *TextBox
 	score  *TextBox
 	lives  *TextBox
 }
 
 func (d *DisplayBox) Draw(scrn tcell.Screen) {
+	d.title.Draw(scrn)
 	d.score.Draw(scrn)
 	d.lives.Draw(scrn)
 }
@@ -39,7 +42,7 @@ func (d *DisplayBox) SetLives(lives uint) {
 }
 
 func (d *DisplayBox) Height() int {
-	return max(d.height, d.score.Height()+d.lives.Height())
+	return max(d.height, d.score.Height()+d.lives.Height()+d.title.Height())
 }
 
 func (d *DisplayBox) Width() int {
@@ -51,16 +54,22 @@ func (d *DisplayBox) Bottom() int {
 }
 
 func NewDisplayBox(pos Position, height, width int) *DisplayBox {
+	boxHeight := height / 3
+	titleBox := NewTextBoxWithAlignment(title, CenterAlignment, boardStyle).
+		SetHeight(boxHeight).SetPosition(pos).
+		SetWidth(width).NoBorder()
 	scoreBox := NewTextBox(fmt.Sprintf(scoreFormat, 0), boardStyle).
-		SetHeight(height / 2).SetPosition(pos).SetWidth(width).NoBorder()
+		SetHeight(boxHeight).SetPosition(Position{x: pos.x, y: titleBox.BottomEdge()}).
+		SetWidth(width).NoBorder()
 	livesBox := NewTextBox(fmt.Sprintf(livesFormat, 0), boardStyle).
-		SetHeight(height / 2).SetPosition(Position{x: pos.x, y: scoreBox.BottomEdge()}).
+		SetHeight(boxHeight).SetPosition(Position{x: pos.x, y: scoreBox.BottomEdge()}).
 		SetWidth(width).NoBorder()
 
 	return &DisplayBox{
 		pos:    pos,
 		height: height,
 		width:  width,
+		title:  titleBox,
 		score:  scoreBox,
 		lives:  livesBox,
 	}
