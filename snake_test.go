@@ -41,15 +41,15 @@ func Test_Snake(t *testing.T) {
 	var b *board
 
 	setup := func() {
-		s = newSnake(initialPosition)
+		s = newSnakeOfLength(initialPosition, 1)
 		b = newBoard(Position{x: 0, y: 0}, Position{x: 9, y: 9})
 	}
 
 	t.Run("initial state", func(t *testing.T) {
-		setup()
+		s = newSnake(initialPosition)
 
 		require.Equal(t, right, s.dir)
-		require.Len(t, s.body, 1)
+		require.Len(t, s.body, defaultStartingLength)
 		require.Equal(t, initialPosition, s.headPos())
 	})
 

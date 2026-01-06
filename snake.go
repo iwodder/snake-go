@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	startingDir = right
+	startingDir           = right
+	defaultStartingLength = 3
 )
 
 type direction uint
@@ -175,9 +176,21 @@ func (s *snake) ResetTo(initial Position) {
 }
 
 func newSnake(initial Position) *snake {
+	return newSnakeOfLength(initial, defaultStartingLength)
+}
+
+func newSnakeOfLength(initial Position, length int) *snake {
 	const startingDir = right
+
+	body := make([]cell, 0, 48)
+	zeroBasedCol := initial.x - length + 1
+	for range length {
+		body = append(body, cell{x: zeroBasedCol, y: initial.y})
+		zeroBasedCol += 1
+	}
+
 	return &snake{
 		dir:  startingDir,
-		body: append(make([]cell, 0, 48), cell{x: initial.x, y: initial.y}),
+		body: body,
 	}
 }
