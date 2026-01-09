@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,13 +36,14 @@ func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
 }
 
 func Test_Snake(t *testing.T) {
+	const startingLength = 1
 	initialPosition := Position{x: 5, y: 6}
 
 	var s *snake
 	var b *board
 
 	setup := func() {
-		s = newSnakeOfLength(initialPosition, 1)
+		s = newSnakeOfLength(initialPosition, startingLength)
 		b = newBoard(Position{x: 0, y: 0}, Position{x: 9, y: 9})
 	}
 
@@ -415,6 +417,24 @@ func Test_Snake(t *testing.T) {
 		require.Equal(t, right, s.dir)
 		require.Len(t, s.body, 1)
 		require.Equal(t, pos, s.headPos())
+		require.Equal(t, s.startingLength, s.Length())
+	})
+
+	t.Run("speed increases by 25% when doubling in length", func(t *testing.T) {
+		setup()
+		as := apples{
+			{pos: initialPosition, eaten: false},
+			{pos: Position{x: 1, y: 1}, eaten: false},
+		}
+
+		speed := s.moveDelay
+
+		for range startingLength * 2 {
+			s.eat(as)
+		}
+
+		assert.Equal(t, float64(speed)*0.75, float64(s.moveDelay))
+		assert.Equal(t, startingLength*2, s.lastLength)
 	})
 }
 

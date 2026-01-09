@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	startingDir           = right
-	defaultStartingLength = 3
+	startingDir                   = right
+	defaultStartingLength         = 3
+	defaultStartingSnakeMoveDelay = time.Millisecond * 250
 )
 
 type direction uint
@@ -55,9 +56,12 @@ type cell struct {
 }
 
 type snake struct {
-	timer time.Duration
-	dir   direction
-	body  []cell
+	moveTimer      time.Duration
+	moveDelay      time.Duration
+	lastLength     int
+	startingLength int
+	dir            direction
+	body           []cell
 }
 
 func (s *snake) draw(scn tcell.Screen) {
@@ -111,12 +115,11 @@ func (s *snake) move(b *board, delta time.Duration) {
 }
 
 func (s *snake) canMove(b *board, delta time.Duration) bool {
-	s.timer -= delta
-	if s.timer > 0 {
+	s.moveTimer -= delta
+	if s.moveTimer > 0 {
 		return false
-	} else {
-		s.timer = time.Millisecond * 250
 	}
+	s.moveTimer = s.moveDelay
 
 	c := s.head()
 	return !((c.x >= b.rightEdge() && s.dir == right) ||
@@ -135,7 +138,19 @@ func (s *snake) eat(as apples) uint {
 			ret += 1
 		}
 	}
+	if s.shouldIncreaseSpeed() {
+		s.speedUp()
+	}
 	return ret
+}
+
+func (s *snake) speedUp() {
+	s.moveDelay = time.Duration(float64(s.moveDelay) * 0.75)
+	s.lastLength = len(s.body)
+}
+
+func (s *snake) shouldIncreaseSpeed() bool {
+	return len(s.body) >= s.lastLength*2
 }
 
 func (s *snake) headPos() Position {
@@ -171,8 +186,25 @@ func (s *snake) Notify(event Event) {
 }
 
 func (s *snake) ResetTo(initial Position) {
+	s.init(initial)
+}
+
+func (s *snake) Length() int {
+	return len(s.body)
+}
+
+func (s *snake) init(initial Position) {
+	body := make([]cell, 0, 48)
+	zeroBasedCol := initial.x - s.startingLength + 1
+	for range s.startingLength {
+		body = append(body, cell{x: zeroBasedCol, y: initial.y})
+		zeroBasedCol += 1
+	}
+
 	s.dir = startingDir
-	s.body = append(make([]cell, 0, 48), cell{x: initial.x, y: initial.y})
+	s.moveDelay = defaultStartingSnakeMoveDelay
+	s.lastLength = len(body)
+	s.body = body
 }
 
 func newSnake(initial Position) *snake {
@@ -180,17 +212,10 @@ func newSnake(initial Position) *snake {
 }
 
 func newSnakeOfLength(initial Position, length int) *snake {
-	const startingDir = right
-
-	body := make([]cell, 0, 48)
-	zeroBasedCol := initial.x - length + 1
-	for range length {
-		body = append(body, cell{x: zeroBasedCol, y: initial.y})
-		zeroBasedCol += 1
+	ret := snake{
+		startingLength: length,
 	}
+	ret.init(initial)
 
-	return &snake{
-		dir:  startingDir,
-		body: body,
-	}
+	return &ret
 }
