@@ -14,7 +14,6 @@ import (
 const maxWidth = 39
 const maxHeight = maxWidth
 const pointsPerApple uint = 100
-const defaultNumberOfLives uint = 3
 
 var (
 	appleStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
@@ -103,7 +102,7 @@ func (g *game) Finished() bool {
 
 func (g *game) reset() {
 	g.score = 0
-	g.remainingLives = defaultNumberOfLives
+	g.remainingLives = DefaultNumberOfLives
 	g.gameOver = false
 	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
 		return listener == g.snake
@@ -124,7 +123,7 @@ func newGame(scn tcell.Screen) *game {
 		board:          b,
 		snake:          s,
 		apples:         a,
-		remainingLives: defaultNumberOfLives,
+		remainingLives: DefaultNumberOfLives,
 	}
 	ret.board.setLives(ret.remainingLives)
 	return &ret

@@ -51,7 +51,7 @@ func Test_Snake(t *testing.T) {
 		s = newSnake(initialPosition)
 
 		require.Equal(t, right, s.dir)
-		require.Len(t, s.body, defaultStartingLength)
+		require.Len(t, s.body, DefaultStartingLength)
 		require.Equal(t, initialPosition, s.headPos())
 	})
 

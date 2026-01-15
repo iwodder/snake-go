@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	startingDir                   = right
-	defaultStartingLength         = 3
+	startingDir = right
+
 	defaultStartingSnakeMoveDelay = time.Millisecond * 250
 )
 
@@ -208,7 +208,7 @@ func (s *snake) init(initial Position) {
 }
 
 func newSnake(initial Position) *snake {
-	return newSnakeOfLength(initial, defaultStartingLength)
+	return newSnakeOfLength(initial, DefaultStartingLength)
 }
 
 func newSnakeOfLength(initial Position, length int) *snake {

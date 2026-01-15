@@ -73,7 +73,7 @@ func Test_Game(t *testing.T) {
 			board:          &b,
 			snake:          s,
 			apples:         a,
-			remainingLives: defaultNumberOfLives,
+			remainingLives: DefaultNumberOfLives,
 		}
 	}
 
@@ -138,7 +138,7 @@ func Test_Game(t *testing.T) {
 
 		assert.False(t, g.gameOver)
 		assert.Zero(t, g.score)
-		assert.Equal(t, defaultNumberOfLives, g.remainingLives)
+		assert.Equal(t, DefaultNumberOfLives, g.remainingLives)
 		assert.NotSame(t, g.snake, s)
 	})
 
