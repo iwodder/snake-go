@@ -137,6 +137,9 @@ type Game interface {
 }
 
 func RunGame(game Game, scrn tcell.Screen) (err error) {
+	const FramesPerSecond = 60
+	const FrameDuration = time.Second / FramesPerSecond
+	
 	ctx, cancel := context.WithCancel(context.Background())
 	eventQueue := runEventPoller(ctx, scrn)
 	defer func() {
@@ -161,6 +164,8 @@ func RunGame(game Game, scrn tcell.Screen) (err error) {
 		game.Update(delta)
 		game.Draw(scrn)
 		scrn.Show()
+
+		time.Sleep(FrameDuration - delta)
 	}
 	return nil
 }
