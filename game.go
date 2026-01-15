@@ -111,11 +111,11 @@ func (g *game) reset() {
 	g.eventListeners = append(g.eventListeners, g.snake)
 }
 
-func newGame(scn tcell.Screen) *game {
+func newSnakeGame(cfg *Config, scn tcell.Screen) *game {
 	width, height := scn.Size()
 	b := newBoard(Position{x: 0, y: 0}, Position{x: min(width, maxWidth), y: min(height, maxHeight)})
-	s := newSnake(b.center())
-	a := newApples(b, 2)
+	s := newSnakeOfLength(b.center(), cfg.SnakeStartingLength())
+	a := newApples(b, cfg.MaxNumberOfApples())
 
 	ret := game{
 		eventListeners: EventListeners{s},
@@ -123,7 +123,7 @@ func newGame(scn tcell.Screen) *game {
 		board:          b,
 		snake:          s,
 		apples:         a,
-		remainingLives: DefaultNumberOfLives,
+		remainingLives: cfg.NumberOfLives(),
 	}
 	ret.board.setLives(ret.remainingLives)
 	return &ret

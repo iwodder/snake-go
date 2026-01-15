@@ -14,7 +14,11 @@ func main() {
 	if err = scn.Init(); err != nil {
 		log.Fatalf("failed to init screen: %v", err)
 	}
-	err = RunGame(newGame(scn), scn)
+	cfg, err := LoadConfig("config.json")
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
+	err = RunGame(newSnakeGame(cfg, scn), scn)
 	scn.Fini()
 	if err != nil {
 		log.Fatalf("error while running game: %v", err)

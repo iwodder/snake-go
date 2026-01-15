@@ -18,7 +18,7 @@ func Test_Styles(t *testing.T) {
 }
 
 func Test_NewGameState(t *testing.T) {
-	g := newGame(setupDefaultScreen(t))
+	g := newSnakeGame(&Config{}, setupDefaultScreen(t))
 
 	require.Len(t, g.eventListeners, 1, "snake should be registered for key events")
 	require.NotNil(t, g.snake)
