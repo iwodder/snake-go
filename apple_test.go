@@ -7,16 +7,16 @@ import (
 )
 
 var testBoard = board{
-	upperLeft:  Position{x: 0, y: 0},
-	lowerRight: Position{x: 20, y: 20},
-	hud:        NewDisplayBox(Position{x: 0, y: 0}, 0, 20),
+	upperLeft:  Position{X: 0, Y: 0},
+	lowerRight: Position{X: 20, Y: 20},
+	hud:        NewDisplayBox(Position{X: 0, Y: 0}, 0, 20),
 }
 
 func Test_CanDrawApple(t *testing.T) {
 	scn := setupDefaultScreen(t)
 
 	a := apple{
-		pos: Position{x: 1, y: 1},
+		pos: Position{X: 1, Y: 1},
 	}
 
 	a.draw(scn)
@@ -28,9 +28,9 @@ func Test_CanDrawApples(t *testing.T) {
 	scn := setupDefaultScreen(t)
 
 	a := apples{
-		{pos: Position{x: 1, y: 1}},
-		{pos: Position{x: 2, y: 2}},
-		{pos: Position{x: 3, y: 3}},
+		{pos: Position{X: 1, Y: 1}},
+		{pos: Position{X: 2, Y: 2}},
+		{pos: Position{X: 3, Y: 3}},
 	}
 
 	a.draw(scn)
@@ -41,43 +41,43 @@ func Test_CanDrawApples(t *testing.T) {
 }
 
 func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
-	a := apple{pos: Position{x: 10, y: 10}, eaten: true}
+	a := apple{pos: Position{X: 10, Y: 10}, eaten: true}
 
 	a.move(&testBoard)
 
-	require.NotEqual(t, Position{x: 10, y: 10}, a.pos)
+	require.NotEqual(t, Position{X: 10, Y: 10}, a.pos)
 	require.False(t, a.eaten)
 	requireWithinBounds(t, &testBoard, a.pos)
 }
 
 func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
-	a := apple{pos: Position{x: 10, y: 10}, eaten: false}
+	a := apple{pos: Position{X: 10, Y: 10}, eaten: false}
 
 	a.move(&board{
-		upperLeft:  Position{x: 0, y: 0},
-		lowerRight: Position{x: 20, y: 20},
+		upperLeft:  Position{X: 0, Y: 0},
+		lowerRight: Position{X: 20, Y: 20},
 	})
 
-	require.Equal(t, Position{x: 10, y: 10}, a.pos)
+	require.Equal(t, Position{X: 10, Y: 10}, a.pos)
 	require.False(t, a.eaten)
 }
 
 func Test_CanMoveApples(t *testing.T) {
 	a := apples{
-		{pos: Position{x: 1, y: 1}, eaten: true},
-		{pos: Position{x: testBoard.leftEdge() + 1, y: testBoard.topEdge() + 1}, eaten: false},
-		{pos: Position{x: 3, y: 3}, eaten: true},
+		{pos: Position{X: 1, Y: 1}, eaten: true},
+		{pos: Position{X: testBoard.leftEdge() + 1, Y: testBoard.topEdge() + 1}, eaten: false},
+		{pos: Position{X: 3, Y: 3}, eaten: true},
 	}
 
 	a.move(&testBoard, 0)
 
-	require.NotEqual(t, apple{pos: Position{x: 1, y: 1}, eaten: true}, a[0])
+	require.NotEqual(t, apple{pos: Position{X: 1, Y: 1}, eaten: true}, a[0])
 	requireWithinBounds(t, &testBoard, a[0].pos)
 
-	require.Equal(t, apple{pos: Position{x: testBoard.leftEdge() + 1, y: testBoard.topEdge() + 1}, eaten: false}, a[1])
+	require.Equal(t, apple{pos: Position{X: testBoard.leftEdge() + 1, Y: testBoard.topEdge() + 1}, eaten: false}, a[1])
 	requireWithinBounds(t, &testBoard, a[1].pos)
 
-	require.NotEqual(t, apple{pos: Position{x: 3, y: 3}, eaten: true}, a[0])
+	require.NotEqual(t, apple{pos: Position{X: 3, Y: 3}, eaten: true}, a[0])
 	requireWithinBounds(t, &testBoard, a[2].pos)
 }
 

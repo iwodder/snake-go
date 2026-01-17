@@ -1,4 +1,4 @@
-package main
+package ui
 
 import (
 	"strings"
@@ -17,6 +17,11 @@ const (
 	RightAlignment
 	CenterAlignment
 )
+
+// Position represents a location on the screen
+type Position struct {
+	X, Y int
+}
 
 // TextAlignment is used to for adjusting how text is aligned within a TextBox
 type TextAlignment int
@@ -43,9 +48,10 @@ func (t TextAlignment) Align(width int, text string) string {
 	}
 }
 
-// TextBox displays immutable text on the screen. The TextBox is wrapped with a border
-// and has no padding.
+// TextBox displays immutable text on the screen. The TextBox can be wrapped with a border and has
+// no padding.
 type TextBox struct {
+	leaf
 	upperLeft Position
 	alignment TextAlignment
 	text      string
@@ -89,7 +95,7 @@ func (p *TextBox) SetWidth(width int) *TextBox {
 }
 
 func (p *TextBox) Position() (x, y int) {
-	return p.upperLeft.x, p.upperLeft.y
+	return p.upperLeft.X, p.upperLeft.Y
 }
 
 func (p *TextBox) SetPosition(pos Position) *TextBox {
@@ -120,18 +126,18 @@ func (p *TextBox) fill(scrn tcell.Screen) {
 }
 
 func (p *TextBox) drawBorder(scrn tcell.Screen) {
-	for x := p.upperLeft.x; x < p.upperLeft.x+p.Width(); x++ {
-		scrn.SetContent(x, p.upperLeft.y, tcell.RuneHLine, nil, p.style)
-		scrn.SetContent(x, p.upperLeft.y+p.Height()-1, tcell.RuneHLine, nil, p.style)
+	for x := p.upperLeft.X; x < p.upperLeft.X+p.Width(); x++ {
+		scrn.SetContent(x, p.upperLeft.Y, tcell.RuneHLine, nil, p.style)
+		scrn.SetContent(x, p.upperLeft.Y+p.Height()-1, tcell.RuneHLine, nil, p.style)
 	}
-	for y := p.upperLeft.y; y < p.upperLeft.y+p.Height(); y++ {
-		scrn.SetContent(p.upperLeft.x, y, tcell.RuneVLine, nil, p.style)
-		scrn.SetContent(p.upperLeft.x+p.Width()-1, y, tcell.RuneVLine, nil, p.style)
+	for y := p.upperLeft.Y; y < p.upperLeft.Y+p.Height(); y++ {
+		scrn.SetContent(p.upperLeft.X, y, tcell.RuneVLine, nil, p.style)
+		scrn.SetContent(p.upperLeft.X+p.Width()-1, y, tcell.RuneVLine, nil, p.style)
 	}
-	scrn.SetContent(p.upperLeft.x, p.upperLeft.y, tcell.RuneULCorner, nil, p.style)
-	scrn.SetContent(p.upperLeft.x+p.Width()-1, p.upperLeft.y, tcell.RuneURCorner, nil, p.style)
-	scrn.SetContent(p.upperLeft.x+p.Width()-1, p.upperLeft.y+p.Height()-1, tcell.RuneLRCorner, nil, p.style)
-	scrn.SetContent(p.upperLeft.x, p.upperLeft.y+p.Height()-1, tcell.RuneLLCorner, nil, p.style)
+	scrn.SetContent(p.upperLeft.X, p.upperLeft.Y, tcell.RuneULCorner, nil, p.style)
+	scrn.SetContent(p.upperLeft.X+p.Width()-1, p.upperLeft.Y, tcell.RuneURCorner, nil, p.style)
+	scrn.SetContent(p.upperLeft.X+p.Width()-1, p.upperLeft.Y+p.Height()-1, tcell.RuneLRCorner, nil, p.style)
+	scrn.SetContent(p.upperLeft.X, p.upperLeft.Y+p.Height()-1, tcell.RuneLLCorner, nil, p.style)
 }
 
 func (p *TextBox) drawText(scrn tcell.Screen) {
@@ -143,25 +149,25 @@ func (p *TextBox) drawText(scrn tcell.Screen) {
 
 func (p *TextBox) getTextPos() (x, y int) {
 	if p.border {
-		return p.upperLeft.x + 1, p.upperLeft.y + 1
+		return p.upperLeft.X + 1, p.upperLeft.Y + 1
 	}
-	return p.upperLeft.x, p.upperLeft.y
+	return p.upperLeft.X, p.upperLeft.Y
 }
 
 func (p *TextBox) BottomEdge() int {
-	return p.upperLeft.y + p.Height()
+	return p.upperLeft.Y + p.Height()
 }
 
 func (p *TextBox) topEdge() int {
-	return p.upperLeft.y
+	return p.upperLeft.Y
 }
 
 func (p *TextBox) leftEdge() int {
-	return p.upperLeft.x
+	return p.upperLeft.X
 }
 
 func (p *TextBox) rightEdge() int {
-	return p.upperLeft.x + p.Width() - 1
+	return p.upperLeft.X + p.Width() - 1
 }
 
 func NewTextBox(text string, style tcell.Style) *TextBox {

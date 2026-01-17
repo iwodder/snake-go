@@ -11,7 +11,7 @@ import (
 func Test_BoxCanDraw(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(Position{x: 0, y: 0}, Position{x: 9, y: 9})
+	b := newBoard(Position{X: 0, Y: 0}, Position{X: 9, Y: 9})
 
 	b.draw(dst)
 
@@ -34,33 +34,33 @@ func Test_BoxCanDraw(t *testing.T) {
 func Test_BoxFillsEachCell(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := newBoard(Position{x: 0, y: 0}, Position{x: 10, y: 10})
+	b := newBoard(Position{X: 0, Y: 0}, Position{X: 10, Y: 10})
 
 	b.draw(dst)
 
 	for x := range 10 {
 		for y := range 10 {
 			_, _, style, _ := dst.GetContent(x, y)
-			assert.Equal(t, boardStyle, style, "cell (x=%d,y=%d) didn't have the correct style", x, y)
+			assert.Equal(t, boardStyle, style, "cell (x=%d,Y=%d) didn't have the correct style", x, y)
 		}
 	}
 }
 
 func Test_Board(t *testing.T) {
 	t.Run("height", func(t *testing.T) {
-		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
+		board := newBoard(Position{X: 0, Y: 0}, Position{X: 5, Y: 10})
 
 		require.Equal(t, 11, board.height())
 	})
 
 	t.Run("width", func(t *testing.T) {
-		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
+		board := newBoard(Position{X: 0, Y: 0}, Position{X: 5, Y: 10})
 
 		require.Equal(t, 6, board.width())
 	})
 
 	t.Run("test edges", func(t *testing.T) {
-		board := newBoard(Position{x: 0, y: 0}, Position{x: 5, y: 10})
+		board := newBoard(Position{X: 0, Y: 0}, Position{X: 5, Y: 10})
 
 		t.Run("top", func(t *testing.T) {
 			require.Equal(t, 5, board.topEdge())

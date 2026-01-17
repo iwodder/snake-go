@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"snake/ui"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -88,10 +89,10 @@ func (g *game) Draw(scrn tcell.Screen) {
 }
 
 func (g *game) drawTextBox(text string, scrn tcell.Screen) {
-	textBox := NewTextBox(text, boardStyle)
+	textBox := ui.NewTextBox(text, boardStyle)
 	textBox.SetPosition(Position{
-		x: (g.board.width() - textBox.Width()) / 2,
-		y: (g.board.height() - textBox.Height()) / 2,
+		X: (g.board.width() - textBox.Width()) / 2,
+		Y: (g.board.height() - textBox.Height()) / 2,
 	})
 	textBox.Draw(scrn)
 }
@@ -112,7 +113,7 @@ func (g *game) reset() {
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
-	b := newBoard(Position{x: 0, y: 0}, Position{x: min(width, maxWidth), y: min(height, maxHeight)})
+	b := newBoard(Position{X: 0, Y: 0}, Position{X: min(width, maxWidth), Y: min(height, maxHeight)})
 	s := newSnakeOfLength(b.center(), cfg.SnakeStartingLength())
 	a := newApples(b, cfg.MaxNumberOfApples())
 
@@ -138,7 +139,7 @@ type Game interface {
 func RunGame(game Game, scrn tcell.Screen) (err error) {
 	const FramesPerSecond = 60
 	const FrameDuration = time.Second / FramesPerSecond
-	
+
 	ctx, cancel := context.WithCancel(context.Background())
 	eventQueue := runEventPoller(ctx, scrn)
 	defer func() {

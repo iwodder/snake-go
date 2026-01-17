@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"snake/ui"
 
 	"github.com/gdamore/tcell/v2"
 )
@@ -18,9 +19,9 @@ type DisplayBox struct {
 	pos    Position
 	height int
 	width  int
-	title  *TextBox
-	score  *TextBox
-	lives  *TextBox
+	title  *ui.TextBox
+	score  *ui.TextBox
+	lives  *ui.TextBox
 }
 
 func (d *DisplayBox) Draw(scrn tcell.Screen) {
@@ -50,19 +51,19 @@ func (d *DisplayBox) Width() int {
 }
 
 func (d *DisplayBox) Bottom() int {
-	return d.pos.y + d.Height()
+	return d.pos.Y + d.Height()
 }
 
 func NewDisplayBox(pos Position, height, width int) *DisplayBox {
 	boxHeight := height / 3
-	titleBox := NewTextBoxWithAlignment(title, CenterAlignment, boardStyle).
-		SetHeight(boxHeight).SetPosition(pos).
+	titleBox := ui.NewTextBoxWithAlignment(title, ui.CenterAlignment, boardStyle).
+		SetHeight(boxHeight).SetPosition(ui.Position{X: pos.X, Y: pos.Y}).
 		SetWidth(width).NoBorder()
-	scoreBox := NewTextBox(fmt.Sprintf(scoreFormat, 0), boardStyle).
-		SetHeight(boxHeight).SetPosition(Position{x: pos.x, y: titleBox.BottomEdge()}).
+	scoreBox := ui.NewTextBox(fmt.Sprintf(scoreFormat, 0), boardStyle).
+		SetHeight(boxHeight).SetPosition(ui.Position{X: pos.X, Y: titleBox.BottomEdge()}).
 		SetWidth(width).NoBorder()
-	livesBox := NewTextBox(fmt.Sprintf(livesFormat, 0), boardStyle).
-		SetHeight(boxHeight).SetPosition(Position{x: pos.x, y: scoreBox.BottomEdge()}).
+	livesBox := ui.NewTextBox(fmt.Sprintf(livesFormat, 0), boardStyle).
+		SetHeight(boxHeight).SetPosition(ui.Position{X: pos.X, Y: scoreBox.BottomEdge()}).
 		SetWidth(width).NoBorder()
 
 	return &DisplayBox{

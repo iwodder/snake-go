@@ -10,7 +10,7 @@ import (
 func Test_DisplayBox(t *testing.T) {
 	const width = 10
 	const height = 0
-	pos := Position{x: 0, y: 0}
+	pos := Position{X: 0, Y: 0}
 
 	displayBox := NewDisplayBox(pos, height, width)
 

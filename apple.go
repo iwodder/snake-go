@@ -35,7 +35,7 @@ type apple struct {
 }
 
 func (a *apple) draw(scn tcell.Screen) {
-	scn.SetContent(a.pos.x, a.pos.y, 'A', nil, appleStyle)
+	scn.SetContent(a.pos.X, a.pos.Y, 'A', nil, appleStyle)
 }
 
 func (a *apple) move(b *board) {
@@ -46,9 +46,9 @@ func (a *apple) move(b *board) {
 }
 
 func (a *apple) setPos(b *board) {
-	p := Position{x: rand.Intn(b.rightEdge()), y: rand.Intn(b.bottomEdge())}
+	p := Position{X: rand.Intn(b.rightEdge()), Y: rand.Intn(b.bottomEdge())}
 	for a.pos == p || !b.isInside(p) {
-		p = Position{x: rand.Intn(b.rightEdge()), y: rand.Intn(b.bottomEdge())}
+		p = Position{X: rand.Intn(b.rightEdge()), Y: rand.Intn(b.bottomEdge())}
 	}
 	a.pos = p
 }

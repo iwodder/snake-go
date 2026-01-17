@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
+	"snake/ui"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -47,9 +48,7 @@ const (
 	left
 )
 
-type Position struct {
-	x, y int
-}
+type Position = ui.Position
 
 type cell struct {
 	x, y int
@@ -155,7 +154,7 @@ func (s *snake) shouldIncreaseSpeed() bool {
 
 func (s *snake) headPos() Position {
 	head := s.head()
-	return Position{x: head.x, y: head.y}
+	return Position{X: head.x, Y: head.y}
 }
 
 func (s *snake) head() cell {
@@ -165,7 +164,7 @@ func (s *snake) head() cell {
 func (s *snake) crashed() bool {
 	head := s.headPos()
 	for i := 0; i < len(s.body)-2; i += 1 {
-		if head.x == s.body[i].x && head.y == s.body[i].y {
+		if head.X == s.body[i].x && head.Y == s.body[i].y {
 			return true
 		}
 	}
@@ -195,9 +194,9 @@ func (s *snake) Length() int {
 
 func (s *snake) init(initial Position) {
 	body := make([]cell, 0, 48)
-	zeroBasedCol := initial.x - s.startingLength + 1
+	zeroBasedCol := initial.X - s.startingLength + 1
 	for range s.startingLength {
-		body = append(body, cell{x: zeroBasedCol, y: initial.y})
+		body = append(body, cell{x: zeroBasedCol, y: initial.Y})
 		zeroBasedCol += 1
 	}
 

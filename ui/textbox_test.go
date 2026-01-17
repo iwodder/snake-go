@@ -1,4 +1,4 @@
-package main
+package ui
 
 import (
 	"testing"
@@ -34,7 +34,7 @@ func Test_TextBox(t *testing.T) {
 	})
 
 	t.Run("reports bottom edge text box area", func(t *testing.T) {
-		pos := Position{x: 1, y: 1}
+		pos := Position{X: 1, Y: 1}
 		require.Equal(t, 2, textBoxNoBorder.SetPosition(pos).BottomEdge())
 		require.Equal(t, 4, textBoxBorder.SetPosition(pos).BottomEdge())
 	})

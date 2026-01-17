@@ -38,63 +38,63 @@ func (b *board) drawScoreArea(scn tcell.Screen) {
 	b.hud.Draw(scn)
 
 	for i := range b.width() {
-		scn.SetContent(b.upperLeft.x+i, b.hud.Bottom(), tcell.RuneHLine, nil, boardStyle)
+		scn.SetContent(b.upperLeft.X+i, b.hud.Bottom(), tcell.RuneHLine, nil, boardStyle)
 	}
-	scn.SetContent(b.upperLeft.x, b.hud.Bottom(), tcell.RuneLTee, nil, boardStyle)
-	scn.SetContent(b.lowerRight.x, b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
+	scn.SetContent(b.upperLeft.X, b.hud.Bottom(), tcell.RuneLTee, nil, boardStyle)
+	scn.SetContent(b.lowerRight.X, b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
 }
 
 func (b *board) drawHorizontalEdges(scn tcell.Screen) {
 	for x := 0; x < b.width(); x++ {
-		scn.SetContent(x, b.upperLeft.y, tcell.RuneHLine, nil, boardStyle)
-		scn.SetContent(x, b.lowerRight.y, tcell.RuneHLine, nil, boardStyle)
+		scn.SetContent(x, b.upperLeft.Y, tcell.RuneHLine, nil, boardStyle)
+		scn.SetContent(x, b.lowerRight.Y, tcell.RuneHLine, nil, boardStyle)
 	}
 }
 
 func (b *board) drawVerticalEdges(scn tcell.Screen) {
 	for y := 0; y < b.height(); y++ {
-		scn.SetContent(b.upperLeft.x, y, tcell.RuneVLine, nil, boardStyle)
-		scn.SetContent(b.lowerRight.x, y, tcell.RuneVLine, nil, boardStyle)
+		scn.SetContent(b.upperLeft.X, y, tcell.RuneVLine, nil, boardStyle)
+		scn.SetContent(b.lowerRight.X, y, tcell.RuneVLine, nil, boardStyle)
 	}
 }
 
 func (b *board) setCorners(scn tcell.Screen) {
-	scn.SetContent(b.upperLeft.x, b.upperLeft.y, tcell.RuneULCorner, nil, boardStyle)
-	scn.SetContent(b.lowerRight.x, b.upperLeft.y, tcell.RuneURCorner, nil, boardStyle)
-	scn.SetContent(b.upperLeft.x, b.lowerRight.y, tcell.RuneLLCorner, nil, boardStyle)
-	scn.SetContent(b.lowerRight.x, b.lowerRight.y, tcell.RuneLRCorner, nil, boardStyle)
+	scn.SetContent(b.upperLeft.X, b.upperLeft.Y, tcell.RuneULCorner, nil, boardStyle)
+	scn.SetContent(b.lowerRight.X, b.upperLeft.Y, tcell.RuneURCorner, nil, boardStyle)
+	scn.SetContent(b.upperLeft.X, b.lowerRight.Y, tcell.RuneLLCorner, nil, boardStyle)
+	scn.SetContent(b.lowerRight.X, b.lowerRight.Y, tcell.RuneLRCorner, nil, boardStyle)
 }
 
 func (b *board) leftEdge() int {
-	return b.upperLeft.x + borderWidth
+	return b.upperLeft.X + borderWidth
 }
 
 func (b *board) rightEdge() int {
-	return b.lowerRight.x - borderWidth
+	return b.lowerRight.X - borderWidth
 }
 
 func (b *board) topEdge() int {
-	return b.upperLeft.y + borderWidth + b.hud.Height() + borderWidth
+	return b.upperLeft.Y + borderWidth + b.hud.Height() + borderWidth
 }
 
 func (b *board) bottomEdge() int {
-	return b.lowerRight.y - borderWidth
+	return b.lowerRight.Y - borderWidth
 }
 
 func (b *board) width() int {
-	return b.lowerRight.x - b.upperLeft.x + 1
+	return b.lowerRight.X - b.upperLeft.X + 1
 }
 
 func (b *board) height() int {
-	return b.lowerRight.y - b.upperLeft.y + 1
+	return b.lowerRight.Y - b.upperLeft.Y + 1
 }
 
 func (b *board) center() Position {
-	return Position{x: b.width() / 2, y: b.height() / 2}
+	return Position{X: b.width() / 2, Y: b.height() / 2}
 }
 
 func (b *board) isInside(pos Position) bool {
-	return pos.x > b.leftEdge() && pos.x < b.rightEdge() && pos.y > b.topEdge() && pos.y < b.bottomEdge()
+	return pos.X > b.leftEdge() && pos.X < b.rightEdge() && pos.Y > b.topEdge() && pos.Y < b.bottomEdge()
 }
 
 func (b *board) setScore(score uint) {
@@ -110,6 +110,6 @@ func newBoard(ul, lr Position) *board {
 		upperLeft:  ul,
 		lowerRight: lr,
 	}
-	ret.hud = NewDisplayBox(Position{x: ul.x + 1, y: ul.y + 1}, 0, ret.width()-2)
+	ret.hud = NewDisplayBox(Position{X: ul.X + 1, Y: ul.Y + 1}, 0, ret.width()-2)
 	return &ret
 }

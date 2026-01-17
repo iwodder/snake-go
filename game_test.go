@@ -64,12 +64,12 @@ func Test_Game(t *testing.T) {
 
 	setup := func() {
 		b = board{
-			upperLeft:  Position{x: 0, y: 0},
-			lowerRight: Position{x: 9, y: 9},
+			upperLeft:  Position{X: 0, Y: 0},
+			lowerRight: Position{X: 9, Y: 9},
 			hud:        NewDisplayBox(b.upperLeft, 0, b.width()),
 		}
 		pos := b.center()
-		a = apples{apple{pos: Position{x: pos.x + 1, y: pos.y}}}
+		a = apples{apple{pos: Position{X: pos.X + 1, Y: pos.Y}}}
 		s = newSnake(b.center())
 		g = game{
 			board:          &b,
