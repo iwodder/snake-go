@@ -18,7 +18,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
-	err = RunGame(newSnakeGame(cfg, scn), scn)
+	width, height := scn.Size()
+	err = RunGame(newSnakeGame(cfg, width, height), scn)
 	scn.Fini()
 	if err != nil {
 		log.Fatalf("error while running game: %v", err)
