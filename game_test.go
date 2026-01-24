@@ -2,6 +2,7 @@ package main
 
 import (
 	"slices"
+	"snake/ui"
 	"sync"
 	"testing"
 	"time"
@@ -66,7 +67,7 @@ func Test_Game(t *testing.T) {
 		b = board{
 			upperLeft:  Position{X: 0, Y: 0},
 			lowerRight: Position{X: 9, Y: 9},
-			hud:        NewDisplayBox(b.upperLeft, 0, b.width()),
+			hud:        ui.NewHud(b.upperLeft, 0, b.width()),
 		}
 		pos := b.center()
 		a = apples{apple{pos: Position{X: pos.X + 1, Y: pos.Y}}}

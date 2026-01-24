@@ -1,17 +1,22 @@
 package main
 
 import (
+	"fmt"
+	"snake/ui"
+
 	"github.com/gdamore/tcell/v2"
 )
 
 const (
 	borderWidth = 1
+	livesFormat = "Lives: %d"
+	scoreFormat = "Score: %d"
 )
 
 type board struct {
 	upperLeft  Position
 	lowerRight Position
-	hud        *DisplayBox
+	hud        *ui.Hud
 }
 
 func (b *board) draw(scn tcell.Screen) {
@@ -98,11 +103,11 @@ func (b *board) isInside(pos Position) bool {
 }
 
 func (b *board) setScore(score uint) {
-	b.hud.SetScore(score)
+	b.hud.ScoreBox().SetText(fmt.Sprintf(scoreFormat, score))
 }
 
 func (b *board) setLives(lives uint) {
-	b.hud.SetLives(lives)
+	b.hud.LivesBox().SetText(fmt.Sprintf(livesFormat, lives))
 }
 
 func newBoard(ul, lr Position) *board {
@@ -110,6 +115,6 @@ func newBoard(ul, lr Position) *board {
 		upperLeft:  ul,
 		lowerRight: lr,
 	}
-	ret.hud = NewDisplayBox(Position{X: ul.X + 1, Y: ul.Y + 1}, 0, ret.width()-2)
+	ret.hud = ui.NewHud(Position{X: ul.X + 1, Y: ul.Y + 1}, 0, ret.width()-2)
 	return &ret
 }

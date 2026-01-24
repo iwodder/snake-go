@@ -1,6 +1,7 @@
 package main
 
 import (
+	"snake/ui"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,7 +10,7 @@ import (
 var testBoard = board{
 	upperLeft:  Position{X: 0, Y: 0},
 	lowerRight: Position{X: 20, Y: 20},
-	hud:        NewDisplayBox(Position{X: 0, Y: 0}, 0, 20),
+	hud:        ui.NewHud(Position{X: 0, Y: 0}, 0, 20),
 }
 
 func Test_CanDrawApple(t *testing.T) {
