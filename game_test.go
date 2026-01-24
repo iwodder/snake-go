@@ -58,22 +58,18 @@ func Test_RunGame(t *testing.T) {
 }
 
 func Test_Game(t *testing.T) {
-	var b board
+	var b *ui.GameBoard
 	var a apples
 	var s *snake
 	var g game
 
 	setup := func() {
-		b = board{
-			upperLeft:  Position{X: 0, Y: 0},
-			lowerRight: Position{X: 9, Y: 9},
-			hud:        ui.NewHud(b.upperLeft, 0, b.width()),
-		}
-		pos := b.center()
+		b = ui.NewGameBoard(Position{X: 0, Y: 0}, Position{X: 9, Y: 9})
+		pos := b.Center()
 		a = apples{apple{pos: Position{X: pos.X + 1, Y: pos.Y}}}
-		s = newSnake(b.center())
+		s = newSnake(b.Center())
 		g = game{
-			board:          &b,
+			board:          b,
 			snake:          s,
 			apples:         a,
 			remainingLives: DefaultNumberOfLives,

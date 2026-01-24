@@ -91,7 +91,7 @@ func (s *snake) changeDirection(d direction) {
 	}
 }
 
-func (s *snake) move(b *board, delta time.Duration) {
+func (s *snake) move(b *ui.GameBoard, delta time.Duration) {
 	if !s.canMove(b, delta) {
 		return
 	}
@@ -113,7 +113,7 @@ func (s *snake) move(b *board, delta time.Duration) {
 	s.body = s.body[1:]
 }
 
-func (s *snake) canMove(b *board, delta time.Duration) bool {
+func (s *snake) canMove(b *ui.GameBoard, delta time.Duration) bool {
 	s.moveTimer -= delta
 	if s.moveTimer > 0 {
 		return false
@@ -121,10 +121,10 @@ func (s *snake) canMove(b *board, delta time.Duration) bool {
 	s.moveTimer = s.moveDelay
 
 	c := s.head()
-	return !((c.x >= b.rightEdge() && s.dir == right) ||
-		(c.x <= b.leftEdge() && s.dir == left) ||
-		(c.y <= b.topEdge() && s.dir == up) ||
-		(c.y >= b.bottomEdge() && s.dir == down))
+	return !((c.x >= b.Right() && s.dir == right) ||
+		(c.x <= b.Left() && s.dir == left) ||
+		(c.y <= b.Top() && s.dir == up) ||
+		(c.y >= b.Bottom() && s.dir == down))
 }
 
 func (s *snake) eat(as apples) uint {

@@ -24,11 +24,13 @@ var (
 
 const GameOverText = "Game Over"
 const GamePausedText = "Game Paused"
+const livesFormat = "Lives: %d"
+const scoreFormat = "Score: %d"
 
 type game struct {
 	eventMap       EventMap
 	eventListeners EventListeners
-	board          *board
+	board          *ui.GameBoard
 	snake          *snake
 	apples         apples
 	score          uint
@@ -67,18 +69,18 @@ func (g *game) Update(delta time.Duration) {
 		if g.remainingLives == 0 {
 			g.gameOver = true
 		} else {
-			g.board.setLives(g.remainingLives)
-			g.snake.ResetTo(g.board.center())
+			g.board.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
+			g.snake.ResetTo(g.board.Center())
 		}
 	} else {
 		applesEaten := g.snake.eat(g.apples)
 		g.score += applesEaten * pointsPerApple
-		g.board.setScore(g.score)
+		g.board.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
 	}
 }
 
 func (g *game) Draw(scrn tcell.Screen) {
-	g.board.draw(scrn)
+	g.board.Draw(scrn)
 	g.snake.draw(scrn)
 	g.apples.draw(scrn)
 	if g.paused {
@@ -91,8 +93,8 @@ func (g *game) Draw(scrn tcell.Screen) {
 func (g *game) drawTextBox(text string, scrn tcell.Screen) {
 	textBox := ui.NewTextBox(text, boardStyle)
 	textBox.SetPosition(Position{
-		X: (g.board.width() - textBox.Width()) / 2,
-		Y: (g.board.height() - textBox.Height()) / 2,
+		X: (g.board.Width() - textBox.Width()) / 2,
+		Y: (g.board.Height() - textBox.Height()) / 2,
 	})
 	textBox.Draw(scrn)
 }
@@ -108,13 +110,13 @@ func (g *game) reset() {
 	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
 		return listener == g.snake
 	})
-	g.snake = newSnake(g.board.center())
+	g.snake = newSnake(g.board.Center())
 	g.eventListeners = append(g.eventListeners, g.snake)
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
-	b := newBoard(Position{X: 0, Y: 0}, Position{X: min(width, maxWidth), Y: min(height, maxHeight)})
-	s := newSnakeOfLength(b.center(), cfg.SnakeStartingLength())
+	b := ui.NewGameBoard(Position{X: 0, Y: 0}, Position{X: min(width, maxWidth), Y: min(height, maxHeight)})
+	s := newSnakeOfLength(b.Center(), cfg.SnakeStartingLength())
 	a := newApples(b, cfg.MaxNumberOfApples())
 
 	ret := game{
@@ -125,7 +127,7 @@ func newSnakeGame(cfg *Config, width int, height int) *game {
 		apples:         a,
 		remainingLives: cfg.NumberOfLives(),
 	}
-	ret.board.setLives(ret.remainingLives)
+	b.LivesBox().SetText(fmt.Sprintf(livesFormat, ret.remainingLives))
 	return &ret
 }
 
@@ -161,6 +163,7 @@ func RunGame(game Game, scrn tcell.Screen) (err error) {
 			game.Handle(ev)
 		default:
 		}
+		scrn.Clear()
 		game.Update(delta)
 		game.Draw(scrn)
 		scrn.Show()
