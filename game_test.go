@@ -26,7 +26,7 @@ func Test_NewGameState(t *testing.T) {
 	require.Len(t, g.eventListeners, 1, "snake should be registered for key events")
 	require.NotNil(t, g.snake)
 	require.NotNil(t, g.apples)
-	require.NotNil(t, g.board)
+	require.NotNil(t, g.GameBoard)
 }
 
 func Test_RunGame(t *testing.T) {
@@ -69,7 +69,7 @@ func Test_Game(t *testing.T) {
 		a = apples{apple{pos: Position{X: pos.X + 1, Y: pos.Y}}}
 		s = newSnake(b.Center())
 		g = game{
-			board:          b,
+			GameBoard:      b,
 			snake:          s,
 			apples:         a,
 			remainingLives: DefaultNumberOfLives,
@@ -133,7 +133,7 @@ func Test_Game(t *testing.T) {
 		g.gameOver = true
 		g.score = 100
 
-		g.Handle(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
+		g.keyEventCallback(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
 
 		assert.False(t, g.gameOver)
 		assert.Zero(t, g.score)
@@ -146,7 +146,7 @@ func Test_Game(t *testing.T) {
 		g.gameOver = true
 		paused := g.paused
 
-		g.Handle(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
+		g.keyEventCallback(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
 
 		assert.Equal(t, paused, g.paused)
 	})

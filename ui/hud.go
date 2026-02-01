@@ -93,7 +93,7 @@ func NewHud(pos Position, height, width int) *Hud {
 		SetWidth(width).NoBorder()
 
 	ret := Hud{
-		composite: make(composite, 0, 3),
+		composite: composite{},
 		pos:       pos,
 		height:    height,
 		width:     width,

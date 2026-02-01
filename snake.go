@@ -69,22 +69,6 @@ func (s *snake) draw(scn tcell.Screen) {
 	}
 }
 
-func (s *snake) moveLeft() {
-	s.changeDirection(left)
-}
-
-func (s *snake) moveRight() {
-	s.changeDirection(right)
-}
-
-func (s *snake) moveUp() {
-	s.changeDirection(up)
-}
-
-func (s *snake) moveDown() {
-	s.changeDirection(down)
-}
-
 func (s *snake) changeDirection(d direction) {
 	if !d.isOpposite(s.dir) {
 		s.dir = d
@@ -174,13 +158,13 @@ func (s *snake) crashed() bool {
 func (s *snake) Notify(event Event) {
 	switch event {
 	case MoveDown:
-		s.moveDown()
+		s.changeDirection(down)
 	case MoveUp:
-		s.moveUp()
+		s.changeDirection(up)
 	case MoveRight:
-		s.moveRight()
+		s.changeDirection(right)
 	case MoveLeft:
-		s.moveLeft()
+		s.changeDirection(left)
 	}
 }
 

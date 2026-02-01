@@ -28,9 +28,9 @@ const livesFormat = "Lives: %d"
 const scoreFormat = "Score: %d"
 
 type game struct {
+	*ui.GameBoard
 	eventMap       EventMap
 	eventListeners EventListeners
-	board          *ui.GameBoard
 	snake          *snake
 	apples         apples
 	score          uint
@@ -40,7 +40,7 @@ type game struct {
 	gameOver       bool
 }
 
-func (g *game) Handle(event tcell.Event) {
+func (g *game) keyEventCallback(event *tcell.EventKey) {
 	ev := g.eventMap.Get(event)
 	switch ev {
 	case ExitGame:
@@ -62,25 +62,25 @@ func (g *game) Update(delta time.Duration) {
 	if g.paused || g.gameOver {
 		return
 	}
-	g.snake.move(g.board, delta)
-	g.apples.move(g.board, delta)
+	g.snake.move(g.GameBoard, delta)
+	g.apples.move(g.GameBoard, delta)
 	if g.snake.crashed() {
 		g.remainingLives -= 1
 		if g.remainingLives == 0 {
 			g.gameOver = true
 		} else {
-			g.board.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
-			g.snake.ResetTo(g.board.Center())
+			g.GameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
+			g.snake.ResetTo(g.GameBoard.Center())
 		}
 	} else {
 		applesEaten := g.snake.eat(g.apples)
 		g.score += applesEaten * pointsPerApple
-		g.board.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
+		g.GameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
 	}
 }
 
 func (g *game) Draw(scrn tcell.Screen) {
-	g.board.Draw(scrn)
+	g.GameBoard.Draw(scrn)
 	g.snake.draw(scrn)
 	g.apples.draw(scrn)
 	if g.paused {
@@ -93,8 +93,8 @@ func (g *game) Draw(scrn tcell.Screen) {
 func (g *game) drawTextBox(text string, scrn tcell.Screen) {
 	textBox := ui.NewTextBox(text, boardStyle)
 	textBox.SetPosition(Position{
-		X: (g.board.Width() - textBox.Width()) / 2,
-		Y: (g.board.Height() - textBox.Height()) / 2,
+		X: (g.GameBoard.Width() - textBox.Width()) / 2,
+		Y: (g.GameBoard.Height() - textBox.Height()) / 2,
 	})
 	textBox.Draw(scrn)
 }
@@ -110,7 +110,7 @@ func (g *game) reset() {
 	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
 		return listener == g.snake
 	})
-	g.snake = newSnake(g.board.Center())
+	g.snake = newSnake(g.GameBoard.Center())
 	g.eventListeners = append(g.eventListeners, g.snake)
 }
 
@@ -122,17 +122,18 @@ func newSnakeGame(cfg *Config, width int, height int) *game {
 	ret := game{
 		eventListeners: EventListeners{s},
 		eventMap:       EventMap{},
-		board:          b,
+		GameBoard:      b,
 		snake:          s,
 		apples:         a,
 		remainingLives: cfg.NumberOfLives(),
 	}
 	b.LivesBox().SetText(fmt.Sprintf(livesFormat, ret.remainingLives))
+	b.SetKeyEventCallback(ret.keyEventCallback)
 	return &ret
 }
 
 type Game interface {
-	Handle(event tcell.Event)
+	ui.EventHandler
 	Update(delta time.Duration)
 	Draw(scrn tcell.Screen)
 	Finished() bool

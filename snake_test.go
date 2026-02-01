@@ -97,29 +97,31 @@ func Test_Snake(t *testing.T) {
 	t.Run("can change direction", func(t *testing.T) {
 		t.Run("left", func(t *testing.T) {
 			setup()
-			s.moveUp() // snake starts faced right
+			s.changeDirection(up)
+			// snake starts faced right
 
-			s.moveLeft()
+			s.changeDirection(left)
 			require.Equal(t, left, s.dir)
 		})
 
 		t.Run("right", func(t *testing.T) {
 			setup()
-			s.moveUp() // snake starts faced right
+			s.changeDirection(up)
+			// snake starts faced right
 
-			s.moveRight()
+			s.changeDirection(right)
 			require.Equal(t, right, s.dir)
 		})
 
 		t.Run("up", func(t *testing.T) {
 			setup()
-			s.moveUp()
+			s.changeDirection(up)
 			require.Equal(t, up, s.dir)
 		})
 
 		t.Run("down", func(t *testing.T) {
 			setup()
-			s.moveDown()
+			s.changeDirection(down)
 			require.Equal(t, down, s.dir)
 		})
 	})
@@ -128,7 +130,7 @@ func Test_Snake(t *testing.T) {
 		t.Run("right to left", func(t *testing.T) {
 			setup()
 
-			s.moveLeft()
+			s.changeDirection(left)
 
 			require.Equal(t, right, s.dir)
 		})
@@ -137,7 +139,7 @@ func Test_Snake(t *testing.T) {
 			setup()
 			s.dir = left // snake starts faced right
 
-			s.moveRight()
+			s.changeDirection(right)
 
 			require.Equal(t, left, s.dir)
 		})
@@ -146,7 +148,7 @@ func Test_Snake(t *testing.T) {
 			setup()
 			s.dir = up
 
-			s.moveDown()
+			s.changeDirection(down)
 
 			require.Equal(t, up, s.dir)
 		})
@@ -155,7 +157,7 @@ func Test_Snake(t *testing.T) {
 			setup()
 			s.dir = down
 
-			s.moveUp()
+			s.changeDirection(up)
 
 			require.Equal(t, down, s.dir)
 		})
