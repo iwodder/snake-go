@@ -24,3 +24,12 @@ func drawBorder(start Position, width int, height int, style tcell.Style, scrn t
 	scrn.SetContent(start.X+width-1, start.Y+height-1, tcell.RuneLRCorner, nil, style)
 	scrn.SetContent(start.X, start.Y+height-1, tcell.RuneLLCorner, nil, style)
 }
+
+func ShowMessage(owner Component, text string, scrn tcell.Screen) {
+	msgBox := NewTextBox(text, boardStyle)
+	msgBox.SetPosition(Position{
+		X: (owner.Width() - msgBox.Width()) / 2,
+		Y: (owner.Height() - msgBox.Height()) / 2,
+	})
+	msgBox.Draw(scrn)
+}

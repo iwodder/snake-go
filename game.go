@@ -83,20 +83,12 @@ func (g *game) Draw(scrn tcell.Screen) {
 	g.GameBoard.Draw(scrn)
 	g.snake.draw(scrn)
 	g.apples.draw(scrn)
-	if g.paused {
-		g.drawTextBox(GamePausedText, scrn)
-	} else if g.gameOver {
-		g.drawTextBox(GameOverText, scrn)
+	switch {
+	case g.gameOver:
+		ui.ShowMessage(g.GameBoard, GameOverText, scrn)
+	case g.paused:
+		ui.ShowMessage(g.GameBoard, GamePausedText, scrn)
 	}
-}
-
-func (g *game) drawTextBox(text string, scrn tcell.Screen) {
-	textBox := ui.NewTextBox(text, boardStyle)
-	textBox.SetPosition(Position{
-		X: (g.GameBoard.Width() - textBox.Width()) / 2,
-		Y: (g.GameBoard.Height() - textBox.Height()) / 2,
-	})
-	textBox.Draw(scrn)
 }
 
 func (g *game) Finished() bool {

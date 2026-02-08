@@ -10,6 +10,8 @@ type Component interface {
 	Draw(tcell.Screen)
 	Add(c Component) error
 	Remove(c Component) error
+	Width() int
+	Height() int
 }
 
 type keyHandler interface {

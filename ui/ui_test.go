@@ -6,6 +6,15 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+func setup(t *testing.T) tcell.SimulationScreen {
+	scrn := tcell.NewSimulationScreen("utf-8")
+	if err := scrn.Init(); err != nil {
+		t.Fatalf("failed to initialize screen: %v", err)
+	}
+	t.Cleanup(scrn.Fini)
+	return scrn
+}
+
 func Test_DrawBorder(t *testing.T) {
 	setup := func() tcell.SimulationScreen {
 		scrn := tcell.NewSimulationScreen("utf-8")
@@ -56,6 +65,24 @@ func Test_DrawBorder(t *testing.T) {
 			}
 		}()
 		drawBorder(Position{}, 1, 0, tcell.StyleDefault, scrn)
+	})
+}
+
+func Test_ShowMessage(t *testing.T) {
+	t.Run("writes message to screen in center of owner", func(t *testing.T) {
+		const msg = "test"
+		scrn := setup(t)
+
+		owner := NewGameBoard(Position{X: 0, Y: 0}, Position{X: 10, Y: 10})
+		ShowMessage(owner, msg, scrn)
+
+		pos := owner.Center()
+		pos.X -= len(msg) / 2
+
+		for _, char := range msg {
+			assertEqualContents(t, pos, char, scrn)
+			pos.X += 1
+		}
 	})
 }
 

@@ -58,6 +58,14 @@ type keyEventSpy struct {
 	leaf
 }
 
+func (k *keyEventSpy) Height() int {
+	return 0
+}
+
+func (k *keyEventSpy) Width() int {
+	return 0
+}
+
 func (k *keyEventSpy) Draw(tcell.Screen) {}
 
 func (k *keyEventSpy) handleKeyEvent(key *tcell.EventKey) {
