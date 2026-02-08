@@ -16,15 +16,6 @@ func setup(t *testing.T) tcell.SimulationScreen {
 }
 
 func Test_DrawBorder(t *testing.T) {
-	setup := func() tcell.SimulationScreen {
-		scrn := tcell.NewSimulationScreen("utf-8")
-		if err := scrn.Init(); err != nil {
-			t.Fatalf("failed to initialize screen: %v", err)
-		}
-		t.Cleanup(scrn.Fini)
-		return scrn
-	}
-
 	t.Run("panics on nil screen", func(t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
@@ -35,7 +26,7 @@ func Test_DrawBorder(t *testing.T) {
 	})
 
 	t.Run("draws border", func(t *testing.T) {
-		scrn := setup()
+		scrn := setup(t)
 
 		drawBorder(Position{X: 0, Y: 0}, 5, 5, tcell.StyleDefault, scrn)
 
@@ -46,7 +37,7 @@ func Test_DrawBorder(t *testing.T) {
 	})
 
 	t.Run("panics if width is less than one", func(t *testing.T) {
-		scrn := setup()
+		scrn := setup(t)
 
 		defer func() {
 			if r := recover(); r == nil {
@@ -57,7 +48,7 @@ func Test_DrawBorder(t *testing.T) {
 	})
 
 	t.Run("panics if height is less than one", func(t *testing.T) {
-		scrn := setup()
+		scrn := setup(t)
 
 		defer func() {
 			if r := recover(); r == nil {
