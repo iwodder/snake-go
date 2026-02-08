@@ -64,7 +64,7 @@ type TextBox struct {
 func (p *TextBox) Draw(scrn tcell.Screen) {
 	p.fill(scrn)
 	if p.border {
-		p.drawBorder(scrn)
+		drawBorder(p.upperLeft, p.Width(), p.Height(), p.style, scrn)
 	}
 	p.drawText(scrn)
 }
@@ -123,21 +123,6 @@ func (p *TextBox) fill(scrn tcell.Screen) {
 			scrn.SetContent(x, y, ' ', nil, p.style)
 		}
 	}
-}
-
-func (p *TextBox) drawBorder(scrn tcell.Screen) {
-	for x := p.upperLeft.X; x < p.upperLeft.X+p.Width(); x++ {
-		scrn.SetContent(x, p.upperLeft.Y, tcell.RuneHLine, nil, p.style)
-		scrn.SetContent(x, p.upperLeft.Y+p.Height()-1, tcell.RuneHLine, nil, p.style)
-	}
-	for y := p.upperLeft.Y; y < p.upperLeft.Y+p.Height(); y++ {
-		scrn.SetContent(p.upperLeft.X, y, tcell.RuneVLine, nil, p.style)
-		scrn.SetContent(p.upperLeft.X+p.Width()-1, y, tcell.RuneVLine, nil, p.style)
-	}
-	scrn.SetContent(p.upperLeft.X, p.upperLeft.Y, tcell.RuneULCorner, nil, p.style)
-	scrn.SetContent(p.upperLeft.X+p.Width()-1, p.upperLeft.Y, tcell.RuneURCorner, nil, p.style)
-	scrn.SetContent(p.upperLeft.X+p.Width()-1, p.upperLeft.Y+p.Height()-1, tcell.RuneLRCorner, nil, p.style)
-	scrn.SetContent(p.upperLeft.X, p.upperLeft.Y+p.Height()-1, tcell.RuneLLCorner, nil, p.style)
 }
 
 func (p *TextBox) drawText(scrn tcell.Screen) {

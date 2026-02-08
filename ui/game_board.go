@@ -21,9 +21,7 @@ func (b *GameBoard) Draw(scn tcell.Screen) {
 }
 
 func (b *GameBoard) drawBorder(scn tcell.Screen) {
-	b.drawHorizontalEdges(scn)
-	b.drawVerticalEdges(scn)
-	b.setCorners(scn)
+	drawBorder(b.ul, b.Width(), b.Height(), boardStyle, scn)
 }
 
 func (b *GameBoard) drawScoreArea(scn tcell.Screen) {
@@ -34,27 +32,6 @@ func (b *GameBoard) drawScoreArea(scn tcell.Screen) {
 	}
 	scn.SetContent(b.ul.X, b.hud.Bottom(), tcell.RuneLTee, nil, boardStyle)
 	scn.SetContent(b.lr.X, b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
-}
-
-func (b *GameBoard) drawHorizontalEdges(scn tcell.Screen) {
-	for x := 0; x < b.Width(); x++ {
-		scn.SetContent(x, b.ul.Y, tcell.RuneHLine, nil, boardStyle)
-		scn.SetContent(x, b.lr.Y, tcell.RuneHLine, nil, boardStyle)
-	}
-}
-
-func (b *GameBoard) drawVerticalEdges(scn tcell.Screen) {
-	for y := 0; y < b.Height(); y++ {
-		scn.SetContent(b.ul.X, y, tcell.RuneVLine, nil, boardStyle)
-		scn.SetContent(b.lr.X, y, tcell.RuneVLine, nil, boardStyle)
-	}
-}
-
-func (b *GameBoard) setCorners(scn tcell.Screen) {
-	scn.SetContent(b.ul.X, b.ul.Y, tcell.RuneULCorner, nil, boardStyle)
-	scn.SetContent(b.lr.X, b.ul.Y, tcell.RuneURCorner, nil, boardStyle)
-	scn.SetContent(b.ul.X, b.lr.Y, tcell.RuneLLCorner, nil, boardStyle)
-	scn.SetContent(b.lr.X, b.lr.Y, tcell.RuneLRCorner, nil, boardStyle)
 }
 
 func (b *GameBoard) Left() int {
