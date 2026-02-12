@@ -16,12 +16,8 @@ type GameBoard struct {
 }
 
 func (b *GameBoard) Draw(scn tcell.Screen) {
-	b.drawBorder(scn)
-	b.drawScoreArea(scn)
-}
-
-func (b *GameBoard) drawBorder(scn tcell.Screen) {
 	drawBorder(b.ul, b.Width(), b.Height(), boardStyle, scn)
+	b.drawScoreArea(scn)
 }
 
 func (b *GameBoard) drawScoreArea(scn tcell.Screen) {
