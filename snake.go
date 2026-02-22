@@ -5,8 +5,6 @@ import (
 	"slices"
 	"snake/ui"
 	"time"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 const (
@@ -40,8 +38,6 @@ func (d direction) String() string {
 }
 
 const (
-	snakeRune = 'X'
-
 	up direction = iota
 	right
 	down
@@ -49,18 +45,12 @@ const (
 )
 
 type snake struct {
+	ui.SnakeComponent
 	moveTimer      time.Duration
 	moveDelay      time.Duration
 	lastLength     int
 	startingLength int
 	dir            direction
-	body           []ui.Position
-}
-
-func (s *snake) draw(scn tcell.Screen) {
-	for _, c := range slices.All(s.body) {
-		scn.SetContent(c.X, c.Y, snakeRune, nil, snakeStyle)
-	}
 }
 
 func (s *snake) changeDirection(d direction) {
@@ -87,8 +77,8 @@ func (s *snake) move(b *ui.GameBoard, delta time.Duration) {
 	case left:
 		nextCell.X--
 	}
-	s.body = append(s.body, nextCell)
-	s.body = s.body[1:]
+	s.Body = append(s.Body, nextCell)
+	s.Body = s.Body[1:]
 }
 
 func (s *snake) canMove(b *ui.GameBoard, delta time.Duration) bool {
@@ -111,7 +101,7 @@ func (s *snake) eat(as apples) uint {
 	for i := range as {
 		if p == as[i].pos {
 			as[i].eaten = true
-			s.body = slices.Insert(s.body, 0, s.body[0])
+			s.Body = slices.Insert(s.Body, 0, s.Body[0])
 			ret += 1
 		}
 	}
@@ -123,11 +113,11 @@ func (s *snake) eat(as apples) uint {
 
 func (s *snake) speedUp() {
 	s.moveDelay = time.Duration(float64(s.moveDelay) * 0.75)
-	s.lastLength = len(s.body)
+	s.lastLength = len(s.Body)
 }
 
 func (s *snake) shouldIncreaseSpeed() bool {
-	return len(s.body) >= s.lastLength*2
+	return len(s.Body) >= s.lastLength*2
 }
 
 func (s *snake) headPos() ui.Position {
@@ -136,13 +126,13 @@ func (s *snake) headPos() ui.Position {
 }
 
 func (s *snake) head() ui.Position {
-	return s.body[len(s.body)-1]
+	return s.Body[len(s.Body)-1]
 }
 
 func (s *snake) crashed() bool {
 	head := s.headPos()
-	for i := 0; i < len(s.body)-2; i += 1 {
-		if head.X == s.body[i].X && head.Y == s.body[i].Y {
+	for i := 0; i < len(s.Body)-2; i += 1 {
+		if head.X == s.Body[i].X && head.Y == s.Body[i].Y {
 			return true
 		}
 	}
@@ -167,7 +157,7 @@ func (s *snake) ResetTo(initial ui.Position) {
 }
 
 func (s *snake) Length() int {
-	return len(s.body)
+	return len(s.Body)
 }
 
 func (s *snake) init(initial ui.Position) {
@@ -181,7 +171,7 @@ func (s *snake) init(initial ui.Position) {
 	s.dir = startingDir
 	s.moveDelay = defaultStartingSnakeMoveDelay
 	s.lastLength = len(body)
-	s.body = body
+	s.Body = body
 }
 
 func newSnake(initial ui.Position) *snake {

@@ -87,7 +87,7 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing reduces remainingLives remaining", func(t *testing.T) {
 		setup()
 
-		s.body = []ui.Position{
+		s.Body = []ui.Position{
 			{X: 3, Y: 3},
 			{X: 4, Y: 3},
 			{X: 4, Y: 2},
@@ -104,7 +104,7 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing and running out of remaining lives snake ends game", func(t *testing.T) {
 		setup()
 		g.remainingLives = 1
-		s.body = []ui.Position{
+		s.Body = []ui.Position{
 			{X: 3, Y: 3},
 			{X: 4, Y: 3},
 			{X: 4, Y: 2},
