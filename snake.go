@@ -105,7 +105,7 @@ func (s *snake) canMove(b *ui.GameBoard, delta time.Duration) bool {
 
 func (s *snake) eat(as apples) uint {
 	ret := uint(0)
-	p := s.headPos()
+	p := s.head()
 	for i := range as {
 		if p == as[i].pos {
 			as[i].eaten = true
@@ -128,17 +128,12 @@ func (s *snake) shouldIncreaseSpeed() bool {
 	return len(s.Body) >= s.lastLength*2
 }
 
-func (s *snake) headPos() ui.Position {
-	head := s.head()
-	return ui.Position{X: head.X, Y: head.Y}
-}
-
 func (s *snake) head() ui.Position {
 	return s.Body[len(s.Body)-1]
 }
 
 func (s *snake) crashed() bool {
-	head := s.headPos()
+	head := s.head()
 	for i := 0; i < len(s.Body)-2; i += 1 {
 		if head.X == s.Body[i].X && head.Y == s.Body[i].Y {
 			return true

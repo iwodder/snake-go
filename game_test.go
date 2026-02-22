@@ -120,12 +120,12 @@ func Test_Game(t *testing.T) {
 	t.Run("on game over no entities move", func(t *testing.T) {
 		setup()
 		g.gameOver = true
-		startPos := s.headPos()
+		startPos := s.head()
 
 		g.Update(moveDelta)
 
 		require.True(t, slices.IndexFunc(a, func(a apple) bool { return a.eaten }) == -1)
-		require.Equal(t, startPos, s.headPos())
+		require.Equal(t, startPos, s.head())
 	})
 
 	t.Run("on game over enter resets game", func(t *testing.T) {

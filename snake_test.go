@@ -30,7 +30,7 @@ func Test_Snake(t *testing.T) {
 
 		require.Equal(t, right, s.dir)
 		require.Len(t, s.Body, DefaultStartingLength)
-		require.Equal(t, initialPosition, s.headPos())
+		require.Equal(t, initialPosition, s.head())
 	})
 
 	t.Run("responds to events", func(t *testing.T) {
@@ -40,7 +40,7 @@ func Test_Snake(t *testing.T) {
 			simulate(s, g, MoveDown)
 
 			exp := ui.Position{X: initialPosition.X, Y: initialPosition.Y + 1}
-			require.Equal(t, exp, s.headPos())
+			require.Equal(t, exp, s.head())
 		})
 
 		t.Run("up event", func(t *testing.T) {
@@ -49,7 +49,7 @@ func Test_Snake(t *testing.T) {
 			simulate(s, g, MoveUp)
 
 			exp := ui.Position{X: initialPosition.X, Y: initialPosition.Y - 1}
-			require.Equal(t, exp, s.headPos())
+			require.Equal(t, exp, s.head())
 		})
 
 		t.Run("left event", func(t *testing.T) {
@@ -58,7 +58,7 @@ func Test_Snake(t *testing.T) {
 			simulate(s, g, MoveDown, MoveLeft)
 
 			exp := ui.Position{X: initialPosition.X - 1, Y: initialPosition.Y + 1}
-			require.Equal(t, exp, s.headPos())
+			require.Equal(t, exp, s.head())
 		})
 
 		t.Run("right event", func(t *testing.T) {
@@ -67,7 +67,7 @@ func Test_Snake(t *testing.T) {
 			simulate(s, g, MoveDown, MoveRight)
 
 			exp := ui.Position{X: initialPosition.X + 1, Y: initialPosition.Y + 1}
-			require.Equal(t, exp, s.headPos())
+			require.Equal(t, exp, s.head())
 		})
 	})
 
@@ -188,7 +188,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveRight, MoveRight, MoveRight, MoveRight, MoveRight)
 
-			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y}, s.headPos())
+			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y}, s.head())
 		})
 
 		t.Run("stays on board (up)", func(t *testing.T) {
@@ -196,7 +196,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveUp, MoveUp, MoveUp, MoveUp, MoveUp)
 
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top()}, s.headPos())
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top()}, s.head())
 		})
 
 		t.Run("stays on board (down)", func(t *testing.T) {
@@ -204,7 +204,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveDown, MoveDown, MoveDown, MoveDown, MoveDown)
 
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom()}, s.headPos())
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom()}, s.head())
 		})
 
 		t.Run("stays on board (left)", func(t *testing.T) {
@@ -212,67 +212,67 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveUp, MoveLeft, MoveLeft, MoveLeft, MoveLeft, MoveLeft)
 
-			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y - 1}, s.headPos())
+			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y - 1}, s.head())
 		})
 
 		t.Run("doesn't move until direction is away from edge (right)", func(t *testing.T) {
 			setup()
 
 			simulate(s, g, MoveRight, MoveRight, MoveRight)
-			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y}, s.headPos(),
+			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y}, s.head(),
 				"snake not to right edge")
 
 			simulate(s, g, MoveRight)
-			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y}, s.headPos(),
+			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y}, s.head(),
 				"snake moved after hitting right edge")
 
 			simulate(s, g, MoveUp)
-			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y - 1}, s.headPos())
+			require.Equal(t, ui.Position{X: g.Right(), Y: initialPosition.Y - 1}, s.head())
 		})
 
 		t.Run("doesn't move until direction is away from edge (left)", func(t *testing.T) {
 			setup()
 
 			simulate(s, g, MoveUp, MoveLeft, MoveLeft, MoveLeft, MoveLeft, MoveLeft)
-			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y - 1}, s.headPos(),
+			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y - 1}, s.head(),
 				"snake not to left edge")
 
 			simulate(s, g, MoveLeft)
-			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y - 1}, s.headPos(),
+			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y - 1}, s.head(),
 				"snake moved after hitting left edge")
 
 			simulate(s, g, MoveDown)
-			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y}, s.headPos())
+			require.Equal(t, ui.Position{X: g.Left(), Y: initialPosition.Y}, s.head())
 		})
 
 		t.Run("doesn't move until direction is away from edge (top)", func(t *testing.T) {
 			setup()
 
 			simulate(s, g, MoveUp, MoveUp, MoveUp, MoveUp)
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top()}, s.headPos(),
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top()}, s.head(),
 				"snake not to top edge")
 
 			simulate(s, g, MoveUp)
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top()}, s.headPos(),
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top()}, s.head(),
 				"snake moved after hitting top edge")
 
 			simulate(s, g, MoveLeft)
-			require.Equal(t, ui.Position{X: initialPosition.X - 1, Y: g.Top()}, s.headPos())
+			require.Equal(t, ui.Position{X: initialPosition.X - 1, Y: g.Top()}, s.head())
 		})
 
 		t.Run("doesn't move until direction is away from edge (bottom)", func(t *testing.T) {
 			setup()
 
 			simulate(s, g, MoveDown, MoveDown, MoveDown, MoveDown)
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom()}, s.headPos(),
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom()}, s.head(),
 				"snake not to bottom edge")
 
 			simulate(s, g, MoveDown)
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom()}, s.headPos(),
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom()}, s.head(),
 				"snake moved after hitting bottom edge")
 
 			simulate(s, g, MoveRight)
-			require.Equal(t, ui.Position{X: initialPosition.X + 1, Y: g.Bottom()}, s.headPos())
+			require.Equal(t, ui.Position{X: initialPosition.X + 1, Y: g.Bottom()}, s.head())
 		})
 
 		t.Run("is 4 cells per second", func(t *testing.T) {
@@ -398,7 +398,7 @@ func Test_Snake(t *testing.T) {
 
 		require.Equal(t, right, s.dir)
 		require.Len(t, s.Body, 1)
-		require.Equal(t, pos, s.headPos())
+		require.Equal(t, pos, s.head())
 		require.Equal(t, s.startingLength, s.Length())
 	})
 
