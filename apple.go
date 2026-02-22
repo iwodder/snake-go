@@ -31,7 +31,7 @@ func newApples(b *ui.GameBoard, cnt int) apples {
 }
 
 type apple struct {
-	pos   Position
+	pos   ui.Position
 	eaten bool
 }
 
@@ -47,9 +47,9 @@ func (a *apple) move(b *ui.GameBoard) {
 }
 
 func (a *apple) setPos(b *ui.GameBoard) {
-	p := Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
+	p := ui.Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
 	for a.pos == p || !b.IsInside(p) {
-		p = Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
+		p = ui.Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
 	}
 	a.pos = p
 }

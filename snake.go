@@ -48,8 +48,6 @@ const (
 	left
 )
 
-type Position = ui.Position
-
 type snake struct {
 	moveTimer      time.Duration
 	moveDelay      time.Duration
@@ -164,7 +162,7 @@ func (s *snake) Notify(event Event) {
 	}
 }
 
-func (s *snake) ResetTo(initial Position) {
+func (s *snake) ResetTo(initial ui.Position) {
 	s.init(initial)
 }
 
@@ -172,11 +170,11 @@ func (s *snake) Length() int {
 	return len(s.body)
 }
 
-func (s *snake) init(initial Position) {
-	body := make([]Position, 0, 48)
+func (s *snake) init(initial ui.Position) {
+	body := make([]ui.Position, 0, 48)
 	zeroBasedCol := initial.X - s.startingLength + 1
 	for range s.startingLength {
-		body = append(body, Position{X: zeroBasedCol, Y: initial.Y})
+		body = append(body, ui.Position{X: zeroBasedCol, Y: initial.Y})
 		zeroBasedCol += 1
 	}
 
@@ -186,11 +184,11 @@ func (s *snake) init(initial Position) {
 	s.body = body
 }
 
-func newSnake(initial Position) *snake {
+func newSnake(initial ui.Position) *snake {
 	return newSnakeOfLength(initial, DefaultStartingLength)
 }
 
-func newSnakeOfLength(initial Position, length int) *snake {
+func newSnakeOfLength(initial ui.Position, length int) *snake {
 	ret := snake{
 		startingLength: length,
 	}

@@ -107,7 +107,7 @@ func (g *game) reset() {
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
-	b := ui.NewGameBoard(Position{X: 0, Y: 0}, Position{X: min(width, maxWidth), Y: min(height, maxHeight)})
+	b := ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: min(width, maxWidth), Y: min(height, maxHeight)})
 	s := newSnakeOfLength(b.Center(), cfg.SnakeStartingLength())
 	a := newApples(b, cfg.MaxNumberOfApples())
 
