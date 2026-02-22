@@ -87,12 +87,12 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing reduces remainingLives remaining", func(t *testing.T) {
 		setup()
 
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 4, y: 3},
-			{x: 4, y: 2},
-			{x: 3, y: 2},
-			{x: 3, y: 3},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 4, Y: 3},
+			{X: 4, Y: 2},
+			{X: 3, Y: 2},
+			{X: 3, Y: 3},
 		}
 
 		g.Update(moveDelta)
@@ -104,12 +104,12 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing and running out of remaining lives snake ends game", func(t *testing.T) {
 		setup()
 		g.remainingLives = 1
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 4, y: 3},
-			{x: 4, y: 2},
-			{x: 3, y: 2},
-			{x: 3, y: 3},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 4, Y: 3},
+			{X: 4, Y: 2},
+			{X: 3, Y: 2},
+			{X: 3, Y: 3},
 		}
 
 		g.Update(moveDelta)

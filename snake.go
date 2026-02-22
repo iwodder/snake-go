@@ -50,22 +50,18 @@ const (
 
 type Position = ui.Position
 
-type cell struct {
-	x, y int
-}
-
 type snake struct {
 	moveTimer      time.Duration
 	moveDelay      time.Duration
 	lastLength     int
 	startingLength int
 	dir            direction
-	body           []cell
+	body           []ui.Position
 }
 
 func (s *snake) draw(scn tcell.Screen) {
 	for _, c := range slices.All(s.body) {
-		scn.SetContent(c.x, c.y, snakeRune, nil, snakeStyle)
+		scn.SetContent(c.X, c.Y, snakeRune, nil, snakeStyle)
 	}
 }
 
@@ -79,19 +75,19 @@ func (s *snake) move(b *ui.GameBoard, delta time.Duration) {
 	if !s.canMove(b, delta) {
 		return
 	}
-	nextCell := cell{
-		x: s.head().x,
-		y: s.head().y,
+	nextCell := ui.Position{
+		X: s.head().X,
+		Y: s.head().Y,
 	}
 	switch s.dir {
 	case up:
-		nextCell.y--
+		nextCell.Y--
 	case right:
-		nextCell.x++
+		nextCell.X++
 	case down:
-		nextCell.y++
+		nextCell.Y++
 	case left:
-		nextCell.x--
+		nextCell.X--
 	}
 	s.body = append(s.body, nextCell)
 	s.body = s.body[1:]
@@ -105,10 +101,10 @@ func (s *snake) canMove(b *ui.GameBoard, delta time.Duration) bool {
 	s.moveTimer = s.moveDelay
 
 	c := s.head()
-	return !((c.x >= b.Right() && s.dir == right) ||
-		(c.x <= b.Left() && s.dir == left) ||
-		(c.y <= b.Top() && s.dir == up) ||
-		(c.y >= b.Bottom() && s.dir == down))
+	return !((c.X >= b.Right() && s.dir == right) ||
+		(c.X <= b.Left() && s.dir == left) ||
+		(c.Y <= b.Top() && s.dir == up) ||
+		(c.Y >= b.Bottom() && s.dir == down))
 }
 
 func (s *snake) eat(as apples) uint {
@@ -136,19 +132,19 @@ func (s *snake) shouldIncreaseSpeed() bool {
 	return len(s.body) >= s.lastLength*2
 }
 
-func (s *snake) headPos() Position {
+func (s *snake) headPos() ui.Position {
 	head := s.head()
-	return Position{X: head.x, Y: head.y}
+	return ui.Position{X: head.X, Y: head.Y}
 }
 
-func (s *snake) head() cell {
+func (s *snake) head() ui.Position {
 	return s.body[len(s.body)-1]
 }
 
 func (s *snake) crashed() bool {
 	head := s.headPos()
 	for i := 0; i < len(s.body)-2; i += 1 {
-		if head.X == s.body[i].x && head.Y == s.body[i].y {
+		if head.X == s.body[i].X && head.Y == s.body[i].Y {
 			return true
 		}
 	}
@@ -177,10 +173,10 @@ func (s *snake) Length() int {
 }
 
 func (s *snake) init(initial Position) {
-	body := make([]cell, 0, 48)
+	body := make([]Position, 0, 48)
 	zeroBasedCol := initial.X - s.startingLength + 1
 	for range s.startingLength {
-		body = append(body, cell{x: zeroBasedCol, y: initial.Y})
+		body = append(body, Position{X: zeroBasedCol, Y: initial.Y})
 		zeroBasedCol += 1
 	}
 

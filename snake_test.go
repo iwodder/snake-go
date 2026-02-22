@@ -16,23 +16,23 @@ func Test_SnakeCanDrawOntoTheScreen(t *testing.T) {
 	dst := setupDefaultScreen(t)
 
 	s := snake{
-		body: []cell{
-			{x: 1, y: 2},
-			{x: 1, y: 3},
-			{x: 2, y: 3},
-			{x: 3, y: 3},
-			{x: 3, y: 2},
-			{x: 3, y: 1},
-			{x: 3, y: 0},
-			{x: 2, y: 0},
-			{x: 1, y: 0},
-			{x: 0, y: 0},
+		body: []Position{
+			{X: 1, Y: 2},
+			{X: 1, Y: 3},
+			{X: 2, Y: 3},
+			{X: 3, Y: 3},
+			{X: 3, Y: 2},
+			{X: 3, Y: 1},
+			{X: 3, Y: 0},
+			{X: 2, Y: 0},
+			{X: 1, Y: 0},
+			{X: 0, Y: 0},
 		},
 	}
 	s.draw(dst)
 
 	for _, c := range s.body {
-		requireEqualContents(t, c.x, c.y, snakeRune, dst)
+		requireEqualContents(t, c.X, c.Y, snakeRune, dst)
 	}
 }
 
@@ -169,7 +169,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveUp)
 
-			exp := cell{x: initialPosition.X, y: initialPosition.Y - 1}
+			exp := ui.Position{X: initialPosition.X, Y: initialPosition.Y - 1}
 			require.Equal(t, up, s.dir)
 			require.Equal(t, exp, s.body[0])
 		})
@@ -179,7 +179,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, b, MoveDown)
 
-			exp := cell{x: initialPosition.X, y: initialPosition.Y + 1}
+			exp := ui.Position{X: initialPosition.X, Y: initialPosition.Y + 1}
 			require.Equal(t, down, s.dir)
 			require.Equal(t, exp, s.body[0])
 		})
@@ -190,7 +190,7 @@ func Test_Snake(t *testing.T) {
 			simulate(s, b, MoveUp)
 			simulate(s, b, MoveRight)
 
-			exp := cell{x: initialPosition.X + 1, y: initialPosition.Y - 1}
+			exp := ui.Position{X: initialPosition.X + 1, Y: initialPosition.Y - 1}
 			require.Equal(t, right, s.dir)
 			require.Equal(t, exp, s.body[0])
 		})
@@ -201,7 +201,7 @@ func Test_Snake(t *testing.T) {
 			simulate(s, b, MoveUp)
 			simulate(s, b, MoveLeft)
 
-			exp := cell{x: initialPosition.X - 1, y: initialPosition.Y - 1}
+			exp := ui.Position{X: initialPosition.X - 1, Y: initialPosition.Y - 1}
 			require.Equal(t, left, s.dir)
 			require.Equal(t, exp, s.body[0])
 		})
@@ -304,8 +304,8 @@ func Test_Snake(t *testing.T) {
 			startPos := Position{X: 0, Y: 5}
 
 			setup()
-			s.body[0].x = startPos.X
-			s.body[0].y = startPos.Y
+			s.body[0].X = startPos.X
+			s.body[0].Y = startPos.Y
 
 			ticks := 0
 			for range ticker.C {
@@ -337,12 +337,12 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("snake moving in left circle crashes", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 2, y: 3},
-			{x: 2, y: 2},
-			{x: 3, y: 2},
-			{x: 3, y: 3},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 2, Y: 3},
+			{X: 2, Y: 2},
+			{X: 3, Y: 2},
+			{X: 3, Y: 3},
 		}
 
 		require.True(t, s.crashed())
@@ -350,12 +350,12 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("snake moving in right circle crashes", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 4, y: 3},
-			{x: 4, y: 2},
-			{x: 3, y: 2},
-			{x: 3, y: 3},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 4, Y: 3},
+			{X: 4, Y: 2},
+			{X: 3, Y: 2},
+			{X: 3, Y: 3},
 		}
 
 		require.True(t, s.crashed())
@@ -363,10 +363,10 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("moving in straight line (right) doesn't crash", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 4, y: 3},
-			{x: 5, y: 3},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 4, Y: 3},
+			{X: 5, Y: 3},
 		}
 
 		require.False(t, s.crashed())
@@ -374,10 +374,10 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("moving in straight line (left) doesn't crash", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 2, y: 3},
-			{x: 1, y: 3},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 2, Y: 3},
+			{X: 1, Y: 3},
 		}
 
 		require.False(t, s.crashed())
@@ -385,10 +385,10 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("moving in straight line (up) doesn't crash", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 3, y: 2},
-			{x: 3, y: 1},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 3, Y: 2},
+			{X: 3, Y: 1},
 		}
 
 		require.False(t, s.crashed())
@@ -396,10 +396,10 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("moving in straight line (down) doesn't crash", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 3, y: 4},
-			{x: 3, y: 5},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 3, Y: 4},
+			{X: 3, Y: 5},
 		}
 
 		require.False(t, s.crashed())
@@ -407,10 +407,10 @@ func Test_Snake(t *testing.T) {
 
 	t.Run("reset restores initial state", func(t *testing.T) {
 		setup()
-		s.body = []cell{
-			{x: 3, y: 3},
-			{x: 3, y: 4},
-			{x: 3, y: 5},
+		s.body = []ui.Position{
+			{X: 3, Y: 3},
+			{X: 3, Y: 4},
+			{X: 3, Y: 5},
 		}
 		simulate(s, b, MoveUp, MoveUp, MoveRight, MoveLeft)
 
