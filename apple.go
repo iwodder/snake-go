@@ -16,9 +16,9 @@ func (as apples) draw(scn tcell.Screen) {
 	}
 }
 
-func (as apples) move(b *ui.GameBoard, _ time.Duration) {
+func (as apples) Update(g *game, _ time.Duration) {
 	for i := range as {
-		as[i].move(b)
+		as[i].Update(g)
 	}
 }
 
@@ -39,9 +39,9 @@ func (a *apple) draw(scn tcell.Screen) {
 	scn.SetContent(a.pos.X, a.pos.Y, 'A', nil, appleStyle)
 }
 
-func (a *apple) move(b *ui.GameBoard) {
+func (a *apple) Update(g *game) {
 	if a.eaten {
-		a.setPos(b)
+		a.setPos(g.GameBoard)
 		a.eaten = false
 	}
 }

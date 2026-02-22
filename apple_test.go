@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var testBoard = ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20})
+var testGame = &game{
+	GameBoard: ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20}),
+}
 
 func Test_CanDrawApple(t *testing.T) {
 	scn := setupDefaultScreen(t)
@@ -40,17 +42,17 @@ func Test_CanDrawApples(t *testing.T) {
 func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
 	a := apple{pos: ui.Position{X: 10, Y: 10}, eaten: true}
 
-	a.move(testBoard)
+	a.Update(testGame)
 
 	require.NotEqual(t, ui.Position{X: 10, Y: 10}, a.pos)
 	require.False(t, a.eaten)
-	requireWithinBounds(t, testBoard, a.pos)
+	requireWithinBounds(t, testGame.GameBoard, a.pos)
 }
 
 func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
 	a := apple{pos: ui.Position{X: 10, Y: 10}, eaten: false}
 
-	a.move(testBoard)
+	a.Update(testGame)
 
 	require.Equal(t, ui.Position{X: 10, Y: 10}, a.pos)
 	require.False(t, a.eaten)
@@ -59,24 +61,24 @@ func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
 func Test_CanMoveApples(t *testing.T) {
 	a := apples{
 		{pos: ui.Position{X: 1, Y: 1}, eaten: true},
-		{pos: ui.Position{X: testBoard.Left() + 1, Y: testBoard.Top() + 1}, eaten: false},
+		{pos: ui.Position{X: testGame.Left() + 1, Y: testGame.Top() + 1}, eaten: false},
 		{pos: ui.Position{X: 3, Y: 3}, eaten: true},
 	}
 
-	a.move(testBoard, 0)
+	a.Update(testGame, 0)
 
 	require.NotEqual(t, apple{pos: ui.Position{X: 1, Y: 1}, eaten: true}, a[0])
-	requireWithinBounds(t, testBoard, a[0].pos)
+	requireWithinBounds(t, testGame.GameBoard, a[0].pos)
 
-	require.Equal(t, apple{pos: ui.Position{X: testBoard.Left() + 1, Y: testBoard.Top() + 1}, eaten: false}, a[1])
-	requireWithinBounds(t, testBoard, a[1].pos)
+	require.Equal(t, apple{pos: ui.Position{X: testGame.Left() + 1, Y: testGame.Top() + 1}, eaten: false}, a[1])
+	requireWithinBounds(t, testGame.GameBoard, a[1].pos)
 
 	require.NotEqual(t, apple{pos: ui.Position{X: 3, Y: 3}, eaten: true}, a[0])
-	requireWithinBounds(t, testBoard, a[2].pos)
+	requireWithinBounds(t, testGame.GameBoard, a[2].pos)
 }
 
 func Test_NewApplesHasSizeOfTwo(t *testing.T) {
-	as := newApples(testBoard, 2)
+	as := newApples(testGame.GameBoard, 2)
 
 	require.Len(t, as, 2)
 	require.NotEqual(t, as[0], as[1])

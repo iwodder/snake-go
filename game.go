@@ -62,10 +62,8 @@ func (g *game) Update(delta time.Duration) {
 	if g.paused || g.gameOver {
 		return
 	}
-	// Update snake and apples
-	// Update UI with new game state
 	g.snake.Update(g, delta)
-	g.apples.move(g.GameBoard, delta)
+	g.apples.Update(g, delta)
 	if g.remainingLives == 0 {
 		g.gameOver = true
 	}
