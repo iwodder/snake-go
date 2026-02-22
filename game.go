@@ -62,21 +62,15 @@ func (g *game) Update(delta time.Duration) {
 	if g.paused || g.gameOver {
 		return
 	}
-	g.snake.move(g.GameBoard, delta)
+	// Update snake and apples
+	// Update UI with new game state
+	g.snake.Update(g, delta)
 	g.apples.move(g.GameBoard, delta)
-	if g.snake.crashed() {
-		g.remainingLives -= 1
-		if g.remainingLives == 0 {
-			g.gameOver = true
-		} else {
-			g.GameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
-			g.snake.ResetTo(g.GameBoard.Center())
-		}
-	} else {
-		applesEaten := g.snake.eat(g.apples)
-		g.score += applesEaten * pointsPerApple
-		g.GameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
+	if g.remainingLives == 0 {
+		g.gameOver = true
 	}
+	g.GameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
+	g.GameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
 }
 
 func (g *game) Draw(scrn tcell.Screen) {

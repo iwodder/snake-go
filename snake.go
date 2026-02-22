@@ -59,8 +59,8 @@ func (s *snake) changeDirection(d direction) {
 	}
 }
 
-func (s *snake) move(b *ui.GameBoard, delta time.Duration) {
-	if !s.canMove(b, delta) {
+func (s *snake) Update(g *game, delta time.Duration) {
+	if !s.canMove(g.GameBoard, delta) {
 		return
 	}
 	nextPos := s.head()
@@ -75,6 +75,17 @@ func (s *snake) move(b *ui.GameBoard, delta time.Duration) {
 		nextPos.X--
 	}
 	s.Body = append(s.Body, nextPos)
+
+	if s.crashed() {
+		if g.remainingLives -= 1; g.remainingLives > 0 {
+			s.ResetTo(g.GameBoard.Center())
+		}
+		return
+	}
+
+	if cnt := s.eat(g.apples); cnt > 0 {
+		g.score += cnt * pointsPerApple
+	}
 	s.Body = s.Body[1:]
 }
 
