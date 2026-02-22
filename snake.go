@@ -63,21 +63,18 @@ func (s *snake) move(b *ui.GameBoard, delta time.Duration) {
 	if !s.canMove(b, delta) {
 		return
 	}
-	nextCell := ui.Position{
-		X: s.head().X,
-		Y: s.head().Y,
-	}
+	nextPos := s.head()
 	switch s.dir {
 	case up:
-		nextCell.Y--
+		nextPos.Y--
 	case right:
-		nextCell.X++
+		nextPos.X++
 	case down:
-		nextCell.Y++
+		nextPos.Y++
 	case left:
-		nextCell.X--
+		nextPos.X--
 	}
-	s.Body = append(s.Body, nextCell)
+	s.Body = append(s.Body, nextPos)
 	s.Body = s.Body[1:]
 }
 
