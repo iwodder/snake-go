@@ -11,23 +11,23 @@ const (
 	snakeRune = 'X'
 )
 
-type SnakeComponent struct {
+type SnakeRenderer struct {
 	leaf
 	Body []Position
 }
 
-func (s *SnakeComponent) Draw(scrn tcell.Screen) {
+func (s *SnakeRenderer) Draw(scrn tcell.Screen) {
 	for _, c := range slices.All(s.Body) {
 		scrn.SetContent(c.X, c.Y, snakeRune, nil, tcell.StyleDefault)
 	}
 }
 
-func (s *SnakeComponent) Width() int {
+func (s *SnakeRenderer) Width() int {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *SnakeComponent) Height() int {
+func (s *SnakeRenderer) Height() int {
 	//TODO implement me
 	panic("implement me")
 }

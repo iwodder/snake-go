@@ -45,7 +45,7 @@ const (
 )
 
 type snake struct {
-	ui.SnakeComponent
+	ui.SnakeRenderer
 	moveTimer      time.Duration
 	moveDelay      time.Duration
 	lastLength     int

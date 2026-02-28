@@ -6,7 +6,7 @@ func Test_EntityRendering(t *testing.T) {
 	t.Run("snake", func(t *testing.T) {
 		dst := setup(t)
 
-		s := SnakeComponent{
+		s := SnakeRenderer{
 			Body: []Position{
 				{X: 1, Y: 2},
 				{X: 1, Y: 3},
