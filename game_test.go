@@ -66,7 +66,9 @@ func Test_Game(t *testing.T) {
 	setup := func() {
 		b = ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9})
 		pos := b.Center()
-		a = apples{apple{pos: ui.Position{X: pos.X + 1, Y: pos.Y}}}
+		a = apples{
+			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: pos.X + 1, Y: pos.Y}}, eaten: false},
+		}
 		s = newSnake(b.Center())
 		g = game{
 			GameBoard:      b,

@@ -73,7 +73,6 @@ func (g *game) Update(delta time.Duration) {
 
 func (g *game) Draw(scrn tcell.Screen) {
 	g.GameBoard.Draw(scrn)
-	g.apples.draw(scrn)
 	switch {
 	case g.gameOver:
 		ui.ShowMessage(g.GameBoard, GameOverText, scrn)
@@ -103,6 +102,9 @@ func newSnakeGame(cfg *Config, width int, height int) *game {
 	a := newApples(b, cfg.MaxNumberOfApples())
 
 	_ = b.Add(s)
+	a.ForEach(func(a *apple) {
+		_ = b.Add(a)
+	})
 
 	ret := game{
 		eventListeners: EventListeners{s},

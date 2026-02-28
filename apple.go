@@ -4,26 +4,24 @@ import (
 	"math/rand"
 	"snake/ui"
 	"time"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 type apples []apple
 
-func (as apples) draw(scn tcell.Screen) {
-	for _, a := range as {
-		a.draw(scn)
+func (a apples) Update(g *game, _ time.Duration) {
+	for i := range a {
+		a[i].Update(g)
 	}
 }
 
-func (as apples) Update(g *game, _ time.Duration) {
-	for i := range as {
-		as[i].Update(g)
+func (a apples) ForEach(f func(*apple)) {
+	for i := range a {
+		f(&a[i])
 	}
 }
 
 func newApples(b *ui.GameBoard, cnt int) apples {
-	ret := make(apples, 0, cnt)
+	ret := make([]apple, 0, cnt)
 	for range cnt {
 		ret = append(ret, newApple(b))
 	}
@@ -31,12 +29,8 @@ func newApples(b *ui.GameBoard, cnt int) apples {
 }
 
 type apple struct {
-	pos   ui.Position
+	ui.AppleRenderer
 	eaten bool
-}
-
-func (a *apple) draw(scn tcell.Screen) {
-	scn.SetContent(a.pos.X, a.pos.Y, 'A', nil, appleStyle)
 }
 
 func (a *apple) Update(g *game) {
@@ -48,10 +42,10 @@ func (a *apple) Update(g *game) {
 
 func (a *apple) setPos(b *ui.GameBoard) {
 	p := ui.Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
-	for a.pos == p || !b.IsInside(p) {
+	for a.Pos == p || !b.IsInside(p) {
 		p = ui.Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
 	}
-	a.pos = p
+	a.Pos = p
 }
 
 func newApple(b *ui.GameBoard) apple {

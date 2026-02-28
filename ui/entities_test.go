@@ -25,3 +25,15 @@ func Test_SnakeComponent(t *testing.T) {
 		requireEqualContents(t, c.X, c.Y, snakeRune, dst)
 	}
 }
+
+func Test_CanRenderApple(t *testing.T) {
+	scn := setup(t)
+
+	ar := AppleRenderer{
+		Pos: Position{X: 1, Y: 1},
+	}
+
+	ar.Draw(scn)
+
+	requireEqualContents(t, 1, 1, appleRune, scn)
+}

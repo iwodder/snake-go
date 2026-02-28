@@ -302,8 +302,8 @@ func Test_Snake(t *testing.T) {
 		setup()
 
 		as := apples{
-			{pos: ui.Position{X: initialPosition.X + 1, Y: initialPosition.Y}, eaten: false},
-			{pos: ui.Position{X: 1, Y: 1}, eaten: false},
+			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: initialPosition.X + 1, Y: initialPosition.Y}}, eaten: false},
+			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: 1, Y: 1}}, eaten: false},
 		}
 		g.apples = as
 
@@ -405,8 +405,8 @@ func Test_Snake(t *testing.T) {
 	t.Run("speed increases by 25% when doubling in length", func(t *testing.T) {
 		setup()
 		as := apples{
-			{pos: initialPosition, eaten: false},
-			{pos: ui.Position{X: 1, Y: 1}, eaten: false},
+			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: initialPosition.X, Y: initialPosition.Y}}, eaten: false},
+			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: 1, Y: 1}}, eaten: false},
 		}
 
 		speed := s.moveDelay
@@ -418,11 +418,6 @@ func Test_Snake(t *testing.T) {
 		assert.Equal(t, float64(speed)*0.75, float64(s.moveDelay))
 		assert.Equal(t, startingLength*2, s.lastLength)
 	})
-}
-
-func requireEqualContents(t *testing.T, x, y int, exp rune, scn tcell.SimulationScreen) {
-	act, _, _, _ := scn.GetContent(x, y)
-	require.EqualValues(t, exp, act, "position (x=%d,Y=%d) expected '%c', but was '%c'", x, y, exp, act)
 }
 
 func setupDefaultScreen(t *testing.T) tcell.SimulationScreen {

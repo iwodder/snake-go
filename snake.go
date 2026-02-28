@@ -106,13 +106,13 @@ func (s *snake) canMove(b *ui.GameBoard, delta time.Duration) bool {
 func (s *snake) eat(as apples) uint {
 	ret := uint(0)
 	p := s.head()
-	for i := range as {
-		if p == as[i].pos {
-			as[i].eaten = true
+	as.ForEach(func(a *apple) {
+		if p == a.Pos {
+			a.eaten = true
 			s.Body = slices.Insert(s.Body, 0, s.Body[0])
 			ret += 1
 		}
-	}
+	})
 	if s.shouldIncreaseSpeed() {
 		s.speedUp()
 	}

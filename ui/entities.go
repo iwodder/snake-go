@@ -6,7 +6,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-const snakeRune = 'X'
+const (
+	appleRune = 'A'
+	snakeRune = 'X'
+)
 
 type SnakeComponent struct {
 	leaf
@@ -27,4 +30,21 @@ func (s *SnakeComponent) Width() int {
 func (s *SnakeComponent) Height() int {
 	//TODO implement me
 	panic("implement me")
+}
+
+type AppleRenderer struct {
+	leaf
+	Pos Position
+}
+
+func (a *AppleRenderer) Draw(scn tcell.Screen) {
+	scn.SetContent(a.Pos.X, a.Pos.Y, appleRune, nil, tcell.StyleDefault)
+}
+
+func (a *AppleRenderer) Width() int {
+	return 1
+}
+
+func (a *AppleRenderer) Height() int {
+	return 1
 }
