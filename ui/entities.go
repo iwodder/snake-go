@@ -18,7 +18,7 @@ type SnakeRenderer struct {
 
 func (s *SnakeRenderer) Draw(scrn tcell.Screen) {
 	for _, c := range slices.All(s.Body) {
-		scrn.SetContent(c.X, c.Y, snakeRune, nil, tcell.StyleDefault)
+		scrn.SetContent(c.X, c.Y, snakeRune, nil, styles[snakeStyle])
 	}
 }
 
@@ -38,7 +38,7 @@ type AppleRenderer struct {
 }
 
 func (a *AppleRenderer) Draw(scn tcell.Screen) {
-	scn.SetContent(a.Pos.X, a.Pos.Y, appleRune, nil, tcell.StyleDefault)
+	scn.SetContent(a.Pos.X, a.Pos.Y, appleRune, nil, styles[foodStyle])
 }
 
 func (a *AppleRenderer) Width() int {

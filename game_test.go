@@ -12,12 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Styles(t *testing.T) {
-	require.Equal(t, appleStyle, tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite))
-	require.Equal(t, boardStyle, tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite))
-	require.Equal(t, snakeStyle, tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite))
-}
-
 func Test_NewGameState(t *testing.T) {
 	scn := setupDefaultScreen(t)
 	width, height := scn.Size()

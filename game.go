@@ -16,12 +16,6 @@ const maxWidth = 39
 const maxHeight = maxWidth
 const pointsPerApple uint = 100
 
-var (
-	appleStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
-	boardStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
-	snakeStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
-)
-
 const GameOverText = "Game Over"
 const GamePausedText = "Game Paused"
 const livesFormat = "Lives: %d"
