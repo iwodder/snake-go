@@ -13,9 +13,7 @@ import (
 )
 
 func Test_NewGameState(t *testing.T) {
-	scn := setupDefaultScreen(t)
-	width, height := scn.Size()
-	g := newSnakeGame(&Config{}, width, height)
+	g := newSnakeGame(&Config{}, 10, 10)
 
 	require.Len(t, g.eventListeners, 1, "snake should be registered for key events")
 	require.NotNil(t, g.snake)
@@ -197,4 +195,11 @@ func (s *spyGame) assertUpdated(t *testing.T) {
 
 func (s *spyGame) assertDrawn(t *testing.T) {
 	assert.True(t, s.drawn, "game was never drawn")
+}
+
+func setupScreen(t *testing.T, height, width int) tcell.SimulationScreen {
+	ret := tcell.NewSimulationScreen("")
+	require.NoError(t, ret.Init())
+	ret.SetSize(height, width)
+	return ret
 }

@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -420,20 +419,9 @@ func Test_Snake(t *testing.T) {
 	})
 }
 
-func setupDefaultScreen(t *testing.T) tcell.SimulationScreen {
-	return setupScreen(t, 80, 80)
-}
-
 func simulate(s *snake, g *game, events ...Event) {
 	for _, event := range events {
 		s.Notify(event)
 		s.Update(g, moveDelta)
 	}
-}
-
-func setupScreen(t *testing.T, height, width int) tcell.SimulationScreen {
-	ret := tcell.NewSimulationScreen("")
-	require.NoError(t, ret.Init())
-	ret.SetSize(height, width)
-	return ret
 }
