@@ -146,16 +146,6 @@ func Test_Game(t *testing.T) {
 	})
 }
 
-type spyScreen struct {
-	wasFinialized bool
-	tcell.SimulationScreen
-}
-
-func (s *spyScreen) Fini() {
-	s.wasFinialized = true
-	s.SimulationScreen.Fini()
-}
-
 type spyGame struct {
 	notified bool
 	updated  bool
