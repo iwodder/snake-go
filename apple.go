@@ -20,7 +20,7 @@ func (a apples) ForEach(f func(*apple)) {
 	}
 }
 
-func newApples(b *ui.GameBoard, cnt int) apples {
+func newApples(b *gameBoard, cnt int) apples {
 	ret := make([]apple, 0, cnt)
 	for range cnt {
 		ret = append(ret, newApple(b))
@@ -35,12 +35,12 @@ type apple struct {
 
 func (a *apple) Update(g *game) {
 	if a.eaten {
-		a.setPos(g.GameBoard)
+		a.setPos(g.gameBoard)
 		a.eaten = false
 	}
 }
 
-func (a *apple) setPos(b *ui.GameBoard) {
+func (a *apple) setPos(b *gameBoard) {
 	p := ui.Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
 	for a.Pos == p || !b.IsInside(p) {
 		p = ui.Position{X: rand.Intn(b.Right()), Y: rand.Intn(b.Bottom())}
@@ -48,7 +48,7 @@ func (a *apple) setPos(b *ui.GameBoard) {
 	a.Pos = p
 }
 
-func newApple(b *ui.GameBoard) apple {
+func newApple(b *gameBoard) apple {
 	var ret apple
 	ret.setPos(b)
 	return ret

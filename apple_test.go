@@ -8,7 +8,9 @@ import (
 )
 
 var testGame = &game{
-	GameBoard: ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20}),
+	gameBoard: &gameBoard{
+		ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20}),
+	},
 }
 
 func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
@@ -21,7 +23,7 @@ func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {
 
 	require.NotEqual(t, ui.Position{X: 10, Y: 10}, a.Pos)
 	require.False(t, a.eaten)
-	requireWithinBounds(t, testGame.GameBoard, a.Pos)
+	requireWithinBounds(t, testGame.gameBoard, a.Pos)
 }
 
 func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
@@ -37,7 +39,7 @@ func Test_IfAppleIsNotEatenThenPositionDoesNotChange(t *testing.T) {
 }
 
 func Test_CanUpdateApples(t *testing.T) {
-	as := newApples(testGame.GameBoard, 3)
+	as := newApples(testGame.gameBoard, 3)
 	as[0].eaten = true
 	as[0].Pos = ui.Position{X: 1, Y: 1}
 	as[1].Pos = ui.Position{X: testGame.Left() + 1, Y: testGame.Top() + 1}
@@ -47,17 +49,17 @@ func Test_CanUpdateApples(t *testing.T) {
 	as.Update(testGame, 0)
 
 	require.NotEqual(t, apple{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: 1, Y: 1}}, eaten: true}, as[0])
-	requireWithinBounds(t, testGame.GameBoard, as[0].Pos)
+	requireWithinBounds(t, testGame.gameBoard, as[0].Pos)
 
 	require.Equal(t, apple{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: testGame.Left() + 1, Y: testGame.Top() + 1}}, eaten: false}, as[1])
-	requireWithinBounds(t, testGame.GameBoard, as[1].Pos)
+	requireWithinBounds(t, testGame.gameBoard, as[1].Pos)
 
 	require.NotEqual(t, apple{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: 3, Y: 3}}, eaten: true}, as[2])
-	requireWithinBounds(t, testGame.GameBoard, as[2].Pos)
+	requireWithinBounds(t, testGame.gameBoard, as[2].Pos)
 }
 
 func Test_NewApplesHasSizeOfTwo(t *testing.T) {
-	as := newApples(testGame.GameBoard, 2)
+	as := newApples(testGame.gameBoard, 2)
 
 	require.Len(t, as, 2)
 	require.NotEqual(t, as[0], as[1])
@@ -70,7 +72,7 @@ func Test_Apples(t *testing.T) {
 			set := make(map[*apple]struct{})
 			wasRun := false
 
-			as := newApples(testGame.GameBoard, numApples)
+			as := newApples(testGame.gameBoard, numApples)
 			as.ForEach(func(a *apple) {
 				wasRun = true
 				set[a] = struct{}{}
@@ -83,6 +85,6 @@ func Test_Apples(t *testing.T) {
 	})
 }
 
-func requireWithinBounds(t *testing.T, b *ui.GameBoard, p ui.Position) {
+func requireWithinBounds(t *testing.T, b *gameBoard, p ui.Position) {
 	require.Truef(t, b.IsInside(p), "%#v was not inside board", p)
 }

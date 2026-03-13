@@ -60,7 +60,7 @@ func (s *snake) changeDirection(d direction) {
 }
 
 func (s *snake) Update(g *game, delta time.Duration) {
-	if !s.canMove(g.GameBoard, delta) {
+	if !s.canMove(g.gameBoard, delta) {
 		return
 	}
 	nextPos := s.head()
@@ -78,7 +78,7 @@ func (s *snake) Update(g *game, delta time.Duration) {
 
 	if s.crashed() {
 		if g.remainingLives -= 1; g.remainingLives > 0 {
-			s.ResetTo(g.GameBoard.Center())
+			s.ResetTo(g.gameBoard.Center())
 		}
 		return
 	}
@@ -89,7 +89,7 @@ func (s *snake) Update(g *game, delta time.Duration) {
 	s.Body = s.Body[1:]
 }
 
-func (s *snake) canMove(b *ui.GameBoard, delta time.Duration) bool {
+func (s *snake) canMove(b *gameBoard, delta time.Duration) bool {
 	s.moveTimer -= delta
 	if s.moveTimer > 0 {
 		return false

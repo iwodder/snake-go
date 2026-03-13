@@ -22,7 +22,7 @@ const livesFormat = "Lives: %d"
 const scoreFormat = "Score: %d"
 
 type game struct {
-	*ui.GameBoard
+	*gameBoard
 	eventMap       EventMap
 	eventListeners EventListeners
 	snake          *snake
@@ -61,17 +61,17 @@ func (g *game) Update(delta time.Duration) {
 	if g.remainingLives == 0 {
 		g.gameOver = true
 	}
-	g.GameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
-	g.GameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
+	g.gameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
+	g.gameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
 }
 
 func (g *game) Draw(scrn tcell.Screen) {
-	g.GameBoard.Draw(scrn)
+	g.gameBoard.Draw(scrn)
 	switch {
 	case g.gameOver:
-		ui.ShowMessage(g.GameBoard, GameOverText, scrn)
+		ui.ShowMessage(g.gameBoard, GameOverText, scrn)
 	case g.paused:
-		ui.ShowMessage(g.GameBoard, GamePausedText, scrn)
+		ui.ShowMessage(g.gameBoard, GamePausedText, scrn)
 	}
 }
 
@@ -86,12 +86,15 @@ func (g *game) reset() {
 	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
 		return listener == g.snake
 	})
-	g.snake = newSnake(g.GameBoard.Center())
+	g.snake = newSnake(g.gameBoard.Center())
 	g.eventListeners = append(g.eventListeners, g.snake)
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
-	b := ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: min(width, maxWidth), Y: min(height, maxHeight)})
+	b := newGameBoard(
+		ui.Position{X: 0, Y: 0},
+		ui.Position{X: min(width, maxWidth), Y: min(height, maxHeight)},
+	)
 	s := newSnakeOfLength(b.Center(), cfg.SnakeStartingLength())
 	a := newApples(b, cfg.MaxNumberOfApples())
 
@@ -103,7 +106,7 @@ func newSnakeGame(cfg *Config, width int, height int) *game {
 	ret := game{
 		eventListeners: EventListeners{s},
 		eventMap:       EventMap{},
-		GameBoard:      b,
+		gameBoard:      b,
 		snake:          s,
 		apples:         a,
 		remainingLives: cfg.NumberOfLives(),
