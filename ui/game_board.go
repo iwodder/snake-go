@@ -55,17 +55,6 @@ func (b *GameBoard) Height() int {
 	return b.lr.Y - b.ul.Y + 1
 }
 
-func (b *GameBoard) Center() Position {
-	return Position{
-		X: b.ul.X + b.Width()/2,
-		Y: b.ul.Y + b.Height()/2,
-	}
-}
-
-func (b *GameBoard) IsInside(pos Position) bool {
-	return pos.X > b.Left() && pos.X < b.Right() && pos.Y > b.Top() && pos.Y < b.Bottom()
-}
-
 func (b *GameBoard) setHud(hud *Hud) {
 	if b.hud != nil {
 		_ = b.Remove(b.hud)

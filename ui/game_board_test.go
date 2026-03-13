@@ -40,19 +40,7 @@ func Test_Board(t *testing.T) {
 	t.Run("width", func(t *testing.T) {
 		require.Equal(t, 6, board.Width())
 	})
-
-	t.Run("center", func(t *testing.T) {
-		t.Run("upper left not at (0,0)", func(t *testing.T) {
-			board := NewGameBoard(Position{X: 10, Y: 20}, Position{X: 19, Y: 29})
-
-			require.Equal(t, Position{X: 15, Y: 25}, board.Center())
-		})
-
-		t.Run("upper left at (0,0)", func(t *testing.T) {
-			require.Equal(t, Position{X: 3, Y: 5}, board.Center())
-		})
-	})
-
+	
 	t.Run("test edges", func(t *testing.T) {
 		t.Run("top", func(t *testing.T) {
 			require.Equal(t, 5, board.Top())

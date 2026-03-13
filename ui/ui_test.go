@@ -67,12 +67,12 @@ func Test_ShowMessage(t *testing.T) {
 		owner := NewGameBoard(Position{X: 0, Y: 0}, Position{X: 10, Y: 10})
 		ShowMessage(owner, msg, scrn)
 
-		pos := owner.Center()
-		pos.X -= len(msg) / 2
+		center := Position{X: 5, Y: 5}
+		center.X -= len(msg) / 2
 
 		for _, char := range msg {
-			assertEqualContents(t, pos, char, scrn)
-			pos.X += 1
+			assertEqualContents(t, center, char, scrn)
+			center.X += 1
 		}
 	})
 }
