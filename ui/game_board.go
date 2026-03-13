@@ -56,7 +56,10 @@ func (b *GameBoard) Height() int {
 }
 
 func (b *GameBoard) Center() Position {
-	return Position{X: b.Width() / 2, Y: b.Height() / 2}
+	return Position{
+		X: b.ul.X + b.Width()/2,
+		Y: b.ul.Y + b.Height()/2,
+	}
 }
 
 func (b *GameBoard) IsInside(pos Position) bool {
