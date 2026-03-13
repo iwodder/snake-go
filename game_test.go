@@ -18,7 +18,7 @@ func Test_NewGameState(t *testing.T) {
 	require.Len(t, g.eventListeners, 1, "snake should be registered for key events")
 	require.NotNil(t, g.snake)
 	require.NotNil(t, g.apples)
-	require.NotNil(t, g.GameBoard)
+	require.NotNil(t, g.GameBoardRenderer)
 }
 
 func Test_RunGame(t *testing.T) {
@@ -57,7 +57,7 @@ func Test_Game(t *testing.T) {
 
 	setup := func() {
 		b = &gameBoard{
-			GameBoard: ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9}),
+			GameBoardRenderer: ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9}),
 		}
 		pos := b.Center()
 		a = apples{

@@ -20,8 +20,8 @@ func Test_Snake(t *testing.T) {
 
 	setup := func() {
 		s = newSnakeOfLength(initialPosition, startingLength)
-		b := ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9})
-		g = &game{gameBoard: &gameBoard{GameBoard: b}}
+		b := ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9})
+		g = &game{gameBoard: &gameBoard{GameBoardRenderer: b}}
 	}
 
 	t.Run("initial state", func(t *testing.T) {

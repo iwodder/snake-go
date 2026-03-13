@@ -3,7 +3,7 @@ package main
 import "snake/ui"
 
 type gameBoard struct {
-	*ui.GameBoard
+	*ui.GameBoardRenderer
 }
 
 func (b *gameBoard) Center() ui.Position {
@@ -20,6 +20,6 @@ func (b *gameBoard) IsInside(pos ui.Position) bool {
 
 func newGameBoard(ul, lr ui.Position) *gameBoard {
 	return &gameBoard{
-		GameBoard: ui.NewGameBoard(ul, lr),
+		GameBoardRenderer: ui.NewGameBoardRenderer(ul, lr),
 	}
 }

@@ -9,7 +9,7 @@ import (
 
 var testGame = &game{
 	gameBoard: &gameBoard{
-		ui.NewGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20}),
+		ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20}),
 	},
 }
 

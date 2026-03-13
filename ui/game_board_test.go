@@ -10,7 +10,7 @@ import (
 func Test_BoardCanDraw(t *testing.T) {
 	dst := setupScreen(t, 10, 10)
 
-	b := NewGameBoard(Position{X: 0, Y: 0}, Position{X: 9, Y: 9})
+	b := NewGameBoardRenderer(Position{X: 0, Y: 0}, Position{X: 9, Y: 9})
 
 	b.Draw(dst)
 
@@ -31,7 +31,7 @@ func Test_BoardCanDraw(t *testing.T) {
 }
 
 func Test_Board(t *testing.T) {
-	board := NewGameBoard(Position{X: 0, Y: 0}, Position{X: 5, Y: 10})
+	board := NewGameBoardRenderer(Position{X: 0, Y: 0}, Position{X: 5, Y: 10})
 
 	t.Run("height", func(t *testing.T) {
 		require.Equal(t, 11, board.Height())

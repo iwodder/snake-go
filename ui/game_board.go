@@ -8,20 +8,20 @@ const (
 	borderWidth = 1
 )
 
-type GameBoard struct {
+type GameBoardRenderer struct {
 	composite
 	ul  Position
 	lr  Position
 	hud *Hud
 }
 
-func (b *GameBoard) Draw(scn tcell.Screen) {
+func (b *GameBoardRenderer) Draw(scn tcell.Screen) {
 	drawBorder(b.ul, b.Width(), b.Height(), boardStyle, scn)
 	b.drawScoreArea(scn)
 	b.composite.Draw(scn)
 }
 
-func (b *GameBoard) drawScoreArea(scn tcell.Screen) {
+func (b *GameBoardRenderer) drawScoreArea(scn tcell.Screen) {
 	b.hud.Draw(scn)
 
 	for i := range b.Width() {
@@ -31,31 +31,31 @@ func (b *GameBoard) drawScoreArea(scn tcell.Screen) {
 	scn.SetContent(b.lr.X, b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
 }
 
-func (b *GameBoard) Left() int {
+func (b *GameBoardRenderer) Left() int {
 	return b.ul.X + borderWidth
 }
 
-func (b *GameBoard) Right() int {
+func (b *GameBoardRenderer) Right() int {
 	return b.lr.X - borderWidth
 }
 
-func (b *GameBoard) Top() int {
+func (b *GameBoardRenderer) Top() int {
 	return b.ul.Y + borderWidth + b.hud.Height() + borderWidth
 }
 
-func (b *GameBoard) Bottom() int {
+func (b *GameBoardRenderer) Bottom() int {
 	return b.lr.Y - borderWidth
 }
 
-func (b *GameBoard) Width() int {
+func (b *GameBoardRenderer) Width() int {
 	return b.lr.X - b.ul.X + 1
 }
 
-func (b *GameBoard) Height() int {
+func (b *GameBoardRenderer) Height() int {
 	return b.lr.Y - b.ul.Y + 1
 }
 
-func (b *GameBoard) setHud(hud *Hud) {
+func (b *GameBoardRenderer) setHud(hud *Hud) {
 	if b.hud != nil {
 		_ = b.Remove(b.hud)
 	}
@@ -63,16 +63,16 @@ func (b *GameBoard) setHud(hud *Hud) {
 	b.hud = hud
 }
 
-func (b *GameBoard) ScoreBox() *TextBox {
+func (b *GameBoardRenderer) ScoreBox() *TextBox {
 	return b.hud.ScoreBox()
 }
 
-func (b *GameBoard) LivesBox() *TextBox {
+func (b *GameBoardRenderer) LivesBox() *TextBox {
 	return b.hud.LivesBox()
 }
 
-func NewGameBoard(ul, lr Position) *GameBoard {
-	ret := GameBoard{
+func NewGameBoardRenderer(ul, lr Position) *GameBoardRenderer {
+	ret := GameBoardRenderer{
 		ul: ul,
 		lr: lr,
 	}
