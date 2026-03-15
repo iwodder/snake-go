@@ -31,7 +31,6 @@ type game struct {
 	remainingLives uint
 	finished       bool
 	paused         bool
-	gameOver       bool
 }
 
 func (g *game) keyEventCallback(event *tcell.EventKey) {
@@ -40,11 +39,11 @@ func (g *game) keyEventCallback(event *tcell.EventKey) {
 	case ExitGame:
 		g.finished = true
 	case PauseGame:
-		if !g.gameOver {
+		if !g.gameOver() {
 			g.paused = !g.paused
 		}
 	case StartGame:
-		if g.gameOver {
+		if g.gameOver() {
 			g.reset()
 		}
 	default:
@@ -53,14 +52,11 @@ func (g *game) keyEventCallback(event *tcell.EventKey) {
 }
 
 func (g *game) Update(delta time.Duration) {
-	if g.paused || g.gameOver {
+	if g.paused || g.gameOver() {
 		return
 	}
 	g.snake.Update(g, delta)
 	g.apples.Update(g, delta)
-	if g.remainingLives == 0 {
-		g.gameOver = true
-	}
 	g.gameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
 	g.gameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
 }
@@ -68,7 +64,7 @@ func (g *game) Update(delta time.Duration) {
 func (g *game) Draw(scrn tcell.Screen) {
 	g.gameBoard.Draw(scrn)
 	switch {
-	case g.gameOver:
+	case g.gameOver():
 		ui.ShowMessage(g.gameBoard, GameOverText, scrn)
 	case g.paused:
 		ui.ShowMessage(g.gameBoard, GamePausedText, scrn)
@@ -79,10 +75,13 @@ func (g *game) Finished() bool {
 	return g.finished
 }
 
+func (g *game) gameOver() bool {
+	return g.remainingLives == 0
+}
+
 func (g *game) reset() {
 	g.score = 0
 	g.remainingLives = DefaultNumberOfLives
-	g.gameOver = false
 	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
 		return listener == g.snake
 	})

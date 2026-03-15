@@ -85,7 +85,7 @@ func Test_Game(t *testing.T) {
 
 		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
 
-		require.False(t, g.gameOver)
+		require.False(t, g.gameOver())
 		require.Equal(t, uint(2), g.remainingLives)
 	})
 
@@ -93,16 +93,14 @@ func Test_Game(t *testing.T) {
 		setup()
 		g.remainingLives = 1
 
-		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft)
-		s.changeDirection(up)
-		g.Update(moveDelta)
+		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
 
-		require.True(t, g.gameOver)
+		require.True(t, g.gameOver())
 	})
 
 	t.Run("on game over no entities move", func(t *testing.T) {
 		setup()
-		g.gameOver = true
+		g.remainingLives = 0
 		startPos := s.head()
 
 		g.Update(moveDelta)
@@ -113,12 +111,12 @@ func Test_Game(t *testing.T) {
 
 	t.Run("on game over enter resets game", func(t *testing.T) {
 		setup()
-		g.gameOver = true
+		g.remainingLives = 0
 		g.score = 100
 
 		g.keyEventCallback(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
 
-		assert.False(t, g.gameOver)
+		assert.False(t, g.gameOver())
 		assert.Zero(t, g.score)
 		assert.Equal(t, DefaultNumberOfLives, g.remainingLives)
 		assert.NotSame(t, g.snake, s)
@@ -126,7 +124,7 @@ func Test_Game(t *testing.T) {
 
 	t.Run("on game over pressing pause key does nothing", func(t *testing.T) {
 		setup()
-		g.gameOver = true
+		g.remainingLives = 0
 		paused := g.paused
 
 		g.keyEventCallback(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
