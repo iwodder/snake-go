@@ -83,15 +83,7 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing reduces remainingLives remaining", func(t *testing.T) {
 		setup()
 
-		s.Body = []ui.Position{
-			{X: 3, Y: 3},
-			{X: 4, Y: 3},
-			{X: 4, Y: 2},
-			{X: 3, Y: 2},
-			{X: 3, Y: 3},
-		}
-
-		g.Update(moveDelta)
+		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
 
 		require.False(t, g.gameOver)
 		require.Equal(t, uint(2), g.remainingLives)
@@ -100,14 +92,9 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing and running out of remaining lives snake ends game", func(t *testing.T) {
 		setup()
 		g.remainingLives = 1
-		s.Body = []ui.Position{
-			{X: 3, Y: 3},
-			{X: 4, Y: 3},
-			{X: 4, Y: 2},
-			{X: 3, Y: 2},
-			{X: 3, Y: 3},
-		}
 
+		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft)
+		s.changeDirection(up)
 		g.Update(moveDelta)
 
 		require.True(t, g.gameOver)

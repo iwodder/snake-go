@@ -32,19 +32,19 @@ func (b *GameBoardRenderer) drawScoreArea(scn tcell.Screen) {
 }
 
 func (b *GameBoardRenderer) Left() int {
-	return b.ul.X + borderWidth
+	return b.ul.X
 }
 
 func (b *GameBoardRenderer) Right() int {
-	return b.lr.X - borderWidth
+	return b.lr.X
 }
 
 func (b *GameBoardRenderer) Top() int {
-	return b.ul.Y + borderWidth + b.hud.Height() + borderWidth
+	return b.ul.Y + b.hud.Height() + borderWidth
 }
 
 func (b *GameBoardRenderer) Bottom() int {
-	return b.lr.Y - borderWidth
+	return b.lr.Y
 }
 
 func (b *GameBoardRenderer) Width() int {

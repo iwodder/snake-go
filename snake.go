@@ -60,7 +60,7 @@ func (s *snake) changeDirection(d direction) {
 }
 
 func (s *snake) Update(g *game, delta time.Duration) {
-	if !s.canMove(g.gameBoard, delta) {
+	if !s.canMove(delta) {
 		return
 	}
 	nextPos := s.head()
@@ -74,33 +74,33 @@ func (s *snake) Update(g *game, delta time.Duration) {
 	case left:
 		nextPos.X--
 	}
-	s.Body = append(s.Body, nextPos)
 
-	if s.crashed() {
+	if !g.gameBoard.IsInside(nextPos) {
+		return
+	}
+
+	if s.crashed(nextPos) {
 		if g.remainingLives -= 1; g.remainingLives > 0 {
 			s.ResetTo(g.gameBoard.Center())
 		}
 		return
 	}
 
+	s.Body = append(s.Body, nextPos)
+	s.Body = s.Body[1:]
+
 	if cnt := s.eat(g.apples); cnt > 0 {
 		g.score += cnt * pointsPerApple
 	}
-	s.Body = s.Body[1:]
 }
 
-func (s *snake) canMove(b *gameBoard, delta time.Duration) bool {
+func (s *snake) canMove(delta time.Duration) bool {
 	s.moveTimer -= delta
 	if s.moveTimer > 0 {
 		return false
 	}
 	s.moveTimer = s.moveDelay
-
-	c := s.head()
-	return !((c.X >= b.Right() && s.dir == right) ||
-		(c.X <= b.Left() && s.dir == left) ||
-		(c.Y <= b.Top() && s.dir == up) ||
-		(c.Y >= b.Bottom() && s.dir == down))
+	return true
 }
 
 func (s *snake) eat(as apples) uint {
@@ -132,10 +132,9 @@ func (s *snake) head() ui.Position {
 	return s.Body[len(s.Body)-1]
 }
 
-func (s *snake) crashed() bool {
-	head := s.head()
+func (s *snake) crashed(nextPos ui.Position) bool {
 	for i := 0; i < len(s.Body)-2; i += 1 {
-		if head.X == s.Body[i].X && head.Y == s.Body[i].Y {
+		if nextPos.X == s.Body[i].X && nextPos.Y == s.Body[i].Y {
 			return true
 		}
 	}

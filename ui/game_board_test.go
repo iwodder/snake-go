@@ -40,22 +40,25 @@ func Test_Board(t *testing.T) {
 	t.Run("width", func(t *testing.T) {
 		require.Equal(t, 6, board.Width())
 	})
-	
+
 	t.Run("test edges", func(t *testing.T) {
 		t.Run("top", func(t *testing.T) {
-			require.Equal(t, 5, board.Top())
+			require.Equal(t, 4, board.Top())
 		})
 
 		t.Run("bottom", func(t *testing.T) {
-			require.Equal(t, 9, board.Bottom())
+			// the border is drawn along lowerRight.Y
+			require.Equal(t, 10, board.Bottom())
 		})
 
 		t.Run("left", func(t *testing.T) {
-			require.Equal(t, 1, board.Left())
+			// the border is drawn along upperLeft.X
+			require.Equal(t, 0, board.Left())
 		})
 
 		t.Run("right", func(t *testing.T) {
-			require.Equal(t, 4, board.Right())
+			// the border is drawn along lowerRight.X
+			require.Equal(t, 5, board.Right())
 		})
 	})
 }
