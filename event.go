@@ -27,6 +27,8 @@ func (e EventListeners) Notify(event Event) {
 	}
 }
 
+var eventMap = &EventMap{}
+
 type EventMap struct {
 }
 

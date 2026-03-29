@@ -59,7 +59,7 @@ func (s *snake) changeDirection(d direction) {
 	}
 }
 
-func (s *snake) Update(g *game, delta time.Duration) {
+func (s *snake) Update(board *gameBoard, g *game, delta time.Duration) {
 	if !s.canMove(delta) {
 		return
 	}
@@ -75,13 +75,13 @@ func (s *snake) Update(g *game, delta time.Duration) {
 		nextPos.X--
 	}
 
-	if !g.gameBoard.IsInside(nextPos) {
+	if !board.IsInside(nextPos) {
 		return
 	}
 
 	if s.crashed(nextPos) {
 		if g.remainingLives -= 1; g.remainingLives > 0 {
-			s.ResetTo(g.gameBoard.Center())
+			s.ResetTo(board.Center())
 		}
 		return
 	}
@@ -89,7 +89,7 @@ func (s *snake) Update(g *game, delta time.Duration) {
 	s.Body = append(s.Body, nextPos)
 	s.Body = s.Body[1:]
 
-	if cnt := s.eat(g.apples); cnt > 0 {
+	if cnt := s.eat(board.apples); cnt > 0 {
 		g.score += cnt * pointsPerApple
 	}
 }

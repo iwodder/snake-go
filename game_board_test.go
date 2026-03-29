@@ -8,11 +8,11 @@ import (
 )
 
 func Test_GameBoard(t *testing.T) {
-	board := newGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9})
+	board := newGameBoard(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9}, &Config{})
 
 	t.Run("center", func(t *testing.T) {
 		t.Run("upper left not at origin", func(t *testing.T) {
-			board := newGameBoard(ui.Position{X: 10, Y: 20}, ui.Position{X: 19, Y: 29})
+			board := newGameBoard(ui.Position{X: 10, Y: 20}, ui.Position{X: 19, Y: 29}, &Config{})
 
 			require.Equal(t, ui.Position{X: 14, Y: 26}, board.Center())
 		})

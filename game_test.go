@@ -15,10 +15,7 @@ import (
 func Test_NewGameState(t *testing.T) {
 	g := newSnakeGame(&Config{}, 10, 10)
 
-	require.Len(t, g.eventListeners, 1, "snake should be registered for key events")
-	require.NotNil(t, g.snake)
-	require.NotNil(t, g.apples)
-	require.NotNil(t, g.GameBoardRenderer)
+	require.NotNil(t, g.gameBoard)
 }
 
 func Test_RunGame(t *testing.T) {
@@ -64,10 +61,10 @@ func Test_Game(t *testing.T) {
 			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: pos.X + 1, Y: pos.Y}}, eaten: false},
 		}
 		s = newSnake(b.Center())
+		b.snake = s
+		b.apples = a
 		g = game{
 			gameBoard:      b,
-			snake:          s,
-			apples:         a,
 			remainingLives: DefaultNumberOfLives,
 		}
 	}
@@ -83,7 +80,7 @@ func Test_Game(t *testing.T) {
 	t.Run("crashing reduces remainingLives remaining", func(t *testing.T) {
 		setup()
 
-		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
+		simulate(g.gameBoard.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
 
 		require.False(t, g.gameOver())
 		require.Equal(t, uint(2), g.remainingLives)
@@ -114,7 +111,7 @@ func Test_Game(t *testing.T) {
 		g.remainingLives = 0
 		g.score = 100
 
-		g.keyEventCallback(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
+		g.Handle(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
 
 		assert.False(t, g.gameOver())
 		assert.Zero(t, g.score)
@@ -127,7 +124,7 @@ func Test_Game(t *testing.T) {
 		g.remainingLives = 0
 		paused := g.paused
 
-		g.keyEventCallback(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
+		g.Handle(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
 
 		assert.Equal(t, paused, g.paused)
 	})

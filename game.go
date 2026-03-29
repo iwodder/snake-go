@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"slices"
 	"snake/ui"
 	"time"
 
@@ -23,19 +22,14 @@ const scoreFormat = "Score: %d"
 
 type game struct {
 	*gameBoard
-	eventMap       EventMap
-	eventListeners EventListeners
-	snake          *snake
-	apples         apples
 	score          uint
 	remainingLives uint
 	finished       bool
 	paused         bool
 }
 
-func (g *game) keyEventCallback(event *tcell.EventKey) {
-	ev := g.eventMap.Get(event)
-	switch ev {
+func (g *game) Handle(event tcell.Event) {
+	switch eventMap.Get(event) {
 	case ExitGame:
 		g.finished = true
 	case PauseGame:
@@ -47,7 +41,7 @@ func (g *game) keyEventCallback(event *tcell.EventKey) {
 			g.reset()
 		}
 	default:
-		g.eventListeners.Notify(ev)
+		g.gameBoard.Handle(event)
 	}
 }
 
@@ -55,10 +49,7 @@ func (g *game) Update(delta time.Duration) {
 	if g.paused || g.gameOver() {
 		return
 	}
-	g.snake.Update(g, delta)
-	g.apples.Update(g, delta)
-	g.gameBoard.LivesBox().SetText(fmt.Sprintf(livesFormat, g.remainingLives))
-	g.gameBoard.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
+	g.gameBoard.Update(g, delta)
 }
 
 func (g *game) Draw(scrn tcell.Screen) {
@@ -82,36 +73,20 @@ func (g *game) gameOver() bool {
 func (g *game) reset() {
 	g.score = 0
 	g.remainingLives = DefaultNumberOfLives
-	g.eventListeners = slices.DeleteFunc(g.eventListeners, func(listener EventListener) bool {
-		return listener == g.snake
-	})
 	g.snake = newSnake(g.gameBoard.Center())
-	g.eventListeners = append(g.eventListeners, g.snake)
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
 	b := newGameBoard(
 		ui.Position{X: 0, Y: 0},
 		ui.Position{X: min(width, maxWidth), Y: min(height, maxHeight)},
+		cfg,
 	)
-	s := newSnakeOfLength(b.Center(), cfg.SnakeStartingLength())
-	a := newApples(b, cfg.MaxNumberOfApples())
-
-	_ = b.Add(s)
-	a.ForEach(func(a *apple) {
-		_ = b.Add(a)
-	})
 
 	ret := game{
-		eventListeners: EventListeners{s},
-		eventMap:       EventMap{},
 		gameBoard:      b,
-		snake:          s,
-		apples:         a,
 		remainingLives: cfg.NumberOfLives(),
 	}
-	b.LivesBox().SetText(fmt.Sprintf(livesFormat, ret.remainingLives))
-	b.SetKeyEventCallback(ret.keyEventCallback)
 	return &ret
 }
 

@@ -190,7 +190,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveRight, MoveRight, MoveRight, MoveRight, MoveRight)
 
-			require.Equal(t, ui.Position{X: g.Right() - 1, Y: initialPosition.Y}, s.head())
+			require.Equal(t, ui.Position{X: g.gameBoard.Right() - 1, Y: initialPosition.Y}, s.head())
 		})
 
 		t.Run("stays on board (up)", func(t *testing.T) {
@@ -198,7 +198,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveUp, MoveUp, MoveUp, MoveUp, MoveUp)
 
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Top() + 1}, s.head())
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.gameBoard.Top() + 1}, s.head())
 		})
 
 		t.Run("stays on board (down)", func(t *testing.T) {
@@ -206,7 +206,7 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveDown, MoveDown, MoveDown, MoveDown, MoveDown)
 
-			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.Bottom() - 1}, s.head())
+			require.Equal(t, ui.Position{X: initialPosition.X, Y: g.gameBoard.Bottom() - 1}, s.head())
 		})
 
 		t.Run("stays on board (left)", func(t *testing.T) {
@@ -214,12 +214,12 @@ func Test_Snake(t *testing.T) {
 
 			simulate(s, g, MoveUp, MoveLeft, MoveLeft, MoveLeft, MoveLeft, MoveLeft)
 
-			require.Equal(t, ui.Position{X: g.Left() + 1, Y: initialPosition.Y - 1}, s.head())
+			require.Equal(t, ui.Position{X: g.gameBoard.Left() + 1, Y: initialPosition.Y - 1}, s.head())
 		})
 
 		t.Run("doesn't move until direction is away from edge (right)", func(t *testing.T) {
 			setup()
-			expX := g.Right() - 1
+			expX := g.gameBoard.Right() - 1
 
 			simulate(s, g, MoveRight, MoveRight, MoveRight, MoveRight)
 			require.Equal(t, ui.Position{X: expX, Y: initialPosition.Y}, s.head(),
@@ -235,7 +235,7 @@ func Test_Snake(t *testing.T) {
 
 		t.Run("doesn't move until direction is away from edge (left)", func(t *testing.T) {
 			setup()
-			expX := g.Left() + 1
+			expX := g.gameBoard.Left() + 1
 
 			simulate(s, g, MoveUp, MoveLeft, MoveLeft, MoveLeft, MoveLeft, MoveLeft)
 			require.Equal(t, ui.Position{X: expX, Y: initialPosition.Y - 1}, s.head(),
@@ -251,7 +251,7 @@ func Test_Snake(t *testing.T) {
 
 		t.Run("doesn't move until direction is away from edge (top)", func(t *testing.T) {
 			setup()
-			expY := g.Top() + 1
+			expY := g.gameBoard.Top() + 1
 			simulate(s, g, MoveUp, MoveUp, MoveUp, MoveUp, MoveUp)
 			require.Equal(t, ui.Position{X: initialPosition.X, Y: expY}, s.head(),
 				"snake not to top edge")
@@ -268,7 +268,7 @@ func Test_Snake(t *testing.T) {
 			setup()
 
 			simulate(s, g, MoveDown, MoveDown, MoveDown, MoveDown)
-			expY := g.Bottom() - 1
+			expY := g.gameBoard.Bottom() - 1
 			require.Equal(t, ui.Position{X: initialPosition.X, Y: expY}, s.head(),
 				"snake not to bottom edge")
 
@@ -292,7 +292,7 @@ func Test_Snake(t *testing.T) {
 
 			ticks := 0
 			for range ticker.C {
-				s.Update(g, rate)
+				s.Update(g.gameBoard, g, rate)
 				if ticks += 1; ticks == 20 {
 					ticker.Stop()
 					break
@@ -313,7 +313,7 @@ func Test_Snake(t *testing.T) {
 		}
 		g.apples = as
 
-		s.Update(g, moveDelta)
+		s.Update(g.gameBoard, g, moveDelta)
 
 		require.Len(t, s.Body, 2)
 		require.True(t, as[0].eaten)
@@ -424,6 +424,6 @@ func Test_Snake(t *testing.T) {
 func simulate(s *snake, g *game, events ...Event) {
 	for _, event := range events {
 		s.Notify(event)
-		s.Update(g, moveDelta)
+		s.Update(g.gameBoard, g, moveDelta)
 	}
 }

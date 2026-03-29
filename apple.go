@@ -8,9 +8,9 @@ import (
 
 type apples []apple
 
-func (a apples) Update(g *game, _ time.Duration) {
+func (a apples) Update(board *gameBoard, _ time.Duration) {
 	for i := range a {
-		a[i].Update(g)
+		a[i].Update(board)
 	}
 }
 
@@ -33,9 +33,9 @@ type apple struct {
 	eaten bool
 }
 
-func (a *apple) Update(g *game) {
+func (a *apple) Update(board *gameBoard) {
 	if a.eaten {
-		a.setPos(g.gameBoard)
+		a.setPos(board)
 		a.eaten = false
 	}
 }
