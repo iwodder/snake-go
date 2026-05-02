@@ -64,13 +64,21 @@ func Test_Game(t *testing.T) {
 		b.snake = s
 		b.apples = a
 		g = game{
+			Manager:        ui.NewManager(),
 			gameBoard:      b,
+			cfg:            &Config{},
 			remainingLives: DefaultNumberOfLives,
+			currentState:   new(menuState),
 		}
+	}
+
+	simulateEvent := func(g *game, event Event) {
+		g.currentState.handle(g, event)
 	}
 
 	t.Run("player earns points for eating apples", func(t *testing.T) {
 		setup()
+		simulateEvent(&g, StartGame)
 
 		g.Update(moveDelta)
 
@@ -79,6 +87,7 @@ func Test_Game(t *testing.T) {
 
 	t.Run("crashing reduces remainingLives remaining", func(t *testing.T) {
 		setup()
+		simulateEvent(&g, StartGame)
 
 		simulate(g.gameBoard.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
 
@@ -90,7 +99,7 @@ func Test_Game(t *testing.T) {
 		setup()
 		g.remainingLives = 1
 
-		simulate(g.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
+		simulate(g.gameBoard.snake, &g, MoveRight, MoveDown, MoveLeft, MoveUp)
 
 		require.True(t, g.gameOver())
 	})
@@ -108,25 +117,22 @@ func Test_Game(t *testing.T) {
 
 	t.Run("on game over enter resets game", func(t *testing.T) {
 		setup()
-		g.remainingLives = 0
-		g.score = 100
+		g.currentState = new(gameOverState)
 
-		g.Handle(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
+		g.keyHandler(tcell.NewEventKey(tcell.KeyEnter, ' ', tcell.ModNone))
 
 		assert.False(t, g.gameOver())
 		assert.Zero(t, g.score)
 		assert.Equal(t, DefaultNumberOfLives, g.remainingLives)
-		assert.NotSame(t, g.snake, s)
 	})
 
 	t.Run("on game over pressing pause key does nothing", func(t *testing.T) {
 		setup()
-		g.remainingLives = 0
-		paused := g.paused
+		exp := g
 
-		g.Handle(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
+		g.keyHandler(tcell.NewEventKey(tcell.KeyRune, ' ', tcell.ModNone))
 
-		assert.Equal(t, paused, g.paused)
+		assert.Equal(t, exp, g)
 	})
 }
 

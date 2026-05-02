@@ -15,51 +15,27 @@ const maxWidth = 39
 const maxHeight = maxWidth
 const pointsPerApple uint = 100
 
-const GameOverText = "Game Over"
-const GamePausedText = "Game Paused"
-const livesFormat = "Lives: %d"
-const scoreFormat = "Score: %d"
-
 type game struct {
-	*gameBoard
+	*ui.Manager
+	cfg            *Config
+	gameBoard      *gameBoard
 	score          uint
 	remainingLives uint
 	finished       bool
-	paused         bool
+	currentState   state
 }
 
-func (g *game) Handle(event tcell.Event) {
-	switch eventMap.Get(event) {
+func (g *game) keyHandler(key *tcell.EventKey) {
+	switch event := eventMap.Get(key); event {
 	case ExitGame:
 		g.finished = true
-	case PauseGame:
-		if !g.gameOver() {
-			g.paused = !g.paused
-		}
-	case StartGame:
-		if g.gameOver() {
-			g.reset()
-		}
 	default:
-		g.gameBoard.Handle(event)
+		g.currentState.handle(g, event)
 	}
 }
 
 func (g *game) Update(delta time.Duration) {
-	if g.paused || g.gameOver() {
-		return
-	}
-	g.gameBoard.Update(g, delta)
-}
-
-func (g *game) Draw(scrn tcell.Screen) {
-	g.gameBoard.Draw(scrn)
-	switch {
-	case g.gameOver():
-		ui.ShowMessage(g.gameBoard, GameOverText, scrn)
-	case g.paused:
-		ui.ShowMessage(g.gameBoard, GamePausedText, scrn)
-	}
+	g.currentState.update(g, delta)
 }
 
 func (g *game) Finished() bool {
@@ -72,8 +48,8 @@ func (g *game) gameOver() bool {
 
 func (g *game) reset() {
 	g.score = 0
-	g.remainingLives = DefaultNumberOfLives
-	g.snake = newSnake(g.gameBoard.Center())
+	g.remainingLives = g.cfg.NumberOfLives()
+	g.gameBoard.reset()
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
@@ -82,11 +58,17 @@ func newSnakeGame(cfg *Config, width int, height int) *game {
 		ui.Position{X: min(width, maxWidth), Y: min(height, maxHeight)},
 		cfg,
 	)
+	mgr := ui.NewManager()
+	mgr.AddView("GameBoard", b)
 
 	ret := game{
+		Manager:        mgr,
+		cfg:            cfg,
 		gameBoard:      b,
 		remainingLives: cfg.NumberOfLives(),
+		currentState:   new(menuState),
 	}
+	mgr.SetKeyEventCallback(ret.keyHandler)
 	return &ret
 }
 

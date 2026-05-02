@@ -311,7 +311,7 @@ func Test_Snake(t *testing.T) {
 			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: initialPosition.X + 1, Y: initialPosition.Y}}, eaten: false},
 			{AppleRenderer: ui.AppleRenderer{Pos: ui.Position{X: 1, Y: 1}}, eaten: false},
 		}
-		g.apples = as
+		g.gameBoard.apples = as
 
 		s.Update(g.gameBoard, g, moveDelta)
 

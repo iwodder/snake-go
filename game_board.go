@@ -8,6 +8,9 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+const livesFormat = "Lives: %d"
+const scoreFormat = "Score: %d"
+
 type gameBoard struct {
 	*ui.GameBoardRenderer
 	snake  *snake
@@ -21,19 +24,6 @@ func (b *gameBoard) Update(g *game, delta time.Duration) {
 	b.GameBoardRenderer.ScoreBox().SetText(fmt.Sprintf(scoreFormat, g.score))
 }
 
-func (b *gameBoard) keyHandler(key *tcell.EventKey) {
-	switch eventMap.GetEventFromKey(key) {
-	case MoveDown:
-		b.snake.Notify(MoveDown)
-	case MoveUp:
-		b.snake.Notify(MoveUp)
-	case MoveLeft:
-		b.snake.Notify(MoveLeft)
-	case MoveRight:
-		b.snake.Notify(MoveRight)
-	}
-}
-
 func (b *gameBoard) Center() ui.Position {
 	return ui.Position{
 		X: b.Left() + (b.Right()-b.Left())/2,
@@ -44,6 +34,14 @@ func (b *gameBoard) Center() ui.Position {
 func (b *gameBoard) IsInside(pos ui.Position) bool {
 	return pos.X > b.Left() && pos.X < b.Right() &&
 		pos.Y > b.Top() && pos.Y < b.Bottom()
+}
+
+func (b *gameBoard) keyHandler(key *tcell.EventKey) {
+	b.snake.Notify(eventMap.GetEventFromKey(key))
+}
+
+func (b *gameBoard) reset() {
+	b.snake.ResetTo(b.Center())
 }
 
 func newGameBoard(ul, lr ui.Position, cfg *Config) *gameBoard {
