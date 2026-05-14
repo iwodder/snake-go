@@ -20,7 +20,7 @@ func Test_Snake(t *testing.T) {
 
 	setup := func() {
 		b := gameBoard{
-			GameBoardRenderer: ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, ui.Position{X: 9, Y: 9}),
+			GameBoardRenderer: ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, 9, 9),
 		}
 		initialPosition = b.Center()
 		s = newSnakeOfLength(initialPosition, startingLength)

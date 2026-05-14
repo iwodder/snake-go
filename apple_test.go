@@ -8,7 +8,7 @@ import (
 )
 
 var testBoard = &gameBoard{
-	GameBoardRenderer: ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, ui.Position{X: 20, Y: 20}),
+	GameBoardRenderer: ui.NewGameBoardRenderer(ui.Position{X: 0, Y: 0}, 20, 20),
 }
 
 func Test_IfAppleIsEatenThenPositionIsUpdatedAndItsNotEaten(t *testing.T) {

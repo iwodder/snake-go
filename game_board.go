@@ -44,9 +44,9 @@ func (b *gameBoard) reset() {
 	b.snake.ResetTo(b.Center())
 }
 
-func newGameBoard(ul, lr ui.Position, cfg *Config) *gameBoard {
+func newGameBoard(ul ui.Position, width int, height int, cfg *Config) *gameBoard {
 	ret := gameBoard{
-		GameBoardRenderer: ui.NewGameBoardRenderer(ul, lr),
+		GameBoardRenderer: ui.NewGameBoardRenderer(ul, width, height),
 	}
 	ret.SetKeyEventCallback(ret.keyHandler)
 	ret.LivesBox().SetText(fmt.Sprintf(livesFormat, cfg.NumberOfLives()))

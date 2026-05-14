@@ -53,11 +53,7 @@ func (g *game) reset() {
 }
 
 func newSnakeGame(cfg *Config, width int, height int) *game {
-	b := newGameBoard(
-		ui.Position{X: 0, Y: 0},
-		ui.Position{X: min(width, maxWidth), Y: min(height, maxHeight)},
-		cfg,
-	)
+	b := newGameBoard(ui.Position{X: 0, Y: 0}, min(width, maxWidth), min(height, maxHeight), cfg)
 	mgr := ui.NewManager()
 	mgr.AddView("GameBoard", b)
 

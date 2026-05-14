@@ -10,9 +10,9 @@ const (
 
 type GameBoardRenderer struct {
 	composite
-	ul  Position
-	lr  Position
-	hud *Hud
+	ul            Position
+	height, width int
+	hud           *Hud
 }
 
 func (b *GameBoardRenderer) Draw(scn tcell.Screen) {
@@ -27,8 +27,8 @@ func (b *GameBoardRenderer) drawScoreArea(scn tcell.Screen) {
 	for i := range b.Width() {
 		scn.SetContent(b.ul.X+i, b.hud.Bottom(), tcell.RuneHLine, nil, boardStyle)
 	}
-	scn.SetContent(b.ul.X, b.hud.Bottom(), tcell.RuneLTee, nil, boardStyle)
-	scn.SetContent(b.lr.X, b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
+	scn.SetContent(b.Left(), b.hud.Bottom(), tcell.RuneLTee, nil, boardStyle)
+	scn.SetContent(b.Right(), b.hud.Bottom(), tcell.RuneRTee, nil, boardStyle)
 }
 
 func (b *GameBoardRenderer) Left() int {
@@ -36,7 +36,7 @@ func (b *GameBoardRenderer) Left() int {
 }
 
 func (b *GameBoardRenderer) Right() int {
-	return b.lr.X
+	return b.ul.X + b.width - 1
 }
 
 func (b *GameBoardRenderer) Top() int {
@@ -44,15 +44,15 @@ func (b *GameBoardRenderer) Top() int {
 }
 
 func (b *GameBoardRenderer) Bottom() int {
-	return b.lr.Y
+	return b.ul.Y + b.height - borderWidth
 }
 
 func (b *GameBoardRenderer) Width() int {
-	return b.lr.X - b.ul.X + 1
+	return b.width
 }
 
 func (b *GameBoardRenderer) Height() int {
-	return b.lr.Y - b.ul.Y + 1
+	return b.height
 }
 
 func (b *GameBoardRenderer) setHud(hud *Hud) {
@@ -71,10 +71,11 @@ func (b *GameBoardRenderer) LivesBox() *TextBox {
 	return b.hud.LivesBox()
 }
 
-func NewGameBoardRenderer(ul, lr Position) *GameBoardRenderer {
+func NewGameBoardRenderer(ul Position, width int, height int) *GameBoardRenderer {
 	ret := GameBoardRenderer{
-		ul: ul,
-		lr: lr,
+		ul:     ul,
+		width:  width,
+		height: height,
 	}
 	ret.setHud(NewHud(Position{X: ul.X + 1, Y: ul.Y + 1}, 0, ret.Width()-2))
 	return &ret

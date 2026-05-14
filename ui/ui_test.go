@@ -64,7 +64,7 @@ func Test_ShowMessage(t *testing.T) {
 		const msg = "test"
 		scrn := setup(t)
 
-		owner := NewGameBoardRenderer(Position{X: 0, Y: 0}, Position{X: 10, Y: 10})
+		owner := NewGameBoardRenderer(Position{X: 0, Y: 0}, 11, 11)
 		ShowMessage(owner, msg, scrn)
 
 		center := Position{X: 5, Y: 5}
