@@ -2,6 +2,8 @@ package ui
 
 import "github.com/gdamore/tcell/v2"
 
+const runeSpace rune = ' '
+
 // drawBorder renders a rectangular border onto the screen using the given position, dimensions, and style.
 func drawBorder(start Position, width int, height int, style tcell.Style, scrn tcell.Screen) {
 	if width <= 0 {
@@ -23,6 +25,22 @@ func drawBorder(start Position, width int, height int, style tcell.Style, scrn t
 	scrn.SetContent(start.X+width-1, start.Y, tcell.RuneURCorner, nil, style)
 	scrn.SetContent(start.X+width-1, start.Y+height-1, tcell.RuneLRCorner, nil, style)
 	scrn.SetContent(start.X, start.Y+height-1, tcell.RuneLLCorner, nil, style)
+}
+
+// fill renders a rectangular area onto the screen using the given position, dimensions, and style.
+func fill(start Position, width int, height int, style tcell.Style, scrn tcell.Screen) {
+	if width <= 0 {
+		panic("width must be greater than zero")
+	}
+	if height <= 0 {
+		panic("height must be greater than zero")
+	}
+
+	for y := start.Y; y < start.Y+height; y++ {
+		for x := start.X; x < start.X+width; x++ {
+			scrn.SetContent(x, y, runeSpace, nil, style)
+		}
+	}
 }
 
 func ShowMessage(owner Component, text string, scrn tcell.Screen) {

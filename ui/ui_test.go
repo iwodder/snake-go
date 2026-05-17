@@ -59,6 +59,51 @@ func Test_DrawBorder(t *testing.T) {
 	})
 }
 
+func Test_Fill(t *testing.T) {
+	t.Run("panics on nil screen", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("expected panic, but none occurred")
+			}
+		}()
+		drawBorder(Position{}, 0, 0, tcell.Style{}, nil)
+	})
+
+	t.Run("panics if width is less than one", func(t *testing.T) {
+		scrn := setup(t)
+
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("expected panic, but none occurred")
+			}
+		}()
+		fill(Position{}, 0, 1, tcell.StyleDefault, scrn)
+	})
+
+	t.Run("panics if height is less than one", func(t *testing.T) {
+		scrn := setup(t)
+
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("expected panic, but none occurred")
+			}
+		}()
+		fill(Position{}, 1, 0, tcell.StyleDefault, scrn)
+	})
+
+	t.Run("fills screen in with blanks", func(t *testing.T) {
+		scrn := setup(t)
+
+		fill(Position{X: 0, Y: 0}, 5, 5, tcell.StyleDefault, scrn)
+
+		for y := 0; y < 5; y++ {
+			for x := 0; x < 5; x++ {
+				assertEqualContents(t, Position{X: x, Y: y}, runeSpace, scrn)
+			}
+		}
+	})
+}
+
 func Test_ShowMessage(t *testing.T) {
 	t.Run("writes message to screen in center of owner", func(t *testing.T) {
 		const msg = "test"
